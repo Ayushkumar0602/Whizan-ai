@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Library</title>
+    <link rel="icon" type="image/png" href="Smart Study.jpeg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Base Styles */
+       /* Base Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --primary: #6c5ce7;
+    --secondary: #5d4aec;
+    --accent: #48dbfb;
+    --light: #f8f9fa;
+    --dark: #121212;
+    --darker: #0a0a0a;
+    --darkest: #050505;
+    --success: #00b894;
+    --warning: #fd79a8;
+    --vibrant-1: #6c5ce7;
+    --vibrant-2: #a29bfe;
+    --vibrant-3: #48dbfb;
+    --vibrant-4: #00b894;
+    --vibrant-5: #fdcb6e;
+    --text-primary: rgba(255, 255, 255, 0.95);
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --text-tertiary: rgba(255, 255, 255, 0.5);
+    --glass: rgba(15, 15, 15, 0.5);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+body {
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    background: var(--darkest);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Header Styles */
+header {
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+}
+
+h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(to right, var(--vibrant-2), var(--vibrant-3), var(--vibrant-1));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: textGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes textGlow {
+    from {
+        text-shadow: 0 0 5px rgba(108, 92, 231, 0.3);
+    }
+    to {
+        text-shadow: 0 0 20px rgba(108, 92, 231, 0.7);
+    }
+}
+
+header p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Search Bar */
+.search-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--glass-border);
+    transition: all 0.3s ease;
+}
+
+.search-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.search-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+#query {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    background: rgba(30, 30, 30, 0.8);
+    color: var(--text-primary);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    border: 1px solid var(--glass-border);
+}
+
+#query::placeholder {
+    color: var(--text-tertiary);
+}
+
+#query:focus {
+    outline: none;
+    box-shadow: 0 4px 20px rgba(108, 92, 231, 0.3);
+    transform: scale(1.02);
+    border-color: var(--vibrant-1);
+}
+
+.search-btn {
+    padding: 1rem 2rem;
+    background: var(--vibrant-1);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.search-btn:hover {
+    background: var(--vibrant-2);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(108, 92, 231, 0.4);
+}
+
+/* Recommendations Section */
+.recommendations {
+    margin: 3rem auto;
+    max-width: 1200px;
+    padding: 2rem;
+}
+
+.section-title {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    position: relative;
+    display: inline-block;
+    color: var(--text-primary);
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: var(--vibrant-1);
+    border-radius: 2px;
+}
+
+/* Book Cards */
+.books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.book-card {
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s ease;
+    cursor: pointer;
+    position: relative;
+    border: 1px solid var(--glass-border);
+}
+
+.book-card:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 15px 30px rgba(108, 92, 231, 0.2);
+    border-color: rgba(108, 92, 231, 0.3);
+}
+
+.book-thumb {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    transition: all 0.4s ease;
+}
+
+.book-card:hover .book-thumb {
+    transform: scale(1.05);
+}
+
+.book-info {
+    padding: 1.5rem;
+}
+
+.book-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.book-author {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.book-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.read-btn {
+    background: var(--vibrant-1);
+    color: white;
+    flex: 1;
+}
+
+.read-btn:hover {
+    background: var(--vibrant-2);
+}
+
+.fav-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.fav-btn:hover {
+    background: var(--warning);
+}
+
+.fav-btn.favorited {
+    background: var(--warning);
+}
+
+/* Floating Bubbles Background */
+.bubbles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.bubble {
+    position: absolute;
+    bottom: -100px;
+    background: rgba(108, 92, 231, 0.1);
+    border-radius: 50%;
+    animation: float 15s infinite ease-in;
+    opacity: 0.5;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0.5;
+        bottom: -100px;
+    }
+    100% {
+        transform: translateY(-1000px) rotate(720deg);
+        opacity: 0;
+        bottom: 100%;
+    }
+}
+
+/* Fullscreen Modal */
+.fullscreen-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s ease;
+}
+
+.fullscreen-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    width: 90%;
+    height: 90%;
+    background: var(--darker);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.9);
+    transition: all 0.5s ease;
+    border: 1px solid var(--glass-border);
+}
+
+.fullscreen-modal.active .modal-content {
+    transform: scale(1);
+}
+
+.modal-header {
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.close-btn {
+    background: var(--warning);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+    transform: rotate(90deg);
+    background: #e84393;
+}
+
+.modal-body {
+    flex: 1;
+    display: flex;
+}
+
+.book-iframe {
+    flex: 1;
+    border: none;
+    background: var(--dark);
+}
+
+.modal-footer {
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    border-top: 1px solid var(--glass-border);
+}
+
+.modal-btn {
+    padding: 0.7rem 1.5rem;
+    border-radius: 50px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.share-btn {
+    background: var(--vibrant-1);
+    color: white;
+}
+
+.share-btn:hover {
+    background: var(--vibrant-2);
+}
+
+.download-btn {
+    background: var(--vibrant-5);
+    color: var(--darkest);
+}
+
+.download-btn:hover {
+    background: #ffeaa7;
+}
+
+/* Load More Button */
+.load-more {
+    display: block;
+    margin: 2rem auto;
+    padding: 1rem 2rem;
+    background: var(--vibrant-1);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
+    transition: all 0.3s ease;
+}
+
+.load-more:hover {
+    background: var(--vibrant-2);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(108, 92, 231, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2rem;
+    }
+    
+    .search-container {
+        padding: 1.5rem;
+    }
+    
+    .search-bar {
+        flex-direction: column;
+    }
+    
+    .books-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+    
+    .modal-content {
+        width: 95%;
+        height: 95%;
+    }
+}
+
+/* Floating Animation */
+@keyframes floating {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-15px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.floating {
+    animation: floating 6s ease-in-out infinite;
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.pulse {
+    animation: pulse 4s ease-in-out infinite;
+}
+
+/* No Results Message */
+.no-results, .error {
+    text-align: center;
+    color: var(--text-secondary);
+    grid-column: 1 / -1;
+    padding: 2rem;
+    font-size: 1.2rem;
+}
+    </style>
+</head>
+
+<body>
+    <!-- Animated Background Bubbles -->
+    <div class="bubbles" id="bubbles"></div>
+
+
+    <header class="floating">
+        <h1>Digital Library</h1>
+        <p>Discover your next favorite read in stunning fullscreen</p>
+    </header>
+
+
+
+
+    <main>
+
+
+        <div class="search-container pulse">
+            <div class="search-bar">
+                <input type="text" id="query" placeholder="Search for books, authors, or genres...">
+                <button class="search-btn" id="searchBtn">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </div>
+
+        <!-- Recommendations Section -->
+        <div class="recommendations">
+            <h2 class="section-title">Recommended For You</h2>
+            <div class="books-grid" id="recommendationsGrid"></div>
+        </div>
+
+        <!-- Search Results Section -->
+        <div class="recommendations" id="searchResults" style="display: none;">
+            <h2 class="section-title">Search Results</h2>
+            <div class="books-grid" id="resultsGrid"></div>
+            <button class="load-more" id="loadMore">Load More Books</button>
+        </div>
+    </main>
+
+    <!-- Fullscreen Modal -->
+    <div class="fullscreen-modal" id="fullscreenModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Book Preview</h3>
+                <button class="close-btn" id="closeModalBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <iframe class="book-iframe" id="bookIframe" allowfullscreen></iframe>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn share-btn" id="modalShareBtn">
+                    <i class="fas fa-share-alt"></i> Share
+                </button>
+                <button class="modal-btn download-btn" id="modalDownloadBtn">
+                    <i class="fas fa-download"></i> Download
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Key
+        const apiKey = 'AIzaSyDvdyjYPX0MTlDPEwWIiCW1MdtQ6K9ri6Y';
+
+        // DOM Elements
+        const searchBtn = document.getElementById('searchBtn');
+        const queryInput = document.getElementById('query');
+        const recommendationsGrid = document.getElementById('recommendationsGrid');
+        const searchResults = document.getElementById('searchResults');
+        const resultsGrid = document.getElementById('resultsGrid');
+        const loadMoreBtn = document.getElementById('loadMore');
+        const fullscreenModal = document.getElementById('fullscreenModal');
+        const bookIframe = document.getElementById('bookIframe');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalShareBtn = document.getElementById('modalShareBtn');
+        const modalDownloadBtn = document.getElementById('modalDownloadBtn');
+        const modalTitle = document.getElementById('modalTitle');
+        const bubblesContainer = document.getElementById('bubbles');
+
+        // State
+        let currentQuery = '';
+        let currentPage = 0;
+        let currentBookId = '';
+        let favoriteBooks = JSON.parse(localStorage.getItem('favoriteBooks') || '[]');
+
+        // Popular book subjects for recommendations
+        const popularSubjects = [
+            'fiction', 'fantasy', 'science fiction', 'mystery',
+            'romance', 'biography', 'history', 'science',
+            'technology', 'art', 'philosophy', 'business'
+        ];
+
+        // Initialize the app
+        function init() {
+            createBubbles();
+            loadRecommendations();
+            setupEventListeners();
+        }
+
+        // Create animated background bubbles
+        function createBubbles() {
+            for (let i = 0; i < 20; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+
+                // Random size between 50px and 150px
+                const size = Math.random() * 100 + 50;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+
+                // Random position
+                bubble.style.left = `${Math.random() * 100}%`;
+
+                // Random animation duration between 10s and 20s
+                bubble.style.animationDuration = `${Math.random() * 10 + 10}s`;
+
+                // Random delay
+                bubble.style.animationDelay = `${Math.random() * 5}s`;
+
+                bubblesContainer.appendChild(bubble);
+            }
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            searchBtn.addEventListener('click', searchBooks);
+            queryInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') searchBooks();
+            });
+
+            closeModalBtn.addEventListener('click', closeFullscreenModal);
+            modalShareBtn.addEventListener('click', shareBook);
+            modalDownloadBtn.addEventListener('click', downloadBook);
+            loadMoreBtn.addEventListener('click', loadMoreBooks);
+
+            // Close modal when clicking outside content
+            fullscreenModal.addEventListener('click', (e) => {
+                if (e.target === fullscreenModal) {
+                    closeFullscreenModal();
+                }
+            });
+
+            // Close modal on ESC key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && fullscreenModal.classList.contains('active')) {
+                    closeFullscreenModal();
+                }
+            });
+        }
+
+        // Load random recommendations
+        async function loadRecommendations() {
+            try {
+                // Get a random subject
+                const randomSubject = popularSubjects[Math.floor(Math.random() * popularSubjects.length)];
+                const url = `https://www.googleapis.com/books/v1/volumes?q=subject:${randomSubject}&key=${apiKey}&maxResults=12&orderBy=newest`;
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.items && data.items.length > 0) {
+                    displayBooks(data.items, recommendationsGrid, true);
+                }
+            } catch (error) {
+                console.error('Error loading recommendations:', error);
+            }
+        }
+
+        // Search for books
+        async function searchBooks() {
+            currentQuery = queryInput.value.trim();
+            currentPage = 0;
+
+            if (!currentQuery) {
+                alert('Please enter a search term');
+                return;
+            }
+
+            try {
+                const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(currentQuery)}&key=${apiKey}&maxResults=12`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.items && data.items.length > 0) {
+                    // Show search results and hide recommendations
+                    searchResults.style.display = 'block';
+                    document.querySelector('.recommendations').style.display = 'none';
+
+                    // Display books
+                    displayBooks(data.items, resultsGrid);
+
+                    // Show load more button if there are likely more results
+                    loadMoreBtn.style.display = data.items.length === 12 ? 'block' : 'none';
+                } else {
+                    resultsGrid.innerHTML = '<p class="no-results">No books found. Try a different search term.</p>';
+                    loadMoreBtn.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error searching books:', error);
+                resultsGrid.innerHTML = '<p class="error">Error loading books. Please try again.</p>';
+            }
+        }
+
+        // Load more books
+        async function loadMoreBooks() {
+            currentPage++;
+            loadMoreBtn.disabled = true;
+            loadMoreBtn.textContent = 'Loading...';
+
+            try {
+                const startIndex = currentPage * 12;
+                const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(currentQuery)}&key=${apiKey}&maxResults=12&startIndex=${startIndex}`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.items && data.items.length > 0) {
+                    displayBooks(data.items, resultsGrid, false, true);
+
+                    // Hide load more button if we've reached the end
+                    if (data.items.length < 12) {
+                        loadMoreBtn.style.display = 'none';
+                    }
+                } else {
+                    loadMoreBtn.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error loading more books:', error);
+            } finally {
+                loadMoreBtn.disabled = false;
+                loadMoreBtn.textContent = 'Load More Books';
+            }
+        }
+
+        // Display books in a grid
+        function displayBooks(books, container, isRecommendation = false, append = false) {
+            if (!append) {
+                container.innerHTML = '';
+            }
+
+            books.forEach(book => {
+                const bookCard = createBookCard(book, isRecommendation);
+                container.appendChild(bookCard);
+            });
+        }
+
+        // Create a book card element
+        function createBookCard(book, isRecommendation = false) {
+            const info = book.volumeInfo;
+            const bookId = book.id;
+
+            const card = document.createElement('div');
+            card.className = 'book-card';
+
+            // Book cover
+            const thumb = document.createElement('img');
+            thumb.className = 'book-thumb';
+            thumb.src = info.imageLinks?.thumbnail || 'https://via.placeholder.com/150x220?text=No+Cover';
+            thumb.alt = info.title || 'Book cover';
+            thumb.loading = 'lazy';
+
+            // Book info
+            const bookInfo = document.createElement('div');
+            bookInfo.className = 'book-info';
+
+            const title = document.createElement('h3');
+            title.className = 'book-title';
+            title.textContent = info.title || 'Untitled';
+
+            const author = document.createElement('p');
+            author.className = 'book-author';
+            author.textContent = info.authors?.join(', ') || 'Unknown Author';
+
+            // Action buttons
+            const actions = document.createElement('div');
+            actions.className = 'book-actions';
+
+            const readBtn = document.createElement('button');
+            readBtn.className = 'action-btn read-btn';
+            readBtn.innerHTML = '<i class="fas fa-book-open"></i> Read';
+            readBtn.addEventListener('click', () => openFullscreenModal(bookId, info.title));
+
+            const favBtn = document.createElement('button');
+            favBtn.className = favoriteBooks.includes(bookId) ? 'action-btn fav-btn favorited' : 'action-btn fav-btn';
+            favBtn.innerHTML = favoriteBooks.includes(bookId) ? '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>';
+            favBtn.addEventListener('click', () => toggleFavorite(bookId, favBtn));
+
+            // Build the card
+            actions.appendChild(readBtn);
+            actions.appendChild(favBtn);
+
+            bookInfo.appendChild(title);
+            bookInfo.appendChild(author);
+            bookInfo.appendChild(actions);
+
+            card.appendChild(thumb);
+            card.appendChild(bookInfo);
+
+            return card;
+        }
+
+        // Open book in fullscreen modal
+        function openFullscreenModal(bookId, bookTitle) {
+            currentBookId = bookId;
+            modalTitle.textContent = bookTitle || 'Book Preview';
+            bookIframe.src = `https://books.google.com/books?id=${bookId}&printsec=frontcover&output=embed`;
+            fullscreenModal.classList.add('active');
+
+            // Prevent body scrolling
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close fullscreen modal
+        function closeFullscreenModal() {
+            fullscreenModal.classList.remove('active');
+            bookIframe.src = '';
+            document.body.style.overflow = '';
+        }
+
+        // Share book
+        function shareBook() {
+            const shareData = {
+                title: modalTitle.textContent,
+                text: `Check out this book: ${modalTitle.textContent}`,
+                url: `https://books.google.com/books?id=${currentBookId}`
+            };
+
+            if (navigator.share) {
+                navigator.share(shareData)
+                    .catch(err => console.log('Error sharing:', err));
+            } else {
+                // Fallback for browsers without Web Share API
+                const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareData.text)}&url=${encodeURIComponent(shareData.url)}`;
+                window.open(twitterUrl, '_blank');
+            }
+        }
+
+        // Download book (placeholder functionality)
+        function downloadBook() {
+            alert('Download functionality would be implemented here based on book availability');
+        }
+
+        // Toggle favorite status
+        function toggleFavorite(bookId, button) {
+            const index = favoriteBooks.indexOf(bookId);
+
+            if (index === -1) {
+                // Add to favorites
+                favoriteBooks.push(bookId);
+                button.innerHTML = '<i class="fas fa-heart"></i>';
+                button.classList.add('favorited');
+
+                // Animation
+                button.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    button.style.transform = 'scale(1)';
+                }, 300);
+            } else {
+                // Remove from favorites
+                favoriteBooks.splice(index, 1);
+                button.innerHTML = '<i class="far fa-heart"></i>';
+                button.classList.remove('favorited');
+            }
+
+            // Save to localStorage
+            localStorage.setItem('favoriteBooks', JSON.stringify(favoriteBooks));
+        }
+
+        // Initialize the app
+        init();
+    </script>
+
+
+<script>
+    document.addEventListener("contextmenu", function (e) {
+      e.preventDefault();
+    });
+  </script>
+
+</body>
+
+</html>

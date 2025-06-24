@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Root Pages -->
+  <url><loc>https://whizan.xyz/index.html</loc></url>
+  <url><loc>https://whizan.xyz/auth.html</loc></url>
+
+  <!-- Preview Pages -->
+  <url><loc>https://whizan.xyz/index1.html</loc></url>
+  <url><loc>https://whizan.xyz/preview/assignment-preview.html</loc></url>
+  <url><loc>https://whizan.xyz/preview/mock-test-preview.html</loc></url>
+  <url><loc>https://whizan.xyz/preview/libpreview.html</loc></url>
+  <url><loc>https://whizan.xyz/preview/mock-interview-preview.html</loc></url>
+  <url><loc>https://whizan.xyz/preview/resume-builder-preview.html</loc></url>
+  <url><loc>https://whizan.xyz/preview/emotional-support-preview.html</loc></url>
+  <url><loc>https://whizan.xyz/preview/course-preview.html</loc></url>
+  <url><loc>https://whizan.xyz/preview/cheat-preview.html</loc></url>
+ <!-- Policy Pages -->
+
+  
+    <url><loc>https://whizan.xyz/preview/subject/privacy.html</loc></url>
+    <url><loc>https://whizan.xyz/preview/subject/terms.html</loc></url>
+    <url><loc>https://whizan.xyz/preview/subject/contact.html</loc></url>
+    
+
+</urlset>

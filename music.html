@@ -1,0 +1,1994 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Spotify Web Player</title>
+  <link rel="icon" type="image/png" href="Smart Study.jpeg">
+  <script src="https://sdk.scdn.co/spotify-player.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #191414 0%, #1db954 100%);
+      color: white;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      animation: fadeInDown 1s ease-out;
+    }
+
+    h1 {
+      font-size: 3rem;
+      background: linear-gradient(45deg, #1db954, #ffffff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.8;
+      margin-bottom: 30px;
+    }
+
+    #loginBtn {
+      background: linear-gradient(45deg, #1db954, #1ed760);
+      border: none;
+      padding: 15px 40px;
+      font-size: 18px;
+      border-radius: 50px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(29, 185, 84, 0.3);
+      animation: pulse 2s infinite;
+    }
+
+    #loginBtn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(29, 185, 84, 0.4);
+    }
+
+    .player-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-top: 30px;
+    }
+
+    .search-section,
+    .playlist-section {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      animation: fadeInUp 1s ease-out;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      color: #1db954;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 15px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 25px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      margin-bottom: 15px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.02);
+    }
+
+    input[type="text"]::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    button {
+      background: linear-gradient(45deg, #1db954, #1ed760);
+      border: none;
+      padding: 12px 25px;
+      font-size: 16px;
+      border-radius: 25px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 5px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(29, 185, 84, 0.4);
+    }
+
+    .results,
+    .playlist-items {
+      max-height: 400px;
+      overflow-y: auto;
+      margin-top: 20px;
+    }
+
+    .track-item,
+    .playlist-item {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      margin-bottom: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+    }
+
+    .track-item:hover,
+    .playlist-item:hover {
+      background: rgba(29, 185, 84, 0.2);
+      transform: translateX(5px);
+      border-color: #1db954;
+    }
+
+    .track-image,
+    .playlist-image {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      margin-right: 15px;
+      object-fit: cover;
+    }
+
+    .track-info,
+    .playlist-info {
+      flex: 1;
+    }
+
+    .track-name,
+    .playlist-name {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .track-artist,
+    .playlist-description {
+      opacity: 0.7;
+      font-size: 14px;
+    }
+
+    .now-playing {
+      grid-column: 1 / -1;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      margin-top: 30px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: fadeInUp 1s ease-out 0.3s both;
+    }
+
+    .now-playing-content {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      margin-bottom: 25px;
+    }
+
+    #cover {
+      width: 120px;
+      height: 120px;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      transition: transform 0.3s ease;
+    }
+
+    #cover:hover {
+      transform: scale(1.05) rotate(2deg);
+    }
+
+    .track-details {
+      flex: 1;
+      text-align: left;
+    }
+
+    #trackInfo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .control {
+      font-size: 24px;
+      padding: 15px 20px;
+      border-radius: 50px;
+      min-width: 60px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(5px);
+    }
+
+    .control:hover {
+      background: linear-gradient(45deg, #1db954, #1ed760);
+    }
+
+    .volume-control {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    input[type="range"] {
+      width: 200px;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.2);
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #1db954;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(29, 185, 84, 0.4);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      opacity: 0.7;
+    }
+
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top: 3px solid #1db954;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    .error {
+      color: #ff6b6b;
+      background: rgba(255, 107, 107, 0.1);
+      padding: 15px;
+      border-radius: 10px;
+      margin: 10px 0;
+      border: 1px solid rgba(255, 107, 107, 0.3);
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .player-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .now-playing-content {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .controls {
+        gap: 10px;
+      }
+
+      .control {
+        padding: 12px 16px;
+        font-size: 20px;
+      }
+    }
+
+    .liked-songs-section {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      animation: fadeInUp 1s ease-out;
+    }
+
+    /* Update the player-container grid to include the new section */
+    .player-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 30px;
+      margin-top: 30px;
+    }
+
+    @media (max-width: 1024px) {
+      .player-container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .player-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Library Tabs */
+    .library-tabs {
+      display: flex;
+      margin-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .tab-button {
+      background: none;
+      border: none;
+      padding: 10px 15px;
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab-button.active {
+      color: #1db954;
+      border-bottom: 2px solid #1db954;
+    }
+
+    .tab-button:hover {
+      color: white;
+    }
+
+    .library-content {
+      display: none;
+      height: 100%;
+    }
+
+    .library-content.active {
+      display: block;
+    }
+
+    /* Track Actions */
+    .track-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .track-actions button {
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+
+    /* Lyrics */
+    .lyrics-container {
+      margin-top: 20px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      padding: 15px;
+    }
+
+    .lyrics-content {
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 10px;
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    /* Queue */
+    .queue-container {
+      margin-top: 20px;
+    }
+
+    .queue-items {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .queue-item {
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 5px;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+    }
+
+    .queue-item:hover {
+      background: rgba(29, 185, 84, 0.1);
+    }
+
+    .queue-item img {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+      border-radius: 5px;
+    }
+
+    .queue-item-info {
+      flex: 1;
+    }
+
+    /* Modal for playlist creation */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: #191414;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+      border: 1px solid #1db954;
+    }
+
+    .modal-close {
+      float: right;
+      cursor: pointer;
+      font-size: 1.5rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+      .player-container {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .queue-section {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .player-container {
+        grid-template-columns: 1fr;
+      }
+
+      .library-tabs {
+        overflow-x: auto;
+      }
+    }
+
+    /* Pop-out Mini Player Styles */
+    .popout-player {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 300px;
+      background: rgba(25, 20, 20, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      overflow: hidden;
+      display: none;
+      user-select: none;
+      cursor: move;
+    }
+
+    .popout-player.visible {
+      display: block;
+    }
+
+    .popout-header {
+      padding: 10px 15px;
+      background: rgba(0, 0, 0, 0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: move;
+    }
+
+    .popout-header span {
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .popout-actions button {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 0 5px;
+      font-size: 12px;
+    }
+
+    .popout-actions button:hover {
+      color: #1db954;
+    }
+
+    .popout-content {
+      padding: 15px;
+    }
+
+    #popoutCover {
+      width: 80px;
+      height: 80px;
+      border-radius: 5px;
+      margin-right: 15px;
+      float: left;
+    }
+
+    .popout-track-info {
+      margin-left: 95px;
+      margin-bottom: 15px;
+    }
+
+    #popoutTrackInfo {
+      font-weight: bold;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #popoutArtistInfo {
+      font-size: 12px;
+      opacity: 0.8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .popout-controls {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 15px 0;
+      clear: both;
+    }
+
+    .popout-controls button {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: white;
+      transition: all 0.2s ease;
+    }
+
+    .popout-controls button:hover {
+      background: rgba(29, 185, 84, 0.7);
+      transform: scale(1.1);
+    }
+
+    .popout-progress {
+      padding: 5px 0;
+    }
+
+    .popout-progress input[type="range"] {
+      width: 100%;
+      height: 4px;
+      cursor: pointer;
+    }
+
+    .mini-player-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #1db954;
+      border: none;
+      color: white;
+      cursor: pointer;
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(29, 185, 84, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .mini-player-toggle:hover {
+      transform: scale(1.1);
+      background: #1ed760;
+    }
+
+    .mini-player-toggle img {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+
+<body>
+
+
+  <div class="container">
+    <div class="header">
+      <h1>🎵 Spotify Web Player</h1>
+      <p class="subtitle">Stream your favorite music with style</p>
+      <button id="loginBtn">🚀 Connect to Spotify</button>
+    </div>
+
+    <div id="playerUI" style="display:none">
+
+      <div class="player-container">
+        <div class="search-section">
+          <h3 class="section-title">🔍 Search Music</h3>
+          <input id="searchInput" type="text" placeholder="Search for tracks, artists, albums..." />
+          <button onclick="search()">Search</button>
+          <div id="results" class="results"></div>
+        </div>
+
+        <div class="library-section">
+          <div class="library-tabs">
+            <button class="tab-button active" onclick="openLibraryTab('playlists')">Playlists</button>
+            <button class="tab-button" onclick="openLibraryTab('liked-songs')">Liked Songs</button>
+            <button class="tab-button" onclick="openLibraryTab('albums')">Albums</button>
+            <button class="tab-button" onclick="openLibraryTab('artists')">Artists</button>
+          </div>
+
+          <div id="playlists-tab" class="library-content active">
+            <div class="playlist-actions">
+              <button onclick="createPlaylist()">➕ New Playlist</button>
+            </div>
+            <div id="playlists" class="playlist-items"></div>
+          </div>
+
+          <div id="liked-songs-tab" class="library-content">
+            <div id="likedSongs" class="playlist-items"></div>
+          </div>
+
+          <div id="albums-tab" class="library-content">
+            <div id="albums" class="playlist-items"></div>
+          </div>
+
+          <div id="artists-tab" class="library-content">
+            <div id="artists" class="playlist-items"></div>
+          </div>
+        </div>
+
+        <div class="queue-section">
+          <h3 class="section-title">🎵 Now Playing</h3>
+          <div id="nowPlayingDetails" class="now-playing-details">
+            <img id="cover" src="https://via.placeholder.com/120x120/1db954/ffffff?text=♪" alt="Album Cover" />
+            <div class="track-info">
+              <div id="trackInfo">Select a track to start playing...</div>
+              <div id="artistInfo"></div>
+              <div id="albumInfo"></div>
+              <div class="track-actions">
+                <button id="likeBtn" onclick="toggleLike()">♡</button>
+                <button onclick="addToPlaylist()">➕ Add to Playlist</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="lyrics-container">
+            <h4>Lyrics</h4>
+            <div id="lyrics" class="lyrics-content">Lyrics will appear here when available</div>
+          </div>
+
+          <div class="queue-container">
+            <h4>Queue</h4>
+            <div id="queue" class="queue-items"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="now-playing">
+        <!-- <h3 class="section-title">🎶 Now Playing</h3>
+        <div class="now-playing-content">
+          <img id="cover" src="https://via.placeholder.com/120x120/1db954/ffffff?text=♪" alt="Album Cover" />
+          <div class="track-details">
+            <div id="trackInfo">Select a track to start playing...</div>
+            <div id="artistInfo"></div>
+            <div id="albumInfo"></div>
+          </div>
+        </div> -->
+
+        <div class="controls">
+          <button class="control" onclick="previousTrack()" title="Previous Track">⏮️</button>
+          <button class="control" onclick="togglePlay()" title="Play/Pause" id="playBtn">⏯️</button>
+          <button class="control" onclick="nextTrack()" title="Next Track">⏭️</button>
+          <button class="control" onclick="toggleShuffle()" title="Shuffle" id="shuffleBtn">🔀</button>
+          <button class="control" onclick="toggleRepeat()" title="Repeat" id="repeatBtn">🔁</button>
+        </div>
+
+        <div class="volume-control">
+          <span>🔊</span>
+          <input type="range" min="0" max="1" step="0.01" value="0.5" onchange="setVolume(this.value)" />
+          <span>Volume</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const clientId = "e88322dea3144c5d8a09d69dc7b71b3b";
+    const redirectUri = window.location.origin + window.location.pathname;
+    const scopes = [
+      'streaming',
+      'user-read-email',
+      'user-read-private',
+      'user-modify-playback-state',
+      'user-read-playback-state',
+      'playlist-read-private',
+      'playlist-read-collaborative',
+      'user-library-read',
+      'user-library-modify',
+      'playlist-modify-public',
+      'playlist-modify-private'
+    ].join(' ');
+
+    let player, deviceId;
+    let currentPlaylistTracks = [];
+    let isShuffled = false;
+    let repeatMode = 0; // 0: off, 1: context, 2: track
+    let isPlaying = false;
+    let currentTrack = null;
+    let currentTrackIsLiked = false;
+
+    function generateCodeVerifier(length = 64) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+      let result = '';
+      for (let i = 0; i < length; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
+      return result;
+    }
+
+    async function generateCodeChallenge(codeVerifier) {
+      const data = new TextEncoder().encode(codeVerifier);
+      const digest = await crypto.subtle.digest('SHA-256', data);
+      return btoa(String.fromCharCode(...new Uint8Array(digest)))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    document.getElementById("loginBtn").onclick = async () => {
+      const verifier = generateCodeVerifier();
+      const challenge = await generateCodeChallenge(verifier);
+      sessionStorage.setItem("code_verifier", verifier);
+      const params = new URLSearchParams({
+        client_id: clientId,
+        response_type: "code",
+        redirect_uri: redirectUri,
+        code_challenge_method: "S256",
+        code_challenge: challenge,
+        scope: scopes
+      });
+      window.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
+    };
+
+    async function getAccessToken() {
+      const code = new URLSearchParams(window.location.search).get("code");
+      if (!code) return null;
+
+      const verifier = sessionStorage.getItem("code_verifier");
+      if (!verifier) return null;
+
+      const body = new URLSearchParams({
+        client_id: clientId,
+        grant_type: "authorization_code",
+        code,
+        redirect_uri: redirectUri,
+        code_verifier: verifier
+      });
+
+      try {
+        const res = await fetch("https://accounts.spotify.com/api/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body
+        });
+
+        if (!res.ok) {
+          throw new Error(`Token request failed: ${res.status}`);
+        }
+
+        const data = await res.json();
+        sessionStorage.setItem("access_token", data.access_token);
+        sessionStorage.setItem("refresh_token", data.refresh_token);
+        window.history.replaceState({}, document.title, redirectUri);
+        return data.access_token;
+      } catch (error) {
+        console.error('Token exchange error:', error);
+        return null;
+      }
+    }
+
+    async function refreshAccessToken() {
+      const refreshToken = sessionStorage.getItem("refresh_token");
+      if (!refreshToken) return null;
+
+      const body = new URLSearchParams({
+        client_id: clientId,
+        grant_type: "refresh_token",
+        refresh_token: refreshToken
+      });
+
+      try {
+        const res = await fetch("https://accounts.spotify.com/api/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body
+        });
+
+        if (!res.ok) {
+          throw new Error(`Token refresh failed: ${res.status}`);
+        }
+
+        const data = await res.json();
+        sessionStorage.setItem("access_token", data.access_token);
+        if (data.refresh_token) {
+          sessionStorage.setItem("refresh_token", data.refresh_token);
+        }
+        return data.access_token;
+      } catch (error) {
+        console.error('Token refresh error:', error);
+        return null;
+      }
+    }
+
+    async function apiRequest(url, options = {}) {
+      const token = sessionStorage.getItem("access_token");
+      const defaultOptions = {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      };
+
+      const mergedOptions = {
+        ...defaultOptions,
+        ...options,
+        headers: {
+          ...defaultOptions.headers,
+          ...options.headers
+        }
+      };
+
+      try {
+        const response = await fetch(url, mergedOptions);
+
+        if (response.status === 401) {
+          // Token expired, try to refresh
+          const newToken = await refreshAccessToken();
+          if (newToken) {
+            mergedOptions.headers.Authorization = `Bearer ${newToken}`;
+            const retryResponse = await fetch(url, mergedOptions);
+            if (!retryResponse.ok) {
+              throw new Error(`API request failed: ${retryResponse.status} ${retryResponse.statusText}`);
+            }
+            return retryResponse.json();
+          } else {
+            sessionStorage.removeItem("access_token");
+            sessionStorage.removeItem("refresh_token");
+            window.location.reload();
+            return;
+          }
+        }
+
+        if (!response.ok) {
+          throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+        }
+
+        return response.json();
+      } catch (error) {
+        console.error('API request error:', error);
+        throw error;
+      }
+    }
+
+    function search() {
+      const query = document.getElementById("searchInput").value;
+      if (!query.trim()) return;
+
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Searching...</div>';
+
+      apiRequest(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track,artist,album&limit=10`)
+        .then(data => {
+          resultsDiv.innerHTML = "";
+
+          // Display tracks
+          if (data.tracks && data.tracks.items.length > 0) {
+            const tracksHeader = document.createElement("h4");
+            tracksHeader.textContent = "Tracks";
+            resultsDiv.appendChild(tracksHeader);
+
+            data.tracks.items.forEach(track => {
+              const div = document.createElement("div");
+              div.className = "track-item";
+              div.innerHTML = `
+                            <img src="${track.album.images[2]?.url || 'https://via.placeholder.com/50x50/1db954/ffffff?text=♪'}" alt="Track" class="track-image">
+                            <div class="track-info">
+                                <div class="track-name">${track.name}</div>
+                                <div class="track-artist">${track.artists.map(a => a.name).join(', ')}</div>
+                            </div>
+                        `;
+              div.onclick = () => playTrack(track.uri, track);
+              resultsDiv.appendChild(div);
+            });
+          }
+
+          // Display albums
+          if (data.albums && data.albums.items.length > 0) {
+            const albumsHeader = document.createElement("h4");
+            albumsHeader.textContent = "Albums";
+            resultsDiv.appendChild(albumsHeader);
+
+            data.albums.items.forEach(album => {
+              const div = document.createElement("div");
+              div.className = "track-item";
+              div.innerHTML = `
+                            <img src="${album.images[2]?.url || 'https://via.placeholder.com/50x50/1db954/ffffff?text=♪'}" alt="Album" class="track-image">
+                            <div class="track-info">
+                                <div class="track-name">${album.name}</div>
+                                <div class="track-artist">${album.artists.map(a => a.name).join(', ')}</div>
+                            </div>
+                        `;
+              div.onclick = () => loadAlbumTracks(album.id, album.name);
+              resultsDiv.appendChild(div);
+            });
+          }
+
+          // Display artists
+          if (data.artists && data.artists.items.length > 0) {
+            const artistsHeader = document.createElement("h4");
+            artistsHeader.textContent = "Artists";
+            resultsDiv.appendChild(artistsHeader);
+
+            data.artists.items.forEach(artist => {
+              const div = document.createElement("div");
+              div.className = "track-item";
+              div.innerHTML = `
+                            <img src="${artist.images[2]?.url || 'https://via.placeholder.com/50x50/1db954/ffffff?text=♪'}" alt="Artist" class="track-image">
+                            <div class="track-info">
+                                <div class="track-name">${artist.name}</div>
+                                <div class="track-artist">Artist</div>
+                            </div>
+                        `;
+              div.onclick = () => loadArtistTopTracks(artist.id, artist.name);
+              resultsDiv.appendChild(div);
+            });
+          }
+
+          if (resultsDiv.children.length === 0) {
+            resultsDiv.innerHTML = '<div class="loading">No results found</div>';
+          }
+        })
+        .catch(err => {
+          console.error('Search error:', err);
+          resultsDiv.innerHTML = '<div class="error">Search failed. Please try again.</div>';
+        });
+    }
+
+    async function loadAlbumTracks(albumId, albumName) {
+      try {
+        const data = await apiRequest(`https://api.spotify.com/v1/albums/${albumId}/tracks`);
+        currentPlaylistTracks = data.items.filter(item => item.uri);
+
+        if (currentPlaylistTracks.length > 0) {
+          const firstTrack = currentPlaylistTracks[0];
+          await playPlaylist(currentPlaylistTracks.map(t => t.uri));
+          updateNowPlaying(firstTrack, `Playing from: ${albumName}`);
+        }
+      } catch (error) {
+        console.error('Error loading album tracks:', error);
+        showError('Failed to load album tracks');
+      }
+    }
+
+    async function loadArtistTopTracks(artistId, artistName) {
+      try {
+        const data = await apiRequest(`https://api.spotify.com/v1/artists/${artistId}/top-tracks?market=US`);
+        currentPlaylistTracks = data.tracks.filter(track => track.uri);
+
+        if (currentPlaylistTracks.length > 0) {
+          const firstTrack = currentPlaylistTracks[0];
+          await playPlaylist(currentPlaylistTracks.map(t => t.uri));
+          updateNowPlaying(firstTrack, `Top tracks by: ${artistName}`);
+        }
+      } catch (error) {
+        console.error('Error loading artist top tracks:', error);
+        showError('Failed to load artist tracks');
+      }
+    }
+
+    async function loadPlaylists() {
+      const playlistsDiv = document.getElementById("playlists");
+      playlistsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Loading playlists...</div>';
+
+      try {
+        const data = await apiRequest('https://api.spotify.com/v1/me/playlists?limit=20');
+
+        playlistsDiv.innerHTML = "";
+        if (data.items && data.items.length > 0) {
+          data.items.forEach(playlist => {
+            const div = document.createElement("div");
+            div.className = "playlist-item";
+
+            const imageUrl = playlist.images && playlist.images.length > 0
+              ? playlist.images[0].url
+              : 'https://via.placeholder.com/50x50/1db954/ffffff?text=♪';
+
+            div.innerHTML = `
+                        <img src="${imageUrl}" alt="Playlist" class="playlist-image">
+                        <div class="playlist-info">
+                            <div class="playlist-name">${playlist.name}</div>
+                            <div class="playlist-description">${playlist.tracks.total} tracks</div>
+                        </div>
+                    `;
+            div.onclick = () => loadPlaylistTracks(playlist.id, playlist.name);
+            playlistsDiv.appendChild(div);
+          });
+        } else {
+          playlistsDiv.innerHTML = '<div class="loading">No playlists found</div>';
+        }
+      } catch (error) {
+        console.error('Error loading playlists:', error);
+        playlistsDiv.innerHTML = '<div class="error">Failed to load playlists. Please check your connection.</div>';
+      }
+    }
+
+    async function loadPlaylistTracks(playlistId, playlistName) {
+      const playlistsDiv = document.getElementById("playlists");
+      playlistsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Loading playlist tracks...</div>';
+
+      try {
+        const playlistData = await apiRequest(`https://api.spotify.com/v1/playlists/${playlistId}`);
+        const data = await apiRequest(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=100`);
+
+        playlistsDiv.innerHTML = "";
+        currentPlaylistTracks = data.items.filter(item => item.track && item.track.uri).map(item => item.track);
+
+        if (currentPlaylistTracks.length > 0) {
+          currentPlaylistTracks.forEach(track => {
+            const div = document.createElement("div");
+            div.className = "track-item";
+            div.innerHTML = `
+                        <img src="${track.album.images[2]?.url || 'https://via.placeholder.com/50x50/1db954/ffffff?text=♪'}" alt="Track" class="track-image">
+                        <div class="track-info">
+                            <div class="track-name">${track.name}</div>
+                            <div class="track-artist">${track.artists.map(a => a.name).join(', ')}</div>
+                        </div>
+                    `;
+            div.onclick = () => playTrack(track.uri, track);
+            playlistsDiv.appendChild(div);
+          });
+
+          const firstTrack = currentPlaylistTracks[0];
+          await playPlaylist(currentPlaylistTracks.map(t => t.uri));
+          updateNowPlaying(firstTrack, `Playing from: ${playlistName}`);
+        } else {
+          playlistsDiv.innerHTML = '<div class="loading">No tracks found in this playlist</div>';
+        }
+      } catch (error) {
+        console.error('Error loading playlist tracks:', error);
+        playlistsDiv.innerHTML = '<div class="error">Failed to load playlist tracks.</div>';
+      }
+    }
+
+    async function playPlaylist(uris) {
+      if (!deviceId) {
+        console.error('No device available');
+        return;
+      }
+
+      try {
+        await apiRequest(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+          method: "PUT",
+          body: JSON.stringify({ uris })
+        });
+      } catch (error) {
+        console.error('Error playing playlist:', error);
+        showError('Failed to start playback');
+      }
+    }
+
+    async function playTrack(uri, track) {
+      if (!deviceId) {
+        console.error('No device available');
+        return;
+      }
+
+      try {
+        await apiRequest(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+          method: "PUT",
+          body: JSON.stringify({ uris: [uri] })
+        });
+
+        currentTrack = track;
+        updateNowPlaying(track);
+        checkIfTrackIsLiked(track.id);
+      } catch (error) {
+        console.error('Error playing track:', error);
+        showError('Failed to play track');
+      }
+    }
+
+    async function checkIfTrackIsLiked(trackId) {
+      try {
+        const response = await apiRequest(`https://api.spotify.com/v1/me/tracks/contains?ids=${trackId}`);
+        currentTrackIsLiked = response[0];
+        updateLikeButton();
+      } catch (error) {
+        console.error('Error checking liked status:', error);
+      }
+    }
+
+    async function toggleLike() {
+      if (!currentTrack) return;
+
+      try {
+        if (currentTrackIsLiked) {
+          await apiRequest(`https://api.spotify.com/v1/me/tracks?ids=${currentTrack.id}`, {
+            method: "DELETE"
+          });
+        } else {
+          await apiRequest(`https://api.spotify.com/v1/me/tracks?ids=${currentTrack.id}`, {
+            method: "PUT"
+          });
+        }
+        currentTrackIsLiked = !currentTrackIsLiked;
+        updateLikeButton();
+      } catch (error) {
+        console.error('Error toggling like:', error);
+        showError('Failed to update liked status');
+      }
+    }
+
+    function updateLikeButton() {
+      const likeBtn = document.getElementById('likeBtn');
+      if (likeBtn) {
+        likeBtn.textContent = currentTrackIsLiked ? '♥' : '♡';
+        likeBtn.style.color = currentTrackIsLiked ? '#1db954' : 'white';
+      }
+    }
+
+    function updateNowPlaying(track, subtitle = '') {
+      document.getElementById("trackInfo").textContent = track.name;
+      document.getElementById("cover").src = track.album.images[1]?.url || track.album.images[0]?.url || 'https://via.placeholder.com/120x120/1db954/ffffff?text=♪';
+
+      const artistInfo = document.getElementById("artistInfo");
+      const albumInfo = document.getElementById("albumInfo");
+      if (artistInfo) artistInfo.textContent = track.artists.map(a => a.name).join(', ');
+      if (albumInfo) albumInfo.textContent = subtitle || track.album.name;
+
+      // Update popout player
+      updatePopoutPlayer(track);
+
+      // Try to fetch lyrics
+      fetchLyrics(track.name, track.artists[0].name);
+    }
+
+
+    async function fetchLyrics(trackName, artistName) {
+      const lyricsDiv = document.getElementById("lyrics");
+      lyricsDiv.textContent = "Loading lyrics...";
+
+      try {
+        // This is a placeholder - you would need to use a lyrics API here
+        // For example, you might use the Genius API or another lyrics service
+        // For now, we'll just show a message
+        lyricsDiv.textContent = "Lyrics not available in this demo. Would use a lyrics API in a real implementation.";
+      } catch (error) {
+        console.error('Error fetching lyrics:', error);
+        lyricsDiv.textContent = "Could not load lyrics";
+      }
+    }
+
+    function togglePlay() {
+      if (player) {
+        player.togglePlay().then(() => {
+          isPlaying = !isPlaying;
+          const playBtn = document.getElementById('playBtn');
+          if (playBtn) playBtn.textContent = isPlaying ? '⏸️' : '▶️';
+        }).catch(error => {
+          console.error('Error toggling play:', error);
+          showError('Failed to toggle playback');
+        });
+      }
+    }
+
+    function nextTrack() {
+      if (player) {
+        player.nextTrack().catch(error => {
+          console.error('Error skipping to next track:', error);
+          showError('Failed to skip track');
+        });
+      }
+    }
+
+    function previousTrack() {
+      if (player) {
+        player.previousTrack().catch(error => {
+          console.error('Error going to previous track:', error);
+          showError('Failed to go back');
+        });
+      }
+    }
+
+    function setVolume(volume) {
+      if (player) {
+        player.setVolume(parseFloat(volume)).catch(error => {
+          console.error('Error setting volume:', error);
+        });
+      }
+    }
+
+    function toggleShuffle() {
+      isShuffled = !isShuffled;
+      const btn = document.getElementById('shuffleBtn');
+      btn.style.background = isShuffled ? 'linear-gradient(45deg, #1db954, #1ed760)' : 'rgba(255, 255, 255, 0.1)';
+
+      if (deviceId) {
+        apiRequest(`https://api.spotify.com/v1/me/player/shuffle?state=${isShuffled}&device_id=${deviceId}`, {
+          method: "PUT"
+        }).catch(error => {
+          console.error('Error toggling shuffle:', error);
+          showError('Failed to toggle shuffle');
+        });
+      }
+    }
+
+    function toggleRepeat() {
+      repeatMode = (repeatMode + 1) % 3;
+      const btn = document.getElementById('repeatBtn');
+      const states = ['off', 'context', 'track'];
+      const colors = ['rgba(255, 255, 255, 0.1)', 'linear-gradient(45deg, #1db954, #1ed760)', 'linear-gradient(45deg, #1ed760, #1db954)'];
+
+      btn.style.background = colors[repeatMode];
+      btn.textContent = repeatMode === 2 ? '🔂' : '🔁';
+
+      if (deviceId) {
+        apiRequest(`https://api.spotify.com/v1/me/player/repeat?state=${states[repeatMode]}&device_id=${deviceId}`, {
+          method: "PUT"
+        }).catch(error => {
+          console.error('Error toggling repeat:', error);
+          showError('Failed to toggle repeat');
+        });
+      }
+    }
+
+    function openLibraryTab(tabName) {
+      // Hide all tab contents
+      document.querySelectorAll('.library-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // Deactivate all tab buttons
+      document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active');
+      });
+
+      // Activate selected tab
+      document.getElementById(`${tabName}-tab`).classList.add('active');
+      document.querySelector(`.tab-button[onclick="openLibraryTab('${tabName}')"]`).classList.add('active');
+
+      // Load content if needed
+      if (tabName === 'liked-songs') {
+        loadLikedSongs();
+      } else if (tabName === 'playlists') {
+        loadPlaylists();
+      } else if (tabName === 'albums') {
+        loadUserAlbums();
+      } else if (tabName === 'artists') {
+        loadUserArtists();
+      }
+    }
+
+    async function loadLikedSongs() {
+      const likedSongsDiv = document.getElementById("likedSongs");
+      likedSongsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Loading liked songs...</div>';
+
+      try {
+        // Get initial data to know total count
+        const initialData = await apiRequest('https://api.spotify.com/v1/me/tracks?limit=1');
+        const totalSongs = initialData.total;
+
+        if (totalSongs === 0) {
+          likedSongsDiv.innerHTML = '<div class="loading">No liked songs found</div>';
+          return;
+        }
+
+        // Update loading message with progress
+        likedSongsDiv.innerHTML = `<div class="loading"><div class="spinner"></div>Loading ${totalSongs} liked songs...</div>`;
+
+        let allTracks = [];
+        let offset = 0;
+        const limit = 50; // Maximum allowed by Spotify API
+
+        // Fetch all pages
+        while (offset < totalSongs) {
+          // Update progress
+          likedSongsDiv.innerHTML = `<div class="loading"><div class="spinner"></div>Loading liked songs... (${Math.min(offset + limit, totalSongs)}/${totalSongs})</div>`;
+
+          const data = await apiRequest(`https://api.spotify.com/v1/me/tracks?limit=${limit}&offset=${offset}`);
+
+          // Add tracks from this batch
+          allTracks = allTracks.concat(data.items.map(item => item.track));
+
+          offset += limit;
+
+          // Break if we've got all tracks (safety check)
+          if (data.items.length < limit) {
+            break;
+          }
+        }
+
+        // Clear loading and display all tracks
+        likedSongsDiv.innerHTML = "";
+        currentPlaylistTracks = allTracks;
+
+        if (currentPlaylistTracks.length > 0) {
+          // Add a header showing total count
+          const headerDiv = document.createElement("div");
+          headerDiv.className = "playlist-header";
+          headerDiv.innerHTML = `<h3>Liked Songs (${currentPlaylistTracks.length})</h3>`;
+          likedSongsDiv.appendChild(headerDiv);
+
+          currentPlaylistTracks.forEach((track, index) => {
+            const div = document.createElement("div");
+            div.className = "track-item";
+            div.innerHTML = `
+                    <div class="track-number">${index + 1}</div>
+                    <img src="${track.album.images[2]?.url || 'https://via.placeholder.com/50x50/1db954/ffffff?text=♪'}" alt="Track" class="track-image">
+                    <div class="track-info">
+                        <div class="track-name">${track.name}</div>
+                        <div class="track-artist">${track.artists.map(a => a.name).join(', ')}</div>
+                    </div>
+                `;
+            div.onclick = () => playTrack(track.uri, track);
+            likedSongsDiv.appendChild(div);
+          });
+        }
+      } catch (error) {
+        console.error('Error loading liked songs:', error);
+        likedSongsDiv.innerHTML = '<div class="error">Failed to load liked songs. Please check your connection.</div>';
+      }
+    }
+
+    // Alternative version with batch loading for better UX
+    async function loadLikedSongsProgressive() {
+      const likedSongsDiv = document.getElementById("likedSongs");
+      likedSongsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Loading liked songs...</div>';
+
+      try {
+        const initialData = await apiRequest('https://api.spotify.com/v1/me/tracks?limit=1');
+        const totalSongs = initialData.total;
+
+        if (totalSongs === 0) {
+          likedSongsDiv.innerHTML = '<div class="loading">No liked songs found</div>';
+          return;
+        }
+
+        // Clear and setup container
+        likedSongsDiv.innerHTML = `
+            <div class="playlist-header">
+                <h3>Liked Songs (Loading... / ${totalSongs})</h3>
+            </div>
+            <div id="tracksContainer"></div>
+            <div id="loadingProgress" class="loading">Loading more songs...</div>
+        `;
+
+        const tracksContainer = document.getElementById("tracksContainer");
+        const loadingProgress = document.getElementById("loadingProgress");
+        const header = likedSongsDiv.querySelector("h3");
+
+        let allTracks = [];
+        let offset = 0;
+        const limit = 50;
+
+        while (offset < totalSongs) {
+          const data = await apiRequest(`https://api.spotify.com/v1/me/tracks?limit=${limit}&offset=${offset}`);
+          const tracks = data.items.map(item => item.track);
+
+          allTracks = allTracks.concat(tracks);
+
+          // Add new tracks to display immediately
+          tracks.forEach((track, index) => {
+            const div = document.createElement("div");
+            div.className = "track-item";
+            div.innerHTML = `
+                    <div class="track-number">${offset + index + 1}</div>
+                    <img src="${track.album.images[2]?.url || 'https://via.placeholder.com/50x50/1db954/ffffff?text=♪'}" alt="Track" class="track-image">
+                    <div class="track-info">
+                        <div class="track-name">${track.name}</div>
+                        <div class="track-artist">${track.artists.map(a => a.name).join(', ')}</div>
+                    </div>
+                `;
+            div.onclick = () => playTrack(track.uri, track);
+            tracksContainer.appendChild(div);
+          });
+
+          // Update progress
+          header.textContent = `Liked Songs (${allTracks.length} / ${totalSongs})`;
+
+          offset += limit;
+
+          if (data.items.length < limit) {
+            break;
+          }
+        }
+
+        // Remove loading indicator and update final count
+        loadingProgress.remove();
+        header.textContent = `Liked Songs (${allTracks.length})`;
+        currentPlaylistTracks = allTracks;
+
+      } catch (error) {
+        console.error('Error loading liked songs:', error);
+        likedSongsDiv.innerHTML = '<div class="error">Failed to load liked songs. Please check your connection.</div>';
+      }
+    }
+    async function loadUserAlbums() {
+      const albumsDiv = document.getElementById("albums");
+      albumsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Loading your albums...</div>';
+
+      try {
+        const data = await apiRequest('https://api.spotify.com/v1/me/albums?limit=20');
+
+        albumsDiv.innerHTML = "";
+        if (data.items && data.items.length > 0) {
+          data.items.forEach(item => {
+            const album = item.album;
+            const div = document.createElement("div");
+            div.className = "playlist-item";
+            div.innerHTML = `
+                        <img src="${album.images[0]?.url || 'https://via.placeholder.com/50x50/1db954/ffffff?text=♪'}" alt="Album" class="playlist-image">
+                        <div class="playlist-info">
+                            <div class="playlist-name">${album.name}</div>
+                            <div class="playlist-description">${album.artists.map(a => a.name).join(', ')}</div>
+                        </div>
+                    `;
+            div.onclick = () => loadAlbumTracks(album.id, album.name);
+            albumsDiv.appendChild(div);
+          });
+        } else {
+          albumsDiv.innerHTML = '<div class="loading">No albums found</div>';
+        }
+      } catch (error) {
+        console.error('Error loading albums:', error);
+        albumsDiv.innerHTML = '<div class="error">Failed to load albums. Please check your connection.</div>';
+      }
+    }
+
+    async function loadUserArtists() {
+      const artistsDiv = document.getElementById("artists");
+      artistsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Loading your artists...</div>';
+
+      try {
+        const data = await apiRequest('https://api.spotify.com/v1/me/following?type=artist&limit=20');
+
+        artistsDiv.innerHTML = "";
+        if (data.artists && data.artists.items.length > 0) {
+          data.artists.items.forEach(artist => {
+            const div = document.createElement("div");
+            div.className = "playlist-item";
+            div.innerHTML = `
+                        <img src="${artist.images[0]?.url || 'https://via.placeholder.com/50x50/1db954/ffffff?text=♪'}" alt="Artist" class="playlist-image">
+                        <div class="playlist-info">
+                            <div class="playlist-name">${artist.name}</div>
+                            <div class="playlist-description">Artist</div>
+                        </div>
+                    `;
+            div.onclick = () => loadArtistTopTracks(artist.id, artist.name);
+            artistsDiv.appendChild(div);
+          });
+        } else {
+          artistsDiv.innerHTML = '<div class="loading">No artists found</div>';
+        }
+      } catch (error) {
+        console.error('Error loading artists:', error);
+        artistsDiv.innerHTML = '<div class="error">Failed to load artists. Please check your connection.</div>';
+      }
+    }
+
+    function createPlaylist() {
+      document.getElementById('playlistModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('playlistModal').style.display = 'none';
+      document.getElementById('addToPlaylistModal').style.display = 'none';
+    }
+
+    async function confirmCreatePlaylist() {
+      const name = document.getElementById('playlistName').value.trim();
+      if (!name) {
+        alert('Please enter a playlist name');
+        return;
+      }
+
+      const description = document.getElementById('playlistDescription').value.trim();
+
+      try {
+        // Get current user ID
+        const userData = await apiRequest('https://api.spotify.com/v1/me');
+        const userId = userData.id;
+
+        // Create playlist
+        const playlistData = await apiRequest(`https://api.spotify.com/v1/users/${userId}/playlists`, {
+          method: "POST",
+          body: JSON.stringify({
+            name,
+            description,
+            public: false
+          })
+        });
+
+        closeModal();
+        loadPlaylists();
+        showSuccess(`Playlist "${name}" created successfully!`);
+      } catch (error) {
+        console.error('Error creating playlist:', error);
+        showError('Failed to create playlist');
+      }
+    }
+
+    function addToPlaylist() {
+      if (!currentTrack) {
+        alert('No track selected');
+        return;
+      }
+
+      document.getElementById('addToPlaylistModal').style.display = 'flex';
+      loadPlaylistsForSelection();
+    }
+
+    async function loadPlaylistsForSelection() {
+      const selectionDiv = document.getElementById("playlistSelection");
+      selectionDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Loading your playlists...</div>';
+
+      try {
+        const data = await apiRequest('https://api.spotify.com/v1/me/playlists?limit=20');
+
+        selectionDiv.innerHTML = "";
+        if (data.items && data.items.length > 0) {
+          data.items.forEach(playlist => {
+            const div = document.createElement("div");
+            div.className = "playlist-item";
+            div.innerHTML = `
+                        <img src="${playlist.images[0]?.url || 'https://via.placeholder.com/50x50/1db954/ffffff?text=♪'}" alt="Playlist" class="playlist-image">
+                        <div class="playlist-info">
+                            <div class="playlist-name">${playlist.name}</div>
+                            <div class="playlist-description">${playlist.tracks.total} tracks</div>
+                        </div>
+                    `;
+            div.onclick = () => addTrackToPlaylist(playlist.id);
+            selectionDiv.appendChild(div);
+          });
+        } else {
+          selectionDiv.innerHTML = '<div class="loading">No playlists found</div>';
+        }
+      } catch (error) {
+        console.error('Error loading playlists:', error);
+        selectionDiv.innerHTML = '<div class="error">Failed to load playlists</div>';
+      }
+    }
+
+    async function addTrackToPlaylist(playlistId) {
+      if (!currentTrack) return;
+
+      try {
+        await apiRequest(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+          method: "POST",
+          body: JSON.stringify({
+            uris: [currentTrack.uri]
+          })
+        });
+
+        closeModal();
+        showSuccess(`Track added to playlist!`);
+      } catch (error) {
+        console.error('Error adding track to playlist:', error);
+        showError('Failed to add track to playlist');
+      }
+    }
+
+    function showError(message) {
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error';
+      errorDiv.textContent = message;
+      document.body.appendChild(errorDiv);
+
+      setTimeout(() => {
+        errorDiv.remove();
+      }, 3000);
+    }
+
+    function showSuccess(message) {
+      const successDiv = document.createElement('div');
+      successDiv.className = 'success';
+      successDiv.style.background = 'rgba(29, 185, 84, 0.2)';
+      successDiv.style.border = '1px solid #1db954';
+      successDiv.style.color = 'white';
+      successDiv.style.padding = '15px';
+      successDiv.style.borderRadius = '10px';
+      successDiv.style.position = 'fixed';
+      successDiv.style.bottom = '20px';
+      successDiv.style.right = '20px';
+      successDiv.style.zIndex = '1000';
+      successDiv.textContent = message;
+      document.body.appendChild(successDiv);
+
+      setTimeout(() => {
+        successDiv.remove();
+      }, 3000);
+    }
+
+    document.getElementById("searchInput").addEventListener("keypress", function (event) {
+      if (event.key === "Enter") {
+        search();
+      }
+    });
+
+    window.onSpotifyWebPlaybackSDKReady = () => {
+      const token = sessionStorage.getItem("access_token");
+      if (!token) return;
+
+      player = new Spotify.Player({
+        name: "Enhanced Web Player",
+        getOAuthToken: cb => cb(token),
+        volume: 0.5
+      });
+
+      player.addListener("ready", ({ device_id }) => {
+        deviceId = device_id;
+        console.log("Ready with Device ID", deviceId);
+
+        // Transfer playback to this device
+        apiRequest('https://api.spotify.com/v1/me/player', {
+          method: "PUT",
+          body: JSON.stringify({
+            device_ids: [deviceId],
+            play: false
+          })
+        }).catch(error => console.error('Error transferring playback:', error));
+      });
+
+      player.addListener("player_state_changed", state => {
+        if (state && state.track_window && state.track_window.current_track) {
+          const track = state.track_window.current_track;
+          currentTrack = track;
+          updateNowPlaying(track);
+
+          isPlaying = !state.paused;
+          const playBtn = document.getElementById('playBtn');
+          if (playBtn) playBtn.textContent = isPlaying ? '⏸️' : '▶️';
+
+          // Update popout player play button
+          updatePopoutPlayButton(isPlaying);
+
+          checkIfTrackIsLiked(track.id);
+
+          // Update queue display
+          updateQueueDisplay(state.track_window.next_tracks);
+        }
+      });
+
+      player.addListener('initialization_error', e => {
+        console.error('Initialization Error:', e);
+        showError('Player initialization failed');
+      });
+
+      player.addListener('authentication_error', e => {
+        console.error('Authentication Error:', e);
+        sessionStorage.removeItem("access_token");
+        showError('Authentication failed. Please login again.');
+        setTimeout(() => window.location.reload(), 2000);
+      });
+
+      player.addListener('account_error', e => {
+        console.error('Account Error:', e);
+        showError('Account error. Please check your subscription.');
+      });
+
+      player.addListener('playback_error', e => {
+        console.error('Playback Error:', e);
+        showError('Playback error occurred');
+      });
+
+      player.connect().then(success => {
+        if (!success) {
+          console.error('Failed to connect to Spotify');
+          showError('Failed to connect to Spotify player');
+        }
+      });
+    };
+
+    function updateQueueDisplay(nextTracks) {
+      const queueDiv = document.getElementById('queue');
+      if (!queueDiv) return;
+
+      queueDiv.innerHTML = '';
+
+      if (nextTracks.length === 0) {
+        queueDiv.innerHTML = '<div class="loading">No tracks in queue</div>';
+        return;
+      }
+
+      nextTracks.forEach(track => {
+        const div = document.createElement('div');
+        div.className = 'queue-item';
+        div.innerHTML = `
+                <img src="${track.album.images[2]?.url || 'https://via.placeholder.com/40x40/1db954/ffffff?text=♪'}" alt="Track">
+                <div class="queue-item-info">
+                    <div>${track.name}</div>
+                    <div class="track-artist">${track.artists.map(a => a.name).join(', ')}</div>
+                </div>
+            `;
+        queueDiv.appendChild(div);
+      });
+    }
+
+    (async () => {
+      const params = new URLSearchParams(window.location.search);
+      let token = sessionStorage.getItem("access_token");
+
+      if (!token && params.get("code")) {
+        token = await getAccessToken();
+      }
+
+      if (token) {
+        document.getElementById("loginBtn").style.display = "none";
+        document.getElementById("playerUI").style.display = "block";
+
+        // Initialize Spotify SDK if not already done
+        if (typeof Spotify !== 'undefined' && !player) {
+          window.onSpotifyWebPlaybackSDKReady();
+        }
+
+        // Load initial content
+        loadPlaylists();
+      }
+    })();
+
+    // Popout Player Functions
+    let isPopoutPlayerOpen = false;
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    function togglePopoutPlayer() {
+      const popoutPlayer = document.getElementById('popoutPlayer');
+      const toggleButton = document.getElementById('miniPlayerToggle');
+
+      if (isPopoutPlayerOpen) {
+        // If player is open, minimize it
+        popoutPlayer.classList.remove('visible');
+        toggleButton.style.display = 'flex';
+      } else {
+        // If player is closed, open it
+        popoutPlayer.classList.add('visible');
+        toggleButton.style.display = 'none';
+
+        // Update with current track if available
+        if (currentTrack) {
+          updatePopoutPlayer(currentTrack);
+        }
+      }
+
+      isPopoutPlayerOpen = !isPopoutPlayerOpen;
+    }
+
+    function closePopoutPlayer() {
+      document.getElementById('popoutPlayer').classList.remove('visible');
+      document.getElementById('miniPlayerToggle').style.display = 'flex';
+      isPopoutPlayerOpen = false;
+    }
+
+    function updatePopoutPlayer(track) {
+      document.getElementById('popoutTrackInfo').textContent = track.name;
+      document.getElementById('popoutArtistInfo').textContent = track.artists.map(a => a.name).join(', ');
+      document.getElementById('popoutCover').src = track.album.images[2]?.url || track.album.images[0]?.url || 'https://via.placeholder.com/80x80/1db954/ffffff?text=♪';
+    }
+
+    function updatePopoutPlayButton(isPlaying) {
+      const popoutPlayBtn = document.getElementById('popoutPlayBtn');
+      if (popoutPlayBtn) {
+        popoutPlayBtn.textContent = isPlaying ? '⏸️' : '▶️';
+      }
+    }
+
+    // Make the popout player draggable
+    function setupDrag() {
+      const popoutPlayer = document.getElementById('popoutPlayer');
+      const header = popoutPlayer.querySelector('.popout-header');
+
+      header.addEventListener('mousedown', startDrag);
+      document.addEventListener('mousemove', drag);
+      document.addEventListener('mouseup', endDrag);
+
+      function startDrag(e) {
+        if (e.target.tagName === 'BUTTON') return;
+
+        isDragging = true;
+        const rect = popoutPlayer.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        popoutPlayer.style.cursor = 'grabbing';
+      }
+
+      function drag(e) {
+        if (!isDragging) return;
+
+        popoutPlayer.style.left = (e.clientX - offsetX) + 'px';
+        popoutPlayer.style.top = (e.clientY - offsetY) + 'px';
+        popoutPlayer.style.right = 'auto';
+        popoutPlayer.style.bottom = 'auto';
+      }
+
+      function endDrag() {
+        isDragging = false;
+        popoutPlayer.style.cursor = 'move';
+      }
+    }
+
+    // Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  setupDrag();
+  
+  // Hide the toggle button if popout is open (for page refreshes)
+  if (isPopoutPlayerOpen) {
+    document.getElementById('miniPlayerToggle').style.display = 'none';
+  }
+});
+  </script>
+
+  <!-- Playlist Creation Modal -->
+  <div id="playlistModal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal()">&times;</span>
+      <h3>Create New Playlist</h3>
+      <input type="text" id="playlistName" placeholder="Playlist name" />
+      <textarea id="playlistDescription" placeholder="Description (optional)"></textarea>
+      <div class="modal-actions">
+        <button onclick="confirmCreatePlaylist()">Create</button>
+        <button onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add to Playlist Modal -->
+  <div id="addToPlaylistModal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal()">&times;</span>
+      <h3>Add to Playlist</h3>
+      <div id="playlistSelection" class="playlist-items"></div>
+    </div>
+  </div>
+
+
+  <!-- Pop-out Mini Player -->
+  <div id="popoutPlayer" class="popout-player">
+    <div class="popout-header">
+      <span>Now Playing</span>
+      <div class="popout-actions">
+        <button onclick="togglePopoutPlayer()" title="Expand">⬜</button>
+        <button onclick="closePopoutPlayer()" title="Close">✕</button>
+      </div>
+    </div>
+    <div class="popout-content">
+      <img id="popoutCover" src="https://via.placeholder.com/80x80/1db954/ffffff?text=♪" alt="Album Cover" />
+      <div class="popout-track-info">
+        <div id="popoutTrackInfo">No track playing</div>
+        <div id="popoutArtistInfo"></div>
+      </div>
+      <div class="popout-controls">
+        <button onclick="previousTrack()">⏮️</button>
+        <button onclick="togglePlay()" id="popoutPlayBtn">⏯️</button>
+        <button onclick="nextTrack()">⏭️</button>
+      </div>
+      <div class="popout-progress">
+        <input type="range" id="popoutProgress" value="0" min="0" max="100" step="1">
+      </div>
+    </div>
+  </div>
+
+  <!-- Toggle Button -->
+  <button id="miniPlayerToggle" class="mini-player-toggle" onclick="togglePopoutPlayer()">
+    <img src="https://via.placeholder.com/30x30/1db954/ffffff?text=♪" alt="Toggle Player">
+  </button>
+</body>
+
+</html>

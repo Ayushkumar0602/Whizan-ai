@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Convert PDF assignments to realistic handwritten notes with Whizan. Choose from 100+ handwriting styles or use your own. Export as PDF or image - perfect for students and teachers.">
+    <meta name="keywords"
+        content="pdf to handwriting converter, turn text into handwriting, handwritten assignment maker, convert pdf into handwritten notes, digital to handwritten converter">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Whizan - Convert PDF Assignments to Handwritten Notes">
+    <meta property="og:description"
+        content="Transform digital assignments into realistic handwritten work with 100+ fonts or your own handwriting style. Export as PDF or image.">
+    <meta property="og:url" content="https://whizan.xyz/preview/assignment-preview.html">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://whizan.xyz/images/soln.jpg">
+    <link rel="canonical" href="https://whizan.xyz/preview/assignment-preview.html">
+    <link rel="icon" href="/preview/Smart Study.jpeg" type="image/jpeg">
+    <title>PDF to Handwriting Converter | Create Handwritten Assignments | Whizan</title>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "Whizan Assignment to Handwriting Converter",
+      "description": "Convert digital assignments to realistic handwritten notes with multiple font options or your own handwriting style",
+      "brand": {
+        "@type": "Brand",
+        "name": "Whizan"
+      },
+      <!-- "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      } -->
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does the PDF to handwriting converter work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Simply upload your assignment PDF or text, select from our 100+ handwriting styles or upload samples of your own handwriting. Our AI will convert your digital content into realistic handwritten notes that you can export as PDF or image files."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use my own handwriting style?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! You can upload samples of your handwriting and our system will create a custom font that mimics your unique writing style for the most authentic results."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What file formats can I export to?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You can export your converted assignments as high-quality PDFs or image files (PNG, JPG) for easy sharing and printing."
+          }
+        }
+      ]
+    }
+    </script>
+    <style>
+        :root {
+            --primary-purple-dark: #4a148c;
+            --primary-purple-light: #7b1fa2;
+            --secondary-black: #121212;
+            --accent-purple: #9c27b0;
+            --text-light: #f5f5f5;
+            --text-dark: #212121;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--secondary-black);
+            color: var(--text-light);
+            overflow-x: hidden;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, var(--primary-purple-dark), var(--secondary-black), var(--primary-purple-light), var(--secondary-black));
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        header {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(18, 18, 18, 0.8);
+            border-bottom: 1px solid var(--accent-purple);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            height: 50px;
+            width: auto;
+            border-radius: 8px;
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(to right, var(--accent-purple), #e91e63);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cta-button {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(to right, var(--accent-purple), var(--primary-purple-light));
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(156, 39, 176, 0.4);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(156, 39, 176, 0.6);
+        }
+
+        .hero {
+            padding: 4rem 2rem;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--text-light), #bb86fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .highlight {
+            color: #bb86fc;
+            font-weight: bold;
+        }
+
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background-color: rgba(30, 30, 30, 0.7);
+            border-radius: 15px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 350px;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(156, 39, 176, 0.3);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-purple);
+            box-shadow: 0 10px 25px rgba(156, 39, 176, 0.3);
+        }
+
+        .feature-card h3 {
+            color: var(--accent-purple);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-card p {
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .demo-section {
+            padding: 4rem 2rem;
+            text-align: center;
+            background-color: rgba(18, 18, 18, 0.7);
+            margin: 3rem 0;
+        }
+
+        .demo-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--text-light);
+        }
+
+        .demo-image-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .image-slider {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .image-slider .demo-image {
+            display: none;
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--accent-purple);
+        }
+
+        .image-slider .demo-image.active {
+            display: block;
+        }
+
+        .slider-controls {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+        }
+
+        .slider-controls button {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 50%;
+            margin: 0 10px;
+        }
+
+        .slider-controls button:hover {
+            background: var(--accent-purple);
+        }
+
+        .how-it-works {
+            padding: 4rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .how-it-works h2 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--text-light);
+        }
+
+        .step {
+            display: flex;
+            margin-bottom: 2rem;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .step-number {
+            background-color: var(--accent-purple);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent-purple);
+        }
+
+        .step-content p {
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .faq-section {
+            padding: 4rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-section h2 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--text-light);
+        }
+
+        .faq-item {
+            margin-bottom: 2rem;
+            background-color: rgba(30, 30, 30, 0.7);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--accent-purple);
+        }
+
+        .faq-question {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent-purple);
+            margin-bottom: 0.5rem;
+        }
+
+        .faq-answer {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .pricing {
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .pricing h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+        }
+
+        .pricing p {
+            font-size: 1.5rem;
+            margin-bottom: 3rem;
+            color: var(--accent-purple);
+        }
+
+        .pricing-features {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: left;
+            background-color: rgba(30, 30, 30, 0.7);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid var(--accent-purple);
+        }
+
+        .pricing-features ul {
+            list-style-type: none;
+        }
+
+        .pricing-features li {
+            margin-bottom: 1rem;
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .pricing-features li:before {
+            content: "✓";
+            color: #4caf50;
+            position: absolute;
+            left: 0;
+        }
+
+        footer {
+            padding: 3rem 2rem;
+            background-color: rgba(18, 18, 18, 0.9);
+            text-align: center;
+            border-top: 1px solid var(--accent-purple);
+        }
+
+        .footer-logo {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--accent-purple), #e91e63);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-purple);
+        }
+
+        .copyright {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .step {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .step-content {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="animated-bg"></div>
+
+    <header>
+        <div class="logo-container">
+            <img src="/preview/Smart Study.jpeg" alt="Whizan Logo" class="logo" itemprop="logo">
+            <span class="logo-text">Whizan</span>
+        </div>
+        <a href="/auth.html" class="cta-button" itemprop="url">Get Started - It's Free</a>
+    </header>
+
+    <main>
+        <section class="hero" itemscope itemtype="https://schema.org/Product">
+            <h1 itemprop="name">Convert PDF Assignments to Realistic Handwriting</h1>
+            <p itemprop="description">Transform your digital assignments into <span class="highlight">authentic
+                    handwritten notes</span> with Whizan. Choose from <span class="highlight">100+ handwriting
+                    styles</span> or create a custom font from your own handwriting. Export as PDF or image with just
+                one click.</p>
+            <div itemprop="offers" itemscope itemtype="https://schema.org/Offer"></div>
+            <meta itemprop="priceCurrency" content="USD" />
+            <meta itemprop="price" content="0.00" />
+            <link itemprop="availability" href="https://schema.org/InStock" />
+            </div>
+            <a href="/auth.html" class="cta-button">Convert Your Assignment Now</a>
+
+            <meta itemprop="brand" content="Whizan">
+            <meta itemprop="url" content="https://whizan.xyz/preview/assignment-preview.html">
+        </section>
+
+        <section class="features">
+            <div class="feature-card" itemscope itemtype="https://schema.org/Product">
+                <h3 itemprop="name">100+ Handwriting Styles</h3>
+                <p itemprop="description">
+                    From neat academic writing to casual notes, select the perfect handwriting style that matches your
+                    needs. Our diverse collection ensures authentic-looking results every time.
+                </p>
+                <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                    <meta itemprop="priceCurrency" content="USD" />
+                    <meta itemprop="price" content="0.00" />
+                    <link itemprop="availability" href="https://schema.org/InStock" />
+                </div>
+            </div>
+
+            <div class="feature-card" itemscope itemtype="https://schema.org/Product">
+                <h3 itemprop="name">Your Own Handwriting</h3>
+                <p itemprop="description">
+                    Upload samples of your handwriting and our AI will create a custom font that perfectly mimics your
+                    unique style. The most authentic digital-to-handwriting conversion available.
+                </p>
+                <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                    <meta itemprop="priceCurrency" content="USD" />
+                    <meta itemprop="price" content="0.00" />
+                    <link itemprop="availability" href="https://schema.org/InStock" />
+                </div>
+            </div>
+
+            <div class="feature-card" itemscope itemtype="https://schema.org/Product">
+                <h3 itemprop="name">Multiple Export Options</h3>
+                <p itemprop="description">
+                    Download your converted assignments as high-quality PDFs or image files (PNG/JPG). Perfect for
+                    submitting handwritten work while maintaining digital convenience.
+                </p>
+                <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                    <meta itemprop="priceCurrency" content="USD" />
+                    <meta itemprop="price" content="0.00" />
+                    <link itemprop="availability" href="https://schema.org/InStock" />
+                </div>
+            </div>
+        </section>
+
+
+        <section class="demo-section">
+            <h2>See Our PDF to Handwriting Converter in Action</h2>
+            <div class="image-slider">
+                <img src="images /question.png" alt="Whizan Assignment Converter - Before Digital Text"
+                    class="demo-image active" itemprop="image">
+                <img src="images /soln.png" alt="Whizan Assignment Converter - After Handwritten Conversion"
+                    class="demo-image" itemprop="image">
+                <div class="slider-controls">
+                    <button class="slider-prev">❮</button>
+                    <button class="slider-next">❯</button>
+                </div>
+            </div>
+            <p style="margin-top: 1.5rem;">Transform your digital assignments into realistic handwritten work in seconds
+            </p>
+        </section>
+
+        <section class="how-it-works">
+            <h2>How Whizan's PDF to Handwriting Converter Works</h2>
+
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Upload Your Assignment</h3>
+                    <p>Upload your assignment PDF or paste your text directly , Our Ai will Generate detailed solution
+                        for you.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Choose Handwriting Style</h3>
+                    <p>Select from our library of 100+ handwriting fonts or upload samples of your own handwriting to
+                        create a completely personalized output.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Customize Appearance</h3>
+                    <p>Adjust ink color, paper texture, line spacing, and other parameters to create the perfect
+                        handwritten look for your assignment.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Download & Share</h3>
+                    <p>Export your converted assignment as a PDF or image file. Print it or submit digitally - no one
+                        will know it wasn't handwritten by you!</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="faq-section">
+            <h2>Frequently Asked Questions</h2>
+
+            <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <div class="faq-question" itemprop="name">How accurate is the handwriting conversion?</div>
+                <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                    <div itemprop="text">Our AI produces remarkably accurate results that closely resemble real
+                        handwriting. The custom handwriting option is particularly realistic as it's based on your
+                        actual writing samples.</div>
+                </div>
+            </div>
+
+            <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <div class="faq-question" itemprop="name">Can I use this for math equations and diagrams?</div>
+                <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                    <div itemprop="text">Yes! Our converter handles mathematical notation, chemical formulas, and simple
+                        diagrams. For complex illustrations, we recommend adding them after conversion.</div>
+                </div>
+            </div>
+
+            <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <div class="faq-question" itemprop="name">Is there a limit to how much text I can convert?</div>
+                <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                    <div itemprop="text">Our free version allows conversion of up to 10 pages at a time. For longer
+                        documents, the conversion will be split into multiple files.</div>
+                </div>
+            </div>
+
+            <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <div class="faq-question" itemprop="name">How many handwriting samples do I need for custom font?</div>
+                <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                    <div itemprop="text">For best results, provide at least 2-3 paragraphs of your handwriting covering
+                        all letters, numbers, and common symbols. The more samples you provide, the more accurate the
+                        font will be.</div>
+                </div>
+            </div>
+
+            <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <div class="faq-question" itemprop="name">Can I edit the converted handwritten document?</div>
+                <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                    <div itemprop="text">The output is an image/PDF, but you can make changes to your original document
+                        and convert it again. We're working on an editable handwritten format for future updates.</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="pricing">
+            <h2>Completely Free. No Hidden Charges.</h2>
+            <p>Unlimited PDF to Handwriting Conversions at Zero Cost</p>
+
+            <div class="pricing-features">
+                <ul>
+                    <li>Convert PDF/text to realistic handwriting</li>
+                    <li>100+ handwriting styles to choose from</li>
+                    <li>Create custom fonts from your own handwriting</li>
+                    <li>Export as PDF or image (PNG/JPG)</li>
+                    <li>Adjustable ink color and paper texture</li>
+                    <li>Preserves original formatting</li>
+                    <li>No credit card required</li>
+                    <li>No trial period - it's always free</li>
+                </ul>
+            </div>
+
+            <a href="/auth.html" class="cta-button" style="margin-top: 3rem;">Convert Your First Assignment Now</a>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-logo">Whizan</div>
+        <div class="footer-links">
+            <a href="/index1.html">About Us</a>
+            <a href="/index1.html">Features</a>
+            <a href="subject/contact.html">Contact</a>
+            <a href="subject/privacy.html">Privacy Policy</a>
+            <a href="subject/terms.html">Terms of Service</a>
+        </div>
+        <p class="copyright">© 2025 Whizan. All rights reserved. Transforming digital learning experiences.</p>
+    </footer>
+
+    <script>
+        // Simple animation for feature cards on scroll
+        document.addEventListener('DOMContentLoaded', function () {
+            const featureCards = document.querySelectorAll('.feature-card');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            featureCards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                observer.observe(card);
+            });
+
+            // Image slider functionality
+            if (document.querySelector('.image-slider')) {
+                const images = document.querySelectorAll('.image-slider .demo-image');
+                const prevBtn = document.querySelector('.slider-prev');
+                const nextBtn = document.querySelector('.slider-next');
+                let currentIndex = 0;
+
+                function showImage(index) {
+                    images.forEach(img => img.classList.remove('active'));
+                    images[index].classList.add('active');
+                }
+
+                prevBtn.addEventListener('click', () => {
+                    currentIndex = (currentIndex > 0) ? currentIndex - 1 : images.length - 1;
+                    showImage(currentIndex);
+                });
+
+                nextBtn.addEventListener('click', () => {
+                    currentIndex = (currentIndex < images.length - 1) ? currentIndex + 1 : 0;
+                    showImage(currentIndex);
+                });
+
+                // Auto-rotate every 5 seconds
+                setInterval(() => {
+                    currentIndex = (currentIndex < images.length - 1) ? currentIndex + 1 : 0;
+                    showImage(currentIndex);
+                }, 5000);
+
+                // Show first image initially
+                showImage(0);
+            }
+
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

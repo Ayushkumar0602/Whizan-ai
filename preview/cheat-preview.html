@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Whizan's AI-powered Cheat Sheet Maker - Generate instant study notes from PDFs, 100% free with unlimited usage. Perfect for exam preparation with AI optimization.">
+    <meta name="keywords" content="cheat sheet maker, AI study notes, exam preparation tool, PDF to notes, free study tools, Whizan AI">
+    <meta name="robots" content="index, follow">
+    <title>Whizan AI Cheat Sheet Maker - Free Study Notes Generator</title>
+    <link rel="icon" href="/preview/Smart Study.jpeg" type="image/jpeg">
+    <style>
+        :root {
+            --primary-purple-dark: #4a148c;
+            --primary-purple-light: #7b1fa2;
+            --secondary-black: #121212;
+            --accent-purple: #9c27b0;
+            --text-light: #f3e5f5;
+            --text-dark: #212121;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--secondary-black);
+            color: var(--text-light);
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-animation div {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: rgba(156, 39, 176, 0.1);
+            border: 1px solid rgba(156, 39, 176, 0.3);
+            border-radius: 50%;
+            animation: move 15s linear infinite;
+        }
+        
+        .bg-animation div:nth-child(1) {
+            top: 20%;
+            left: 20%;
+            animation-delay: 0s;
+        }
+        
+        .bg-animation div:nth-child(2) {
+            top: 60%;
+            left: 80%;
+            animation-delay: -2s;
+        }
+        
+        .bg-animation div:nth-child(3) {
+            top: 80%;
+            left: 10%;
+            animation-delay: -4s;
+        }
+        
+        .bg-animation div:nth-child(4) {
+            top: 30%;
+            left: 50%;
+            animation-delay: -6s;
+        }
+        
+        .bg-animation div:nth-child(5) {
+            top: 70%;
+            left: 30%;
+            animation-delay: -8s;
+        }
+        
+        @keyframes move {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary-purple-dark), var(--primary-purple-light));
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .logo {
+            height: 60px;
+            width: 60px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+            border: 2px solid var(--text-light);
+        }
+        
+        .header-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #ffffff, #e1bee7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header-content p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .feature-section {
+            background: rgba(33, 33, 33, 0.8);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--primary-purple-light);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-section:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-section h2 {
+            color: var(--accent-purple);
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            border-bottom: 2px solid var(--primary-purple-light);
+            padding-bottom: 0.5rem;
+        }
+        
+        .feature-section p {
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .feature-image {
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            border-radius: 8px;
+            margin: 1rem auto;
+            display: block;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--primary-purple-dark);
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-purple-light), var(--accent-purple));
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, var(--accent-purple), var(--primary-purple-light));
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .benefit-card {
+            background: rgba(74, 20, 140, 0.2);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid var(--primary-purple-light);
+            transition: transform 0.3s ease;
+        }
+        
+        .benefit-card:hover {
+            transform: translateY(-5px);
+            background: rgba(74, 20, 140, 0.3);
+        }
+        
+        .benefit-card h3 {
+            color: var(--accent-purple);
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+        
+        .benefit-card p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .testimonial {
+            font-style: italic;
+            background: rgba(74, 20, 140, 0.1);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--accent-purple);
+        }
+        
+        .testimonial-author {
+            font-weight: bold;
+            margin-top: 1rem;
+            text-align: right;
+            color: var(--accent-purple);
+        }
+        
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, var(--primary-purple-dark), var(--secondary-black));
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+        
+        footer p {
+            margin-bottom: 1rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent-purple);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+    
+    <!-- Header -->
+    <header>
+        <div class="logo-container">
+            <img src="/preview/Smart Study.jpeg" alt="Whizan Logo" class="logo">
+        </div>
+        <div class="header-content">
+            <h1>Whizan AI Cheat Sheet Maker</h1>
+            <p>Transform your study materials into concise, exam-ready cheat sheets with our powerful AI. 100% free, unlimited usage with no hidden charges.</p>
+            <a href="/auth.html" class="cta-button">Get Started Now</a>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Feature 1 -->
+        <section class="feature-section">
+            <h2>AI-Powered Cheat Sheet Generation</h2>
+            <p>Our advanced AI analyzes your uploaded PDFs, textbooks, or notes to extract key concepts, formulas, and important information, creating perfectly condensed cheat sheets tailored for your exams.</p>
+            <img src="images /cheat 3.png" alt="AI Cheat Sheet Generation Demo" class="feature-image">
+            <p>Simply upload your study materials and let Whizan's AI do the heavy lifting. No more spending hours highlighting textbooks or trying to decide what's important - our algorithm identifies patterns, recurring concepts, and exam-critical information automatically.</p>
+            <a href="/auth.html" class="cta-button">Try It Free</a>
+        </section>
+        
+        <!-- Feature 2 -->
+        <section class="feature-section">
+            <h2>Smart PDF Processing</h2>
+            <p>Upload any PDF - textbooks, lecture notes, research papers - and our system will process the content, maintaining all important diagrams, formulas, and key points in your final cheat sheet.</p>
+            <img src="images /cheat 1.png" alt="PDF Processing Demo" class="feature-image">
+            <p>Whizan's PDF processor understands academic content structure, preserving the hierarchy of information while removing redundant explanations. The result is a clean, organized reference sheet that covers everything you need without the fluff.</p>
+        </section>
+        
+        <!-- Feature 3 -->
+        <section class="feature-section">
+            <h2>Customizable Output & Download</h2>
+            <p>Personalize your cheat sheets before downloading. Choose from various formats, adjust font sizes, highlight key sections, and export as PDF for printing or digital use.</p>
+            <img src="images /cheat 2.png" alt="Customizable Cheat Sheets Demo" class="feature-image">
+            <p>Our editor lets you fine-tune the AI-generated content before finalizing. Add personal notes, emphasize certain sections, or reorganize content to match your study style. When you're ready, download with one click - no watermarks, no limits.</p>
+            <a href="/auth.html" class="cta-button">Create Your Cheat Sheet</a>
+        </section>
+        
+        <!-- Benefits Grid -->
+        <h2 style="text-align: center; margin: 3rem 0 1rem; color: var(--accent-purple);">Why Choose Whizan Cheat Sheet Maker?</h2>
+        <div class="benefits-grid">
+            <div class="benefit-card">
+                <h3>100% Free Forever</h3>
+                <p>No subscriptions, no hidden fees. Our cheat sheet maker is completely free with unlimited usage.</p>
+            </div>
+            <div class="benefit-card">
+                <h3>AI-Optimized Content</h3>
+                <p>Our algorithms are trained on academic materials to identify what matters most for exams.</p>
+            </div>
+            <div class="benefit-card">
+                <h3>Time-Saving</h3>
+                <p>Reduce hours of study prep to minutes. Focus on understanding rather than note-taking.</p>
+            </div>
+            <div class="benefit-card">
+                <h3>SEO-Optimized</h3>
+                <p>Our content is structured for perfect search engine visibility, helping students find this valuable tool.</p>
+            </div>
+            <div class="benefit-card">
+                <h3>Mobile-Friendly</h3>
+                <p>Create and access your cheat sheets from any device, anywhere.</p>
+            </div>
+            <div class="benefit-card">
+                <h3>Privacy Focused</h3>
+                <p>Your documents are processed securely and never stored longer than necessary.</p>
+            </div>
+        </div>
+        
+        <!-- Testimonial -->
+
+        
+        <!-- Final CTA -->
+        <section style="text-align: center; margin: 4rem 0;">
+            <h2 style="font-size: 2rem; margin-bottom: 1rem;">Ready to Transform Your Study Process?</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 2rem; max-width: 800px; margin-left: auto; margin-right: auto;">Join thousands of students who are studying smarter with Whizan's AI-powered cheat sheet maker. Sign up now - it's completely free!</p>
+            <a href="/auth.html" class="cta-button" style="padding: 15px 40px; font-size: 1.2rem;">Get Started for Free</a>
+        </section>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-links">
+            <a href="subject/privacy.html">Privacy Policy</a>
+            <a href="subject/terms.html">Terms of Service</a>
+            <a href="subject/contact.html">Contact Us</a>
+            <a href="subject/contact.html">FAQ</a>
+        </div>
+        <p>© 2025 Whizan.xyz - All Rights Reserved</p>
+        <p>The ultimate AI study assistant for students worldwide</p>
+    </footer>
+    
+    <script>
+        // Simple animation for the CTA buttons
+        document.querySelectorAll('.cta-button').forEach(button => {
+            button.addEventListener('mouseover', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.3)';
+            });
+            
+            button.addEventListener('mouseout', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+            });
+        });
+        
+        // Animate elements when they come into view
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.feature-section, .benefit-card');
+            
+            elements.forEach(element => {
+                const elementPosition = element.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight / 1.3;
+                
+                if (elementPosition < screenPosition) {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        };
+        
+        // Set initial state for animation
+        window.addEventListener('DOMContentLoaded', () => {
+            const elements = document.querySelectorAll('.feature-section, .benefit-card');
+            elements.forEach(element => {
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(20px)';
+                element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            });
+            
+            // Trigger first check
+            animateOnScroll();
+        });
+        
+        // Add scroll event listener
+        window.addEventListener('scroll', animateOnScroll);
+    </script>
+</body>
+</html>

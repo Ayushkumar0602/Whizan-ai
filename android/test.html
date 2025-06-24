@@ -1,0 +1,1908 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Whizan - Smart Study</title>
+    <link rel="icon" type="image/png" href="smart study.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Styles -->
+    <style>
+        :root {
+            --primary: #9b59b6;
+            --primary-dark: #8e44ad;
+            --accent: #e056fd;
+            --danger: #ff6b81;
+            --success: #7bed9f;
+            --warning: #ffbe76;
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+            --text: #f1f2f6;
+            --text-secondary: #a4b0be;
+            --border: #2c3a4a;
+            --shadow: 0 6px 32px rgba(0, 0, 0, 0.5);
+            --gradient-1: #9b59b6;
+            --gradient-2: #8e44ad;
+            --gradient-3: #e056fd;
+            --card-bg-rgb: 30, 30, 30;
+            --primary-rgb: 155, 89, 182;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            transition: background 0.5s ease, color 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* App Header */
+        .app-header {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .app-logo {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .app-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(90deg, var(--gradient-1), var(--gradient-2), var(--gradient-3));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientShift 8s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(var(--primary-rgb), 0.15) 0%, rgba(var(--primary-rgb), 0) 70%);
+            filter: blur(20px);
+            animation: float 15s infinite ease-in-out;
+            opacity: 0.7;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(10%, 15%) rotate(5deg); }
+            50% { transform: translate(-5%, 20%) rotate(-5deg); }
+            75% { transform: translate(15%, 5%) rotate(8deg); }
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .theme-toggle i {
+            font-size: 18px;
+            color: var(--primary);
+        }
+
+        /* Headings */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text);
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 0 0 20px 0;
+            position: relative;
+            display: inline-block;
+            background: linear-gradient(90deg, var(--gradient-1), var(--gradient-2), var(--gradient-3));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientShift 8s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gradient-1), var(--gradient-2), var(--gradient-3));
+            border-radius: 2px;
+            animation: gradientShift 8s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        /* Main Layout */
+        main {
+            min-height: calc(100vh - 70px);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .center-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 25px 20px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background-color: rgba(var(--card-bg-rgb), 0.9);
+        }
+
+        .center-card:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+            transform: translateY(-3px);
+        }
+
+        /* Form Elements */
+        label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: block;
+            color: var(--text);
+        }
+
+        select,
+        button,
+        input,
+        textarea {
+            padding: 12px 15px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 16px;
+            font-family: inherit;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            background-color: var(--card-bg);
+            color: var(--text);
+        }
+
+        select:focus,
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.3);
+        }
+
+        select,
+        input,
+        textarea {
+            width: 100%;
+        }
+
+        /* Buttons */
+        button {
+            background: linear-gradient(90deg, var(--gradient-1) 0%, var(--gradient-2) 100%);
+            color: #fff;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 8px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--gradient-2) 0%, var(--gradient-3) 100%);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.4);
+        }
+
+        button:hover::before {
+            opacity: 1;
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:disabled {
+            background: #c7d2fe;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            opacity: 0.7;
+        }
+
+        button:disabled::before {
+            opacity: 0;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: linear-gradient(90deg, var(--danger) 0%, #ff6b81 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(90deg, var(--success) 0%, #7bed9f 100%);
+        }
+
+        /* Spinner */
+        .spinner {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            border: 4px solid rgba(var(--primary-rgb), 0.1);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            margin: 10% auto;
+            padding: 25px;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            animation: slideUp 0.4s ease;
+            position: relative;
+            border: 1px solid var(--border);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--danger);
+            transform: rotate(90deg);
+        }
+
+        .fullscreen {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 !important;
+            border-radius: 0 !important;
+            overflow-y: auto !important;
+            z-index: 1001;
+            background: var(--card-bg);
+        }
+
+        /* Timer */
+        .timer {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 0 0 15px 0;
+            background: linear-gradient(90deg, var(--gradient-1), var(--gradient-2), var(--gradient-3));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientShift 8s ease infinite, pulse 2s infinite;
+            background-size: 200% 200%;
+            letter-spacing: 2px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            background: rgba(var(--primary-rgb), 0.1);
+            border-radius: 8px;
+            margin: 10px 0 20px 0;
+            height: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar-inner {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gradient-1) 0%, var(--gradient-2) 50%, var(--gradient-3) 100%);
+            width: 0;
+            transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
+            animation: gradientShift 8s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        .progress-bar-inner::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg,
+                    rgba(255, 255, 255, 0.1) 0%,
+                    rgba(255, 255, 255, 0.3) 50%,
+                    rgba(255, 255, 255, 0.1) 100%);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Questions */
+        .question {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.3s ease;
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .question:hover {
+            transform: translateX(5px);
+        }
+
+        .question::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--gradient-1), var(--gradient-3));
+            border-radius: 2px;
+            opacity: 0.7;
+        }
+
+        .question pre {
+            background: rgba(var(--primary-rgb), 0.05);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 15px;
+            overflow-x: auto;
+            border-left: 3px solid var(--primary);
+            color: var(--text);
+        }
+
+        /* Results */
+        .results-container {
+            margin-top: 20px;
+        }
+
+        .result-item {
+            background: rgba(var(--primary-rgb), 0.05);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--primary);
+        }
+
+        .result-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .correct {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .incorrect {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .feedback {
+            margin-top: 10px;
+            font-style: italic;
+            color: var(--text-secondary);
+            padding: 10px;
+            background: rgba(var(--primary-rgb), 0.05);
+            border-radius: 6px;
+            border-left: 3px solid var(--accent);
+        }
+
+        /* Analytics */
+        .analytics {
+            margin-top: 20px;
+            background: rgba(var(--primary-rgb), 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .analytics::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gradient-1), var(--gradient-2), var(--gradient-3));
+            animation: gradientShift 8s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        /* Test Controls */
+        .test-controls {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 20px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* Difficulty Badge */
+        .difficulty-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 8px;
+            background: rgba(var(--primary-rgb), 0.1);
+            color: var(--primary);
+        }
+
+        /* Topics List */
+        .topics-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 15px;
+            margin: 12px 0;
+            padding: 4px 0 0 0;
+            max-height: 200px;
+            overflow-y: auto;
+            border-radius: 8px;
+            background: rgba(var(--primary-rgb), 0.05);
+            border: 1px solid var(--border);
+        }
+
+        .topic-checkbox-label {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 500;
+            gap: 4px;
+            transition: all 0.2s ease;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .topic-checkbox-label:hover {
+            background: rgba(var(--primary-rgb), 0.1);
+            transform: translateX(3px);
+        }
+
+        .select-all-btn {
+            background: rgba(var(--primary-rgb), 0.1);
+            color: var(--primary);
+            border: 1px solid var(--border);
+            font-weight: 600;
+            border-radius: 6px;
+            margin-left: 8px;
+            margin-bottom: 8px;
+            padding: 6px 10px;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .select-all-btn:hover {
+            background: rgba(var(--primary-rgb), 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: rgba(var(--primary-rgb), 0.3);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+            filter: blur(1px);
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+        }
+
+        /* Question Navigation */
+        .question-nav {
+            position: fixed;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            display: none;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .question-nav:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            transform: translateY(-50%) scale(1.02);
+        }
+
+        .question-nav h3 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            color: var(--primary);
+            text-align: center;
+        }
+
+        .nav-dots {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .nav-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(var(--primary-rgb), 0.2);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-dot:hover {
+            transform: scale(1.3);
+        }
+
+        .nav-dot.active {
+            background: var(--primary);
+            transform: scale(1.2);
+            box-shadow: 0 0 5px var(--primary);
+        }
+
+        .nav-dot.answered {
+            background: var(--success);
+        }
+
+        /* Mark for review */
+        .mark-review {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .mark-review input {
+            width: auto;
+            margin: 0;
+        }
+
+        .mark-review label {
+            margin: 0;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(var(--card-bg-rgb), 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+        }
+
+        .loading-overlay .spinner {
+            width: 40px;
+            height: 40px;
+            border: 5px solid rgba(var(--primary-rgb), 0.1);
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 180px;
+            background-color: var(--card-bg);
+            color: var(--text);
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 700px) {
+            .center-card,
+            .modal-content {
+                padding: 20px 15px;
+            }
+
+            .topics-list {
+                max-height: 160px;
+            }
+
+            .question-nav {
+                display: none !important;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .center-card,
+            .modal-content {
+                padding: 15px 10px;
+            }
+
+            .test-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            button {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 8px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .app-title {
+                font-size: 1.3rem;
+            }
+
+            .app-logo {
+                height: 35px;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(var(--primary-rgb), 0.05);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(var(--primary-rgb), 0.2);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(var(--primary-rgb), 0.3);
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary);
+            opacity: 0;
+            z-index: 999;
+            animation: confetti-fall 5s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Mobile tap animations */
+        button, select, input, textarea, .topic-checkbox-label {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Mobile viewport height fix */
+        @media (max-height: 600px) {
+            .center-card {
+                margin: 10px auto;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- App Header -->
+    <div class="app-header">
+        <img src="smart study.png" alt="Whizan Logo" class="app-logo">
+        <div class="app-title">Whizan</div>
+    </div>
+
+    <!-- Animated Background -->
+    <div class="bg-animation" id="bgAnimation"></div>
+    
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-sun"></i>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="globalSpinner">
+        <div class="spinner"></div>
+    </div>
+    
+    <!-- Floating Particles -->
+    <div class="particles" id="particles"></div>
+
+    <main>
+        <!-- Home Page -->
+        <section id="homePage" class="center-card" aria-label="Home Page">
+            <h1>AI Test Generator <span class="tooltip"><i class="fas fa-info-circle"></i><span class="tooltiptext">Powered by Gemini Flash AI model for accurate test generation and evaluation</span></span></h1>
+            <form id="testSetupForm" autocomplete="off">
+                <div>
+                    <label for="courseSelect">Select Course:</label>
+                    <select id="courseSelect" required>
+                        <option value="">-- Select Course --</option>
+                        <option value="dsa">Data Structures & Algorithms</option>
+                        <option value="webdev">Web Development</option>
+                        <option value="ml">Machine Learning</option>
+                        <option value="ai">Artificial Intelligence</option>
+                        <option value="db">Database Systems</option>
+                    </select>
+                </div>
+                <div id="topicContainer" style="display: none;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;">
+                        <label style="margin-bottom:0;">Select Topics:</label>
+                        <button id="selectAllBtn" class="select-all-btn" type="button" style="display:none;">Select All</button>
+                    </div>
+                    <div id="topicsList" class="topics-list"></div>
+                    <label for="difficultySelect">Difficulty:</label>
+                    <select id="difficultySelect" required>
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                        <option value="expert">Expert</option>
+                    </select>
+                    <button id="generateTestBtn" type="button">
+                        <i class="fas fa-magic" style="margin-right:8px;"></i>Generate Test
+                    </button>
+                </div>
+                <div id="topicSpinner" class="spinner" style="display:none;"></div>
+            </form>
+            <button id="viewResultsBtn" style="margin-top: 20px;">
+                <i class="fas fa-history" style="margin-right:8px;"></i>View Past Results
+            </button>
+            <div class="analytics" id="progressSummary"></div>
+        </section>
+
+        <!-- Test Page -->
+        <section id="testContainer" class="center-card" style="max-width:900px; display:none;" aria-label="Test Page">
+            <div class="timer" id="timer">45:00</div>
+            <div class="progress-bar">
+                <div class="progress-bar-inner" id="progressBar"></div>
+            </div>
+            <div id="testMeta" style="margin-bottom:15px;"></div>
+            <form id="testForm" autocomplete="off">
+                <div id="questionsContainer"></div>
+            </form>
+            <div id="testSpinner" class="spinner" style="display:none;"></div>
+            <div class="test-controls">
+                <button id="prevQuestionBtn" type="button" style="display:none;">
+                    <i class="fas fa-arrow-left" style="margin-right:8px;"></i>Previous
+                </button>
+                <button id="nextQuestionBtn" type="button" style="display:none;">
+                    Next<i class="fas fa-arrow-right" style="margin-left:8px;"></i>
+                </button>
+                <button id="submitTestBtn" type="button" class="btn-danger">
+                    <i class="fas fa-paper-plane" style="margin-right:8px;"></i>Submit Test
+                </button>
+                <button id="fullscreenBtn" type="button" class="btn-outline">
+                    <i class="fas fa-expand" style="margin-right:8px;"></i>Toggle Fullscreen
+                </button>
+            </div>
+        </section>
+
+        <!-- Question Navigation -->
+        <div class="question-nav" id="questionNav" style="display:none;">
+            <h3>Questions</h3>
+            <div class="nav-dots" id="navDots"></div>
+        </div>
+
+        <!-- Results Modal -->
+        <div id="resultsModal" class="modal" aria-modal="true" role="dialog">
+            <div class="modal-content" id="modalContent">
+                <span class="close-modal" id="closeModal">&times;</span>
+                <h2>Test Results</h2>
+                <div id="resultsSpinner" class="spinner" style="display:none;"></div>
+                <div id="resultsContent"></div>
+                <button id="continueBtn" type="button" class="btn-success">
+                    <i class="fas fa-home" style="margin-right:8px;"></i>Continue
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Page -->
+        <section id="resultsPage" class="center-card" style="display:none;" aria-label="Results Page">
+            <h1>Test Results History</h1>
+            <button id="backToHomeBtn" type="button">
+                <i class="fas fa-arrow-left" style="margin-right:8px;"></i>Back to Home
+            </button>
+            <div id="historySpinner" class="spinner" style="display:none;"></div>
+            <div id="allResultsContainer"></div>
+        </section>
+    </main>
+
+    <!-- Firebase Auth -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    
+    <script>
+        // Set CSS variables for RGB values
+        document.documentElement.style.setProperty('--primary-rgb', '155,89,182');
+        document.documentElement.style.setProperty('--card-bg-rgb', '30,30,30');
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVYdfql5aqHrChlA1v3nxRLkIbYyWMvUg",
+            authDomain: "study2-7bdc7.firebaseapp.com",
+            databaseURL: "https://study2-7bdc7-default-rtdb.firebaseio.com",
+            projectId: "study2-7bdc7",
+            storageBucket: "study2-7bdc7.appspot.com",
+            messagingSenderId: "320617984870",
+            appId: "1:320617984870:web:04b61ea4ee88ae057e4ea7",
+            measurementId: "G-VRM14GRNWG"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let currentUser = null;
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                console.log("Authenticated user:", user.email);
+                updateProgressSummary();
+                createParticles();
+                createBackgroundAnimation();
+            } else {
+                window.location.href = "/auth.html";
+            }
+        });
+
+        // DOM Elements
+        const homePage = document.getElementById('homePage');
+        const testContainer = document.getElementById('testContainer');
+        const questionsContainer = document.getElementById('questionsContainer');
+        const timerElement = document.getElementById('timer');
+        const submitTestBtn = document.getElementById('submitTestBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const resultsModal = document.getElementById('resultsModal');
+        const modalContent = document.getElementById('modalContent');
+        const resultsContent = document.getElementById('resultsContent');
+        const continueBtn = document.getElementById('continueBtn');
+        const resultsPage = document.getElementById('resultsPage');
+        const allResultsContainer = document.getElementById('allResultsContainer');
+        const backToHomeBtn = document.getElementById('backToHomeBtn');
+        const viewResultsBtn = document.getElementById('viewResultsBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressSummary = document.getElementById('progressSummary');
+        const topicSpinner = document.getElementById('topicSpinner');
+        const testSpinner = document.getElementById('testSpinner');
+        const resultsSpinner = document.getElementById('resultsSpinner');
+        const historySpinner = document.getElementById('historySpinner');
+        const testMeta = document.getElementById('testMeta');
+        const topicsListDiv = document.getElementById('topicsList');
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const questionNav = document.getElementById('questionNav');
+        const navDots = document.getElementById('navDots');
+        const prevQuestionBtn = document.getElementById('prevQuestionBtn');
+        const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+        const themeToggle = document.getElementById('themeToggle');
+        const closeModal = document.getElementById('closeModal');
+
+        // Test State
+        let currentTest = {
+            course: '',
+            topics: [],
+            difficulty: '',
+            questions: [],
+            answers: {},
+            markedForReview: {},
+            currentQuestionIndex: 0,
+            startTime: null,
+            timeLeft: 45 * 60 // 45 minutes in seconds
+        };
+        let timerInterval;
+
+        // Use Gemini Flash model for all calls
+        const GEMINI_FLASH_MODEL = "gemini-2.0-flash";
+        const GEMINI_API_KEY = "AIzaSyAM1p730RTRu40S1sHghd1KD4501K6iCsI";
+
+        // Difficulty to question count mapping
+        const DIFFICULTY_QUESTION_COUNT = {
+            easy: 20,
+            medium: 15,
+            hard: 10,
+            expert: 5
+        };
+
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30; // Reduced for mobile performance
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+
+                // Random position
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+
+                // Random size
+                const size = Math.random() * 4 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+
+                // Random opacity
+                particle.style.opacity = Math.random() * 0.5 + 0.1;
+
+                // Random animation duration
+                particle.style.animationDuration = `${Math.random() * 15 + 10}s`;
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Create background animation
+        function createBackgroundAnimation() {
+            const bgAnimation = document.getElementById('bgAnimation');
+            const colors = [
+                '139, 92, 246', // Purple
+                '124, 58, 237', // Dark purple
+                '168, 85, 247', // Light purple
+                '217, 70, 239', // Pinkish purple
+                '236, 72, 153'  // Pink
+            ];
+            
+            for (let i = 0; i < 3; i++) { // Reduced for mobile performance
+                const circle = document.createElement('div');
+                circle.classList.add('bg-circle');
+                
+                // Random properties
+                const size = Math.random() * 600 + 200;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 30 + 20;
+                
+                circle.style.width = `${size}px`;
+                circle.style.height = `${size}px`;
+                circle.style.left = `${posX}%`;
+                circle.style.top = `${posY}%`;
+                circle.style.setProperty('--circle-color', color);
+                circle.style.animationDuration = `${duration}s`;
+                circle.style.animationDelay = `${delay}s`;
+                
+                bgAnimation.appendChild(circle);
+            }
+        }
+
+        // Theme toggle
+        themeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            themeToggle.innerHTML = isLight ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+            
+            if (isLight) {
+                document.documentElement.style.setProperty('--bg', '#f8f9fa');
+                document.documentElement.style.setProperty('--card-bg', '#ffffff');
+                document.documentElement.style.setProperty('--text', '#2d3436');
+                document.documentElement.style.setProperty('--text-secondary', '#636e72');
+                document.documentElement.style.setProperty('--border', '#dfe6e9');
+                document.documentElement.style.setProperty('--shadow', '0 6px 32px rgba(44, 62, 80, 0.09)');
+                document.documentElement.style.setProperty('--card-bg-rgb', '255,255,255');
+            } else {
+                document.documentElement.style.setProperty('--bg', '#121212');
+                document.documentElement.style.setProperty('--card-bg', '#1e1e1e');
+                document.documentElement.style.setProperty('--text', '#f1f2f6');
+                document.documentElement.style.setProperty('--text-secondary', '#a4b0be');
+                document.documentElement.style.setProperty('--border', '#2c3a4a');
+                document.documentElement.style.setProperty('--shadow', '0 6px 32px rgba(0, 0, 0, 0.5)');
+                document.documentElement.style.setProperty('--card-bg-rgb', '30,30,30');
+            }
+        });
+
+        // Close modal
+        closeModal.addEventListener('click', function() {
+            resultsModal.style.display = 'none';
+        });
+
+        // Create confetti effect
+        function createConfetti() {
+            const colors = [
+                'var(--primary)', 'var(--accent)', 'var(--success)', 
+                'var(--danger)', 'var(--warning)', '#ffffff'
+            ];
+            
+            for (let i = 0; i < 50; i++) { // Reduced for mobile performance
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                
+                // Random properties
+                const size = Math.random() * 8 + 4;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const left = Math.random() * 100;
+                const animationDuration = Math.random() * 3 + 2;
+                const delay = Math.random() * 5;
+                
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${size}px`;
+                confetti.style.backgroundColor = color;
+                confetti.style.left = `${left}%`;
+                confetti.style.animationDuration = `${animationDuration}s`;
+                confetti.style.animationDelay = `${delay}s`;
+                
+                document.body.appendChild(confetti);
+                
+                // Remove after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, animationDuration * 1000);
+            }
+        }
+
+        // --- UI Logic for Topics ---
+        document.getElementById('courseSelect').addEventListener('change', async function() {
+            const course = this.value;
+            if (!course) {
+                document.getElementById('topicContainer').style.display = 'none';
+                return;
+            }
+            currentTest.course = course;
+            document.getElementById('topicContainer').style.display = 'block';
+            topicSpinner.style.display = 'inline-block';
+            topicsListDiv.innerHTML = '';
+            selectAllBtn.style.display = 'none';
+            showGlobalSpinner();
+
+            try {
+                const topics = await fetchTopicsFromGeminiFlash(course);
+                if (topics.length > 0) {
+                    topicsListDiv.innerHTML = topics.map((topic, idx) => `
+                        <label class="topic-checkbox-label">
+                            <input type="checkbox" class="topic-checkbox" value="${topic.replace(/"/g, "&quot;")}">
+                            ${topic}
+                        </label>
+                    `).join('');
+                    selectAllBtn.style.display = 'inline-block';
+                }
+            } catch (error) {
+                topicsListDiv.innerHTML = '<span style="color:var(--danger);">Error loading topics</span>';
+            }
+            topicSpinner.style.display = 'none';
+            hideGlobalSpinner();
+        });
+
+        // Select All functionality
+        selectAllBtn.addEventListener('click', function() {
+            const checkboxes = topicsListDiv.querySelectorAll('.topic-checkbox');
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            checkboxes.forEach(cb => cb.checked = !allChecked);
+            this.textContent = allChecked ? 'Select All' : 'Deselect All';
+        });
+
+        document.getElementById('generateTestBtn').addEventListener('click', async function() {
+            showGlobalSpinner();
+            const difficulty = document.getElementById('difficultySelect').value;
+            const selectedTopics = Array.from(topicsListDiv.querySelectorAll('.topic-checkbox:checked')).map(cb => cb.value);
+            if (selectedTopics.length === 0) {
+                alert('Please select at least one topic');
+                hideGlobalSpinner();
+                return;
+            }
+            currentTest.topics = selectedTopics;
+            currentTest.difficulty = difficulty;
+            testSpinner.style.display = 'inline-block';
+            questionsContainer.innerHTML = '';
+            testMeta.innerHTML = '';
+            try {
+                const test = await generateTestFromGeminiFlash(currentTest.course, selectedTopics, difficulty);
+                currentTest.questions = test.questions;
+                currentTest.startTime = new Date();
+                currentTest.answers = {};
+                currentTest.markedForReview = {};
+                currentTest.currentQuestionIndex = 0;
+                startTimer();
+                displayQuestion(currentTest.currentQuestionIndex);
+                testMeta.innerHTML = `
+                    <span><b>Course:</b> ${capitalize(currentTest.course)}</span>
+                    <span style="margin-left:15px;"><b>Topics:</b> ${currentTest.topics.join(', ')}</span>
+                    <span class="difficulty-badge">${capitalize(currentTest.difficulty)}</span>
+                `;
+                homePage.style.display = 'none';
+                testContainer.style.display = 'block';
+                questionNav.style.display = 'block';
+                updateNavigationDots();
+            } catch (error) {
+                alert('Failed to generate test. Please try again.');
+            } finally {
+                testSpinner.style.display = 'none';
+                hideGlobalSpinner();
+            }
+        });
+
+        // Display a single question
+        function displayQuestion(index) {
+            if (index < 0 || index >= currentTest.questions.length) return;
+
+            currentTest.currentQuestionIndex = index;
+            questionsContainer.innerHTML = '';
+
+            const q = currentTest.questions[index];
+            const div = document.createElement('div');
+            div.className = 'question';
+            div.innerHTML = `<b>Q${index + 1}. ${q.text}</b><br>`;
+
+            if (q.type === "multiple-choice" && q.options) {
+                q.options.forEach(opt => {
+                    const isChecked = currentTest.answers[index] === opt;
+                    div.innerHTML += `
+                        <label style="display:flex;align-items:center;gap:8px;margin:8px 0;cursor:pointer;">
+                            <input type="radio" name="q${index}" value="${opt}" ${isChecked ? 'checked' : ''}>
+                            ${opt}
+                        </label>
+                    `;
+                });
+            } else if (q.type === "coding" || q.type === "design" || q.type === "debugging") {
+                div.innerHTML += `
+                    <textarea rows="6" name="q${index}" placeholder="Write your code/answer here" 
+                        style="font-family:monospace;width:100%;padding:12px;background:var(--card-bg);color:var(--text);border:1px solid var(--border);">
+                        ${currentTest.answers[index] || ''}
+                    </textarea>
+                `;
+            } else if (q.type === "short-answer") {
+                div.innerHTML += `
+                    <input type="text" name="q${index}" style="width:100%;" 
+                        placeholder="Your answer" value="${currentTest.answers[index] || ''}">
+                `;
+            }
+
+            if (q.type === "coding" && q.explanation && q.explanation.length < 150 && /input|output/i.test(q.explanation)) {
+                div.innerHTML += `<br><small style="color:var(--primary);">${q.explanation}</small>`;
+            }
+
+            // Add mark for review checkbox
+            div.innerHTML += `
+                <div class="mark-review">
+                    <input type="checkbox" id="markReview${index}" name="markReview${index}" 
+                        ${currentTest.markedForReview[index] ? 'checked' : ''}>
+                    <label for="markReview${index}">Mark for review</label>
+                </div>
+            `;
+
+            questionsContainer.appendChild(div);
+
+            // Set up event listeners
+            document.querySelectorAll(`input[name="q${index}"], textarea[name="q${index}"]`).forEach(input => {
+                input.addEventListener('input', saveAnswers);
+                input.addEventListener('change', saveAnswers);
+            });
+
+            document.getElementById(`markReview${index}`).addEventListener('change', function() {
+                currentTest.markedForReview[index] = this.checked;
+                updateNavigationDots();
+            });
+
+            // Update navigation buttons
+            prevQuestionBtn.style.display = index > 0 ? 'inline-block' : 'none';
+            nextQuestionBtn.style.display = index < currentTest.questions.length - 1 ? 'inline-block' : 'none';
+
+            // Update active dot
+            updateNavigationDots();
+        }
+
+        // Update navigation dots
+        function updateNavigationDots() {
+            navDots.innerHTML = '';
+            currentTest.questions.forEach((q, idx) => {
+                const dot = document.createElement('div');
+                dot.className = 'nav-dot';
+                if (idx === currentTest.currentQuestionIndex) dot.classList.add('active');
+                if (currentTest.answers[idx] && currentTest.answers[idx].trim() !== '') dot.classList.add('answered');
+                if (currentTest.markedForReview[idx]) dot.style.border = '2px solid var(--danger)';
+                dot.addEventListener('click', () => {
+                    saveAnswers();
+                    displayQuestion(idx);
+                });
+                navDots.appendChild(dot);
+            });
+        }
+
+        // Navigation buttons
+        prevQuestionBtn.addEventListener('click', () => {
+            saveAnswers();
+            displayQuestion(currentTest.currentQuestionIndex - 1);
+        });
+
+        nextQuestionBtn.addEventListener('click', () => {
+            saveAnswers();
+            displayQuestion(currentTest.currentQuestionIndex + 1);
+        });
+
+        submitTestBtn.addEventListener('click', async function() {
+            if (confirm('Are you sure you want to submit the test? You cannot go back after submitting.')) {
+                clearInterval(timerInterval);
+                showGlobalSpinner();
+                const endTime = new Date();
+                const timeTaken = Math.floor((endTime - currentTest.startTime) / 1000);
+                resultsSpinner.style.display = 'inline-block';
+                resultsContent.innerHTML = '';
+                try {
+                    const results = await evaluateTestWithGeminiFlash(
+                        currentTest.course,
+                        currentTest.topics,
+                        currentTest.questions,
+                        currentTest.answers,
+                        currentTest.difficulty
+                    );
+                    displayResults(results);
+                    resultsModal.style.display = 'block';
+                    await saveTestResults({
+                        course: currentTest.course,
+                        topics: currentTest.topics,
+                        difficulty: currentTest.difficulty,
+                        date: new Date(),
+                        score: results.score,
+                        totalQuestions: results.totalQuestions,
+                        timeTaken: timeTaken,
+                        details: results.details,
+                        aiFeedback: results.aiFeedback,
+                        recommendations: results.recommendations
+                    });
+                    
+                    // Create confetti if score is good
+                    if (results.score / results.totalQuestions >= 0.8) {
+                        createConfetti();
+                    }
+                } catch (error) {
+                    alert('Failed to evaluate test. Please try again.');
+                } finally {
+                    resultsSpinner.style.display = 'none';
+                    hideGlobalSpinner();
+                }
+            }
+        });
+
+        fullscreenBtn.addEventListener('click', function() {
+            testContainer.classList.toggle('fullscreen');
+            questionNav.style.display = testContainer.classList.contains('fullscreen') ? 'none' : 'block';
+            this.innerHTML = testContainer.classList.contains('fullscreen') ? 
+                '<i class="fas fa-compress" style="margin-right:8px;"></i>Exit Fullscreen' : 
+                '<i class="fas fa-expand" style="margin-right:8px;"></i>Toggle Fullscreen';
+        });
+
+        continueBtn.addEventListener('click', function() {
+            resultsModal.style.display = 'none';
+            testContainer.style.display = 'none';
+            homePage.style.display = 'block';
+            questionNav.style.display = 'none';
+            resetTest();
+            updateProgressSummary();
+        });
+
+        viewResultsBtn.addEventListener('click', async function() {
+            homePage.style.display = 'none';
+            resultsPage.style.display = 'block';
+            historySpinner.style.display = 'inline-block';
+            await displayAllResults();
+            historySpinner.style.display = 'none';
+        });
+
+        backToHomeBtn.addEventListener('click', function() {
+            resultsPage.style.display = 'none';
+            homePage.style.display = 'block';
+        });
+
+        // --- GEMINI FLASH INTEGRATION ---
+
+        // 1. Fetch topics from Gemini Flash
+        async function fetchTopicsFromGeminiFlash(course) {
+            const prompt = `You are an expert interviewer and educator. For the course "${course}", generate a JSON array of 20 major, basic to advanced, non-overlapping, up-to-date, and skill-focused topics (no generic topics). Example: ["Topic 1", "Topic 2", ...]`;
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_FLASH_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }]
+                })
+            });
+            const data = await response.json();
+            try {
+                const text = data.candidates[0].content.parts[0].text;
+                const jsonStart = text.indexOf('[');
+                const jsonEnd = text.lastIndexOf(']') + 1;
+                const jsonString = text.substring(jsonStart, jsonEnd);
+                return JSON.parse(jsonString);
+            } catch (e) {
+                throw new Error('Gemini Flash did not return valid topics.');
+            }
+        }
+
+        // 2. Generate test from Gemini Flash
+        async function generateTestFromGeminiFlash(course, topics, difficulty) {
+            const numQuestions = DIFFICULTY_QUESTION_COUNT[difficulty] || 10;
+            const prompt = `
+You are an expert test generator for tech interviews and coding assessments.
+For the course "${course}", and the topics: ${JSON.stringify(topics)}, at "${difficulty}" difficulty, generate a JSON object:
+{
+  "questions": [
+    {
+      "text": "question text",
+      "type": "multiple-choice|coding|short-answer|debugging|design",
+      "options": ["option1", ...], // only for multiple-choice
+      "answer": "correct answer or code",
+      "explanation": "short explanation"
+    }
+  ]
+}
+Rules:
+- Total number of questions: ${numQuestions}
+- At least 2 must be code-based (type: "coding").
+- Mix question types appropriate for the topics.
+- For coding/design/debugging, provide input/output specs if relevant.
+- For multiple-choice, always provide 4 options and mark the correct one in "answer".
+- Make questions non-trivial and industry-relevant.
+- Cover all selected topics, distributing questions as evenly as possible.
+- Return only the JSON object, no extra text.
+    `.trim();
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_FLASH_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }]
+                })
+            });
+            const data = await response.json();
+            try {
+                const text = data.candidates[0].content.parts[0].text;
+                const jsonStart = text.indexOf('{');
+                const jsonEnd = text.lastIndexOf('}') + 1;
+                const jsonString = text.substring(jsonStart, jsonEnd);
+                return JSON.parse(jsonString);
+            } catch (e) {
+                throw new Error('Gemini Flash did not return valid test JSON.');
+            }
+        }
+
+        // 3. Evaluate test with Gemini Flash
+        async function evaluateTestWithGeminiFlash(course, topics, questions, answers, difficulty) {
+            const prompt = `
+You are an expert evaluator for technical tests.
+Given the following test for "${course}" on topics ${JSON.stringify(topics)} at "${difficulty}" difficulty, and the user's answers, evaluate each question:
+- For each question, indicate if the answer is correct, provide a detailed explanation, and suggest resources for improvement.
+- Give an overall score and personalized recommendations.
+Return a JSON object:
+{
+  "score": int,
+  "totalQuestions": int,
+  "details": [
+    {
+      "question": "...",
+      "userAnswer": "...",
+      "correctAnswer": "...",
+      "correct": true|false,
+      "explanation": "...",
+      "feedback": "..."
+    }
+  ],
+  "aiFeedback": "...",
+  "recommendations": "..."
+}
+Test JSON: ${JSON.stringify(questions)}
+User Answers: ${JSON.stringify(answers)}
+    `.trim();
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_FLASH_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }]
+                })
+            });
+            const data = await response.json();
+            try {
+                const text = data.candidates[0].content.parts[0].text;
+                const jsonStart = text.indexOf('{');
+                const jsonEnd = text.lastIndexOf('}') + 1;
+                const jsonString = text.substring(jsonStart, jsonEnd);
+                return JSON.parse(jsonString);
+            } catch (e) {
+                throw new Error('Gemini Flash did not return valid evaluation JSON.');
+            }
+        }
+
+        // --- UI Functions ---
+
+        function saveAnswers() {
+            const index = currentTest.currentQuestionIndex;
+            const name = `q${index}`;
+            let val = '';
+
+            if (currentTest.questions[index].type === "multiple-choice") {
+                const checked = document.querySelector(`input[name="${name}"]:checked`);
+                val = checked ? checked.value : '';
+            } else if (currentTest.questions[index].type === "coding" ||
+                currentTest.questions[index].type === "design" ||
+                currentTest.questions[index].type === "debugging") {
+                val = document.querySelector(`textarea[name="${name}"]`)?.value || '';
+            } else if (currentTest.questions[index].type === "short-answer") {
+                val = document.querySelector(`input[name="${name}"]`)?.value || '';
+            }
+
+            currentTest.answers[index] = val;
+            updateProgressBar();
+            updateNavigationDots();
+        }
+
+        function updateProgressBar() {
+            const total = currentTest.questions.length;
+            let answered = 0;
+            for (let i = 0; i < total; i++) {
+                if (currentTest.answers[i] && currentTest.answers[i].trim() !== '') answered++;
+            }
+            progressBar.style.width = ((answered / total) * 100) + "%";
+        }
+
+        function startTimer() {
+            currentTest.timeLeft = 45 * 60;
+            timerElement.textContent = "45:00";
+            timerElement.style.color = "var(--primary)";
+            timerInterval = setInterval(() => {
+                currentTest.timeLeft--;
+                const min = Math.floor(currentTest.timeLeft / 60);
+                const sec = currentTest.timeLeft % 60;
+                timerElement.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+                if (currentTest.timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    submitTestBtn.click();
+                }
+                if (currentTest.timeLeft <= 300) {
+                    timerElement.style.color = 'var(--danger)';
+                    timerElement.style.animationDuration = '0.5s';
+                }
+            }, 1000);
+        }
+
+        function displayResults(results) {
+            const percentage = Math.round((results.score / results.totalQuestions) * 100);
+            let scoreClass = '';
+            if (percentage >= 80) scoreClass = 'success';
+            else if (percentage >= 50) scoreClass = 'warning';
+            else scoreClass = 'danger';
+            
+            resultsContent.innerHTML = `
+                <div class="result-item" style="background: linear-gradient(90deg, rgba(var(--primary-rgb), 0.1) 0%, var(--card-bg) 50%);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+                        <div style="margin-bottom:8px;">
+                            <b>Score:</b> <span style="font-size:1.5em;color:var(--${scoreClass})">${results.score}/${results.totalQuestions}</span> (${percentage}%)
+                        </div>
+                        <div>
+                            <b>Time Taken:</b> ${Math.floor(currentTest.timeLeft / 60)}m ${currentTest.timeLeft % 60}s
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            if (results.aiFeedback) {
+                resultsContent.innerHTML += `<div class="feedback"><b>AI Feedback:</b> ${results.aiFeedback}</div>`;
+            }
+            if (results.recommendations) {
+                resultsContent.innerHTML += `<div class="feedback"><b>Recommendations:</b> ${results.recommendations}</div>`;
+            }
+
+            results.details.forEach((item, idx) => {
+                resultsContent.innerHTML += `
+                    <div class="result-item">
+                        <b>Q${idx + 1}.</b> ${item.question}<br>
+                        <b>Your Answer:</b> <span class="${item.correct ? 'correct' : 'incorrect'}">${item.userAnswer ? (item.userAnswer.length > 120 ? '<pre>' + escapeHtml(item.userAnswer) + '</pre>' : escapeHtml(item.userAnswer)) : '(No answer)'}</span><br>
+                        <b>Correct Answer:</b> ${item.correctAnswer && item.correctAnswer.length > 120 ? '<pre>' + escapeHtml(item.correctAnswer) + '</pre>' : escapeHtml(item.correctAnswer)}<br>
+                        <b>Explanation:</b> ${item.explanation || 'N/A'}<br>
+                        <b>Feedback:</b> ${item.feedback || ''}<br>
+                        <b>Result:</b> <span class="${item.correct ? 'correct' : 'incorrect'}">${item.correct ? '✓ Correct' : '✗ Incorrect'}</span>
+                    </div>
+                `;
+            });
+        }
+
+        async function saveTestResults(resultObj) {
+            if (!currentUser) {
+                alert("Not authenticated. Please log in again.");
+                return;
+            }
+            const testId = Date.now() + "_" + Math.floor(Math.random() * 100000);
+            try {
+                await db.collection('users').doc(currentUser.uid)
+                    .collection('testresults').doc(testId)
+                    .set(resultObj);
+                console.log("Test result saved to Firestore.");
+            } catch (err) {
+                console.error("Failed to save test result:", err);
+                alert("Failed to save your result. Please check your connection.");
+            }
+        }
+
+        async function displayAllResults() {
+            allResultsContainer.innerHTML = '';
+            if (!currentUser) {
+                allResultsContainer.innerHTML = '<p>Please log in to view results.</p>';
+                return;
+            }
+
+            try {
+                const snapshot = await db.collection('users').doc(currentUser.uid)
+                    .collection('testresults').orderBy('date', 'desc').get();
+
+                if (snapshot.empty) {
+                    allResultsContainer.innerHTML = '<p>No past results found.</p>';
+                    return;
+                }
+
+                let html = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const date = data.date.toDate();
+                    const percentage = Math.round((data.score / data.totalQuestions) * 100);
+
+                    html += `
+                        <div class="result-item" style="border-left: 4px solid ${percentage >= 70 ? 'var(--success)' : percentage >= 50 ? 'var(--warning)' : 'var(--danger)'}">
+                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+                                <div style="margin-bottom:8px;">
+                                    <b>Course:</b> ${capitalize(data.course)}<br>
+                                    <b>Date:</b> ${date.toLocaleString()}<br>
+                                    <b>Score:</b> <span style="font-weight:700;color:${percentage >= 70 ? 'var(--success)' : percentage >= 50 ? 'var(--warning)' : 'var(--danger)'}">${data.score}/${data.totalQuestions} (${percentage}%)</span>
+                                </div>
+                                <div style="text-align:right;">
+                                    <b>Difficulty:</b> ${capitalize(data.difficulty)}<br>
+                                    <b>Time:</b> ${Math.floor(data.timeTaken / 60)}m ${data.timeTaken % 60}s<br>
+                                    <b>Topics:</b> ${Array.isArray(data.topics) ? data.topics.slice(0, 3).join(', ') + (data.topics.length > 3 ? '...' : '') : ''}
+                                </div>
+                            </div>
+                            <details>
+                                <summary>View Details</summary>
+                                ${data.aiFeedback ? `<div class="feedback"><b>AI Feedback:</b> ${data.aiFeedback}</div>` : ''}
+                                ${data.recommendations ? `<div class="feedback"><b>Recommendations:</b> ${data.recommendations}</div>` : ''}
+                                ${data.details ? data.details.map((d, i) => `
+                                    <div style="margin-bottom:8px;padding:10px;background:${i % 2 === 0 ? 'rgba(var(--primary-rgb), 0.05)' : 'transparent'};border-radius:6px;">
+                                        <b>Q${i + 1}:</b> ${d.question}<br>
+                                        <b>Your Answer:</b> <span class="${d.correct ? 'correct' : 'incorrect'}">${d.userAnswer ? (d.userAnswer.length > 120 ? '<pre>' + escapeHtml(d.userAnswer) + '</pre>' : escapeHtml(d.userAnswer)) : '(No answer)'}</span><br>
+                                        <b>Correct Answer:</b> ${d.correctAnswer && d.correctAnswer.length > 120 ? '<pre>' + escapeHtml(d.correctAnswer) + '</pre>' : escapeHtml(d.correctAnswer)}<br>
+                                        <b>Result:</b> <span class="${d.correct ? 'correct' : 'incorrect'}">${d.correct ? '✓ Correct' : '✗ Incorrect'}</span>
+                                    </div>
+                                `).join('') : ''}
+                            </details>
+                        </div>
+                    `;
+                });
+                allResultsContainer.innerHTML = html;
+            } catch (error) {
+                console.error("Error loading results:", error);
+                allResultsContainer.innerHTML = '<p>Error loading results. Please try again.</p>';
+            }
+        }
+
+        function resetTest() {
+            currentTest = {
+                course: '',
+                topics: [],
+                difficulty: '',
+                questions: [],
+                answers: {},
+                markedForReview: {},
+                currentQuestionIndex: 0,
+                startTime: null,
+                timeLeft: 45 * 60
+            };
+            questionsContainer.innerHTML = '';
+            timerElement.textContent = '45:00';
+            progressBar.style.width = '0%';
+            testMeta.innerHTML = '';
+            navDots.innerHTML = '';
+        }
+
+        async function updateProgressSummary() {
+            if (!currentUser) return;
+
+            const snapshot = await db.collection('users').doc(currentUser.uid)
+                .collection('testresults').orderBy('date', 'desc').get();
+
+            if (snapshot.empty) {
+                progressSummary.innerHTML = '<p>No test history yet. Generate your first test!</p>';
+                return;
+            }
+
+            let total = 0, sum = 0, last = null, best = 0;
+            let topicStats = {};
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                total++;
+                sum += data.score;
+                if (!last) last = data;
+                if (data.score > best) best = data.score;
+
+                if (Array.isArray(data.topics)) {
+                    data.topics.forEach(topic => {
+                        if (!topicStats[topic]) topicStats[topic] = { total: 0, correct: 0 };
+                        topicStats[topic].total += data.totalQuestions / data.topics.length;
+                        topicStats[topic].correct += data.score / data.topics.length;
+                    });
+                }
+            });
+
+            const avgScore = (sum / total).toFixed(1);
+            const avgPercentage = Math.round((sum / (total * last.totalQuestions)) * 100);
+            let weakTopic = Object.entries(topicStats).sort((a, b) => (a[1].correct / a[1].total) - (b[1].correct / b[1].total))[0]?.[0];
+
+            progressSummary.innerHTML = `
+                <div style="display:flex; justify-content:space-between; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:120px; margin:5px;">
+                        <b>Total Tests</b><br>
+                        <span style="font-size:1.3em;">${total}</span>
+                    </div>
+                    <div style="flex:1; min-width:120px; margin:5px;">
+                        <b>Average Score</b><br>
+                        <span style="font-size:1.3em;color:${avgPercentage >= 70 ? 'var(--success)' : avgPercentage >= 50 ? 'var(--warning)' : 'var(--danger)'}">${avgScore}</span>
+                    </div>
+                    <div style="flex:1; min-width:120px; margin:5px;">
+                        <b>Highest Score</b><br>
+                        <span style="font-size:1.3em;">${best}</span>
+                    </div>
+                    <div style="flex:1; min-width:120px; margin:5px;">
+                        <b>Weakest Topic</b><br>
+                        <span style="font-size:1.1em;">${weakTopic || 'N/A'}</span>
+                    </div>
+                </div>
+                <div style="margin-top:10px;">
+                    <b>Last Attempt:</b> ${last ? `${capitalize(last.course)} (${last.score}/${last.totalQuestions}) on ${last.date.toDate().toLocaleDateString()}` : 'N/A'}
+                </div>
+            `;
+        }
+
+        function capitalize(str) {
+            if (!str) return '';
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[<>&"]/g, function(c) {
+                return { '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c];
+            });
+        }
+
+        // Show/hide global spinner
+        function showGlobalSpinner() {
+            document.getElementById('globalSpinner').style.display = 'flex';
+        }
+
+        function hideGlobalSpinner() {
+            document.getElementById('globalSpinner').style.display = 'none';
+        }
+
+        // Prevent right-click
+        document.addEventListener("contextmenu", function(e) {
+            e.preventDefault();
+        });
+    </script>
+</body>
+
+</html>

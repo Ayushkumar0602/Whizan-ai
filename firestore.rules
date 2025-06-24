@@ -1,0 +1,216 @@
+
+    rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+  
+  
+  
+   match /waitlist/{emailId} {
+      allow read, write: if true;
+    }
+    
+   match /resumes/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    match /userQuestions/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isUserData(userId) {
+      return isSignedIn() && userId == request.auth.uid;
+    }
+    
+    function isValidNote() {
+      return request.resource.data.keys().hasAll(['userId', 'videoId', 'content']) &&
+             request.resource.data.userId == request.auth.uid &&
+             request.resource.data.videoId is string &&
+             request.resource.data.content is string;
+    }
+    
+    function isValidQuizAttempt() {
+      return request.resource.data.keys().hasAll(['userId', 'videoId', 'score', 'totalQuestions']) &&
+             request.resource.data.userId == request.auth.uid &&
+             request.resource.data.score is number &&
+             request.resource.data.totalQuestions is number;
+    }
+    
+    function isValidVideoWatch() {
+      return request.resource.data.keys().hasAll(['userId', 'videoId', 'timeSpent']) &&
+             request.resource.data.userId == request.auth.uid &&
+             request.resource.data.timeSpent is number &&
+             request.resource.data.timeSpent > 0;
+    }
+
+//test
+  match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    //request 
+    
+    match /courseRequests/{requestId} {
+  allow read: if request.auth != null;
+  allow create: if request.auth != null && 
+                request.resource.data.userId == request.auth.uid &&
+                request.resource.data.userEmail is string &&
+                request.resource.data.courseTitle is string &&
+                request.resource.data.playlistId is string;
+}
+    
+    // Allow users to access their test results subcollection
+    match /users/{userId}/testresults/{testId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    
+    // Users collection
+    match /users/{userId} {
+      allow read, write: if isUserData(userId);
+    }
+      
+    // Notes collection
+    match /notes/{noteId} {
+      allow read: if isUserData(resource.data.userId) || 
+                   isUserData(noteId.split('_')[0]);
+      
+      allow create: if isUserData(request.resource.data.userId) &&
+                    noteId.matches(request.auth.uid + '_.*') &&
+                    isValidNote();
+      
+      allow update: if isUserData(resource.data.userId) &&
+                    resource.data.userId == request.resource.data.userId &&
+                    resource.data.videoId == request.resource.data.videoId &&
+                    isValidNote();
+      
+      allow delete: if isUserData(resource.data.userId);
+    }
+    
+    // QuizAttempts collection (single definition)
+    match /quizAttempts/{docId} {
+      allow read: if isUserData(resource.data.userId) || 
+                   isUserData(docId.split('_')[0]);
+      
+      allow create: if isUserData(request.resource.data.userId) &&
+                    docId.matches(request.auth.uid + '_.*') &&
+                    isValidQuizAttempt();
+      
+      // Prevent updates/deletes to maintain history integrity
+      allow update, delete: if false;
+    }
+    
+    // QuizData collection
+    match /quizData/{docId} {
+      allow read: if isUserData(resource.data.userId) || 
+                   isUserData(docId.split('_')[0]);
+      
+      allow create: if isUserData(request.resource.data.userId) &&
+                    docId.matches(request.auth.uid + '_.*') &&
+                    request.resource.data.keys().hasAll(['questions', 'userAnswers']);
+      
+      allow update, delete: if false;
+    }
+    
+    // VideoWatches collection
+    match /videoWatches/{docId} {
+      allow read: if isUserData(resource.data.userId) || 
+                   isUserData(docId.split('_')[0]);
+      
+      allow create, update: if isUserData(request.resource.data.userId) &&
+                           docId.matches(request.auth.uid + '_.*') &&
+                           isValidVideoWatch();
+      
+      allow delete: if false;
+    }
+    
+    // Analytics collection
+    match /analytics/{userId} {
+      allow read: if isUserData(userId);
+      
+      // Allow writes only from server (via Firebase Admin SDK)
+      allow write: if request.auth != null && 
+                   request.auth.token.firebase.sign_in_provider == 'custom' &&
+                   userId == request.resource.data.userId;
+                   
+    }
+    
+     match /goals/{goalId} {
+      allow read, write: if isUserData(request.auth.uid);
+    }
+
+match /users/{userId} {
+  allow read: if request.auth != null && request.auth.uid == userId;
+  allow write: if request.auth != null && request.auth.uid == userId;
+}
+
+  // Helper functions (keep your existing ones)
+   
+    
+    // Add this new helper function
+    function isValidEnrollment() {
+      return request.resource.data.keys().hasAll(['userId', 'courseId', 'playlistId']) &&
+             request.resource.data.userId == request.auth.uid &&
+             request.resource.data.courseId is string &&
+             request.resource.data.playlistId is string;
+    }
+
+    // Updated enrolledCourses rules
+    match /enrolledCourses/{enrollment} {
+      // Allow users to read their own enrollments
+      allow read: if isUserData(resource.data.userId);
+      
+      // Allow creation of new enrollments with validation
+      allow create: if isSignedIn() && 
+                    isValidEnrollment() &&
+                    request.resource.data.userId == request.auth.uid;
+      
+      // Allow updates only to specific fields
+      allow update: if isUserData(resource.data.userId) &&
+                   request.resource.data.userId == resource.data.userId &&
+                   request.resource.data.courseId == resource.data.courseId &&
+                   request.resource.data.playlistId == resource.data.playlistId &&
+                   request.resource.data.keys().hasOnly(['progress', 'lastAccessed']);
+      
+      // Optionally allow delete if needed
+      allow delete: if isUserData(resource.data.userId);
+    }
+    
+    
+   match /userCode/{docId} {
+      // Users can read, create, update and delete only their own code snippets
+      allow read, write: if request.auth != null && 
+                          request.auth.uid == resource.data.userId || 
+                          request.auth.uid == request.resource.data.userId;
+    }
+
+////streak rules - 
+   match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      allow update: if 
+        // User owns this document
+        request.auth.uid == userId &&
+        // Only credits field can be updated
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['credits']) &&
+        // Credits can only increase
+        request.resource.data.credits >= resource.data.credits &&
+        // Max 100 credits per update (prevent exploits)
+        request.resource.data.credits <= (resource.data.credits + 100);
+        
+        
+        
+        
+    }
+    
+      match /subjects/{subject} {
+      allow read, write: if true;
+    }
+
+
+  }
+}

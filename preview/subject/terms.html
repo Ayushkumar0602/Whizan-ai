@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Whizan Terms of Service - Learn about the terms and conditions governing your use of our SaaS platform.">
+    <meta name="keywords" content="Whizan, SaaS, Terms of Service, Software Agreement, Cloud Services">
+    <meta name="author" content="Whizan">
+    <meta property="og:title" content="Whizan Terms of Service">
+    <meta property="og:description" content="Terms and conditions for using Whizan's SaaS platform">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://whizan.com/terms">
+    <title>Terms of Service | Whizan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary-dark: #4b0082;
+            --primary-light: #9370db;
+            --secondary: #000000;
+            --text-light: #f8f9fa;
+            --text-dark: #212529;
+            --bg-light: #ffffff;
+            --bg-dark: #121212;
+            --accent: #e2b4ff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s;
+        }
+
+        h2 {
+            color: var(--primary-dark);
+            margin-top: 2rem;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 0.5rem;
+            animation: fadeIn 1.5s;
+        }
+
+        body.dark-mode h2 {
+            color: var(--primary-light);
+        }
+
+        p, li {
+            animation: fadeIn 2s;
+        }
+
+        a {
+            color: var(--primary-dark);
+            text-decoration: none;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        body.dark-mode a {
+            color: var(--primary-light);
+        }
+
+        a:hover {
+            color: var(--primary-light);
+        }
+
+        body.dark-mode a:hover {
+            color: var(--accent);
+        }
+
+        a::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--primary-light);
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease-out;
+        }
+
+        a:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+
+        footer {
+            background-color: var(--secondary);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-dark);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary-light);
+            transform: rotate(30deg);
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary-dark);
+            color: white;
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            line-height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 999;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+        }
+
+        .back-to-top:hover {
+            background: var(--primary-light);
+            transform: translateY(-5px);
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .highlight {
+            background-color: rgba(75, 0, 130, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        body.dark-mode .highlight {
+            background-color: rgba(147, 112, 219, 0.2);
+        }
+
+        .last-updated {
+            font-style: italic;
+            color: #666;
+            text-align: right;
+            margin-bottom: 2rem;
+        }
+
+        body.dark-mode .last-updated {
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle">🌓</button>
+    <a href="#" class="back-to-top" id="backToTop">↑</a>
+
+    <header class="floating">
+        <div class="container">
+            <h1>Whizan Terms of Service</h1>
+            <p>Last Updated: <span class="highlight">June 10, 2023</span></p>
+        </div>
+    </header>
+
+    <main class="container">
+        <p class="last-updated">Effective Date: June 10, 2023</p>
+
+        <section>
+            <h2>1. Acceptance of Terms</h2>
+            <p>By accessing or using the Whizan SaaS platform ("Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not use the Service.</p>
+        </section>
+
+        <section>
+            <h2>2. Description of Service</h2>
+            <p>Whizan provides a cloud-based software solution that enables users to [brief description of your SaaS functionality]. The Service may be accessed through our website or mobile applications.</p>
+        </section>
+
+        <section>
+            <h2>3. Registration and Account Security</h2>
+            <p>To use the Service, you must register for an account. You agree to:</p>
+            <ul>
+                <li>Provide accurate, current, and complete information during registration</li>
+                <li>Maintain and promptly update your account information</li>
+                <li>Maintain the security of your password and accept all risks of unauthorized access</li>
+                <li>Notify us immediately if you discover or suspect any security breaches</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>4. Subscription Plans and Payments</h2>
+            <p>Whizan offers various subscription plans:</p>
+            <ul>
+                <li><strong>Free Tier:</strong> Limited functionality with basic features</li>
+                <li><strong>Pro Plan:</strong> Full access to all features with monthly billing</li>
+                <li><strong>Enterprise Plan:</strong> Custom solutions with annual billing</li>
+            </ul>
+            <p>All fees are exclusive of taxes. You are responsible for paying all taxes associated with your subscription.</p>
+        </section>
+
+        <section>
+            <h2>5. User Conduct</h2>
+            <p>You agree not to:</p>
+            <ul>
+                <li>Use the Service for any illegal purpose or in violation of any laws</li>
+                <li>Violate or encourage others to violate the rights of third parties</li>
+                <li>Post, upload, or distribute any content that is unlawful or infringes intellectual property rights</li>
+                <li>Attempt to gain unauthorized access to other accounts or our systems</li>
+                <li>Interfere with the proper functioning of the Service</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>6. Intellectual Property</h2>
+            <p>All content and materials available on the Service, including but not limited to text, graphics, logos, and software, are the property of Whizan or its licensors and are protected by intellectual property laws.</p>
+        </section>
+
+        <section>
+            <h2>7. Termination</h2>
+            <p>We may terminate or suspend your account immediately, without prior notice or liability, for any reason, including if you breach these Terms. Upon termination, your right to use the Service will immediately cease.</p>
+        </section>
+
+        <section>
+            <h2>8. Limitation of Liability</h2>
+            <p>To the maximum extent permitted by law, Whizan shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your access to or use of the Service.</p>
+        </section>
+
+        <section>
+            <h2>9. Changes to Terms</h2>
+            <p>We reserve the right to modify these Terms at any time. We will provide notice of material changes through the Service or via email. Your continued use of the Service after such changes constitutes acceptance of the new Terms.</p>
+        </section>
+
+        <section>
+            <h2>10. Governing Law</h2>
+            <p>These Terms shall be governed by and construed in accordance with the laws of [Your Jurisdiction], without regard to its conflict of law provisions.</p>
+        </section>
+
+        <section>
+            <h2>11. Contact Information</h2>
+            <p>If you have any questions about these Terms, please contact us at <a href="mailto:legal@whizan.com">legal@whizan.com</a>.</p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 Whizan. All rights reserved.</p>
+            <nav>
+                <a href="privacy.html">Privacy Policy</a> | 
+                <a href="terms.html">Terms of Service</a> | 
+                <a href="contact.html">Contact Us</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        });
+
+        // Check for saved theme preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+        }
+
+        // Back to top button
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        backToTop.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Animate sections when they come into view
+        const sections = document.querySelectorAll('section');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        sections.forEach(section => {
+            section.style.opacity = 0;
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1996 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Whizan.ai - Smart Study</title>
+  <link rel="icon" type="image/png" href="smart study.png">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --primary-purple: #8B5CF6;
+      --light-purple: #A78BFA;
+      --dark-purple: #6D28D9;
+      --accent-red: #EF4444;
+      --bg-black: #0A0A0A;
+      --card-bg: rgba(15, 15, 15, 0.95);
+      --glass-bg: rgba(139, 92, 246, 0.1);
+      --text-white: #FFFFFF;
+      --text-gray: rgba(255, 255, 255, 0.7);
+      --text-muted: rgba(255, 255, 255, 0.5);
+      --border-color: rgba(139, 92, 246, 0.2);
+      --success-green: #10B981;
+      --warning-yellow: #F59E0B;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-black);
+      color: var(--text-white);
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding: 0 16px 100px 16px;
+      position: relative;
+    }
+
+    /* Animated Background */
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .bg-gradient {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.3;
+      animation: float 20s infinite ease-in-out;
+    }
+
+    .bg-gradient:nth-child(1) {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(45deg, var(--primary-purple), var(--light-purple));
+      top: -150px;
+      left: -150px;
+      animation-delay: 0s;
+    }
+
+    .bg-gradient:nth-child(2) {
+      width: 250px;
+      height: 250px;
+      background: linear-gradient(45deg, var(--accent-red), var(--primary-purple));
+      bottom: -125px;
+      right: -125px;
+      animation-delay: -10s;
+    }
+
+    .bg-gradient:nth-child(3) {
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(45deg, var(--dark-purple), var(--accent-red));
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation-delay: -5s;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translate(0, 0) rotate(0deg);
+      }
+
+      25% {
+        transform: translate(30px, -30px) rotate(90deg);
+      }
+
+      50% {
+        transform: translate(-20px, 20px) rotate(180deg);
+      }
+
+      75% {
+        transform: translate(20px, -10px) rotate(270deg);
+      }
+    }
+
+    /* Header */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .app-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      object-fit: cover;
+      border: 2px solid var(--border-color);
+    }
+
+    .app-title {
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary-purple), var(--light-purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .user-profile-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid var(--border-color);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+    }
+
+    .user-profile-btn:hover {
+      transform: scale(1.05);
+      border-color: var(--primary-purple);
+      box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+    }
+
+    .user-profile-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Progress Cards */
+    .progress-section {
+      margin-bottom: 32px;
+    }
+
+    .progress-cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .progress-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 20px;
+      backdrop-filter: blur(20px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary-purple), var(--light-purple));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .progress-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary-purple);
+      box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+    }
+
+    .progress-card:hover::before {
+      opacity: 1;
+    }
+
+    .card-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .card-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .quiz-icon {
+      background: linear-gradient(135deg, var(--accent-red), #FF6B6B);
+      color: white;
+    }
+
+    .leetcode-icon {
+      background: linear-gradient(135deg, var(--warning-yellow), #FCD34D);
+      color: white;
+    }
+
+    .goals-icon {
+      background: linear-gradient(135deg, var(--primary-purple), var(--light-purple));
+      color: white;
+    }
+
+    .card-info {
+      flex: 1;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-white);
+    }
+
+    .progress-stats {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .stat-number {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-white);
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: var(--text-gray);
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-purple), var(--light-purple));
+      border-radius: 4px;
+      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% {
+        transform: translateX(-100%);
+      }
+
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    /* Goals Container */
+    .goals-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 24px;
+      backdrop-filter: blur(20px);
+      margin-bottom: 32px;
+    }
+
+    .goals-header {
+      margin-bottom: 24px;
+    }
+
+    .goals-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--text-white), var(--text-gray));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .date-navigation {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+    }
+
+    .nav-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      border: none;
+      background: var(--glass-bg);
+      color: var(--primary-purple);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-btn:hover {
+      background: var(--primary-purple);
+      color: white;
+      transform: scale(1.1);
+    }
+
+    .current-date {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-white);
+      text-align: center;
+      flex: 1;
+    }
+
+    /* Filter Controls */
+    .filter-controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      padding: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+    }
+
+    .filter-btn {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-gray);
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .filter-btn.active {
+      background: var(--primary-purple);
+      color: white;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    }
+
+    .filter-btn:not(.active):hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-white);
+    }
+
+    /* Goals Grid */
+    .goals-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .goal-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .goal-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary-purple), var(--light-purple));
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .goal-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--primary-purple);
+      box-shadow: 0 12px 24px rgba(139, 92, 246, 0.2);
+    }
+
+    .goal-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .goal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .goal-info {
+      flex: 1;
+    }
+
+    .goal-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-white);
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+
+    .goal-date {
+      font-size: 14px;
+      color: var(--text-gray);
+    }
+
+    .goal-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-gray);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .action-btn:hover {
+      background: var(--primary-purple);
+      color: white;
+      transform: scale(1.1);
+    }
+
+    .goal-description {
+      color: var(--text-gray);
+      margin-bottom: 16px;
+      line-height: 1.5;
+      font-size: 15px;
+    }
+
+    .goal-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-badge {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-pending {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--warning-yellow);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .status-completed {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .complete-btn {
+      background: linear-gradient(135deg, var(--success-green), #34D399);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 10px 20px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .complete-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-gray);
+    }
+
+    .empty-state h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-white);
+      margin-bottom: 8px;
+    }
+
+    .empty-state p {
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    /* Floating Action Buttons */
+    .floating-buttons {
+      position: fixed;
+      bottom: 100px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 100;
+    }
+
+    .fab {
+      width: 56px;
+      height: 56px;
+      border-radius: 20px;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .add-goal-btn {
+      background: linear-gradient(135deg, var(--primary-purple), var(--light-purple));
+      color: white;
+    }
+
+    .ai-chatbot-btn {
+      background: linear-gradient(135deg, var(--accent-red), #FF6B6B);
+      color: white;
+    }
+
+    .fab:hover {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 12px 40px rgba(139, 92, 246, 0.4);
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 400px;
+      max-height: 90vh;
+      overflow-y: auto;
+      backdrop-filter: blur(20px);
+      animation: modalSlideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes modalSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 24px 0 24px;
+      margin-bottom: 24px;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-white);
+    }
+
+    .close-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-gray);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 20px;
+    }
+
+    .close-btn:hover {
+      background: var(--accent-red);
+      color: white;
+      transform: scale(1.1);
+    }
+
+    .modal-body {
+      padding: 0 24px 24px 24px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--text-white);
+      font-size: 14px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-white);
+      font-size: 16px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-purple);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .form-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    textarea.form-input {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 16px 24px;
+      border-radius: 16px;
+      border: none;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-purple), var(--light-purple));
+      color: white;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-white);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* LeetCode Modal Specific */
+    .leetcode-input-group {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .leetcode-input-group .form-input {
+      flex: 1;
+    }
+
+    .fetch-btn {
+      padding: 16px 20px;
+      border-radius: 16px;
+      border: none;
+      background: linear-gradient(135deg, var(--warning-yellow), #FCD34D);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
+    }
+
+    .fetch-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+    }
+
+    .leetcode-stats {
+      margin-top: 24px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary-purple);
+      box-shadow: 0 8px 20px rgba(139, 92, 246, 0.2);
+    }
+
+    .stat-card-title {
+      font-size: 14px;
+      color: var(--text-gray);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .stat-card-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-white);
+    }
+
+    .profile-header {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .profile-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-white);
+      margin-bottom: 8px;
+    }
+
+    .profile-rank {
+      color: var(--text-gray);
+      font-size: 14px;
+    }
+
+    .difficulty-stats {
+      margin-top: 20px;
+    }
+
+    .difficulty-item {
+      margin-bottom: 16px;
+    }
+
+    .difficulty-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .difficulty-label {
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .difficulty-easy {
+      color: var(--success-green);
+    }
+
+    .difficulty-medium {
+      color: var(--warning-yellow);
+    }
+
+    .difficulty-hard {
+      color: var(--accent-red);
+    }
+
+    .difficulty-count {
+      font-size: 14px;
+      color: var(--text-gray);
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      border-top: 1px solid var(--border-color);
+      backdrop-filter: blur(20px);
+      z-index: 99;
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 0 max(12px, env(safe-area-inset-bottom));
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: var(--text-gray);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 8px 12px;
+      border-radius: 12px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      min-width: 60px;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      color: var(--primary-purple);
+      background: rgba(139, 92, 246, 0.1);
+    }
+
+    .nav-item i {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    /* Responsive Design */
+    @media (min-width: 768px) {
+      body {
+        padding: 0 24px 100px 24px;
+      }
+
+      .progress-cards {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .goals-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .modal-content {
+        max-width: 500px;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    /* Loading States */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--primary-purple);
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Error States */
+    .error-message {
+      color: var(--accent-red);
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 16px;
+      font-size: 14px;
+    }
+
+    /* Success States */
+    .success-message {
+      color: var(--success-green);
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 16px;
+      font-size: 14px;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary-purple);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--light-purple);
+    }
+
+    /* Safe Area Support */
+    @supports (padding: max(0px)) {
+      body {
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Animated Background -->
+  <div class="animated-bg">
+    <div class="bg-gradient"></div>
+    <div class="bg-gradient"></div>
+    <div class="bg-gradient"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <img src="smart study.png" alt="Smart Study Logo" class="app-logo">
+      <h1 class="app-title">Whizan.ai</h1>
+    </div>
+    <a href="profile.html" class="user-profile-btn" id="user-profile-btn">
+      <img src="" alt="User Profile" class="user-profile-img" id="user-profile-img">
+    </a>
+  </header>
+
+  <!-- Progress Section -->
+  <section class="progress-section">
+    <div class="progress-cards">
+      <!-- Quiz Progress Card -->
+      <div class="progress-card">
+        <div class="card-content">
+          <div class="card-icon quiz-icon">
+            <i class="material-icons">quiz</i>
+          </div>
+          <div class="card-info">
+            <h3 class="card-title">Quizzes</h3>
+            <div class="progress-stats">
+              <span class="stat-number" id="completed-quizzes">0</span>
+              <span class="stat-label">completed</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="quiz-progress" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LeetCode Progress Card -->
+      <div class="progress-card" id="leetcode-card" style="cursor: pointer;">
+        <div class="card-content">
+          <div class="card-icon leetcode-icon">
+            <i class="material-icons">code</i>
+          </div>
+          <div class="card-info">
+            <h3 class="card-title">LeetCode</h3>
+            <div class="progress-stats">
+              <span class="stat-number" id="leetcode-solved">0</span>
+              <span class="stat-label">problems solved</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="leetcode-progress" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Goals Progress Card -->
+      <div class="progress-card">
+        <div class="card-content">
+          <div class="card-icon goals-icon">
+            <i class="material-icons">flag</i>
+          </div>
+          <div class="card-info">
+            <h3 class="card-title">Goals</h3>
+            <div class="progress-stats">
+              <span class="stat-number" id="completed-goals">0</span>
+              <span class="stat-label">achieved</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="goals-progress" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Goals Container -->
+  <main class="goals-container">
+    <div class="goals-header">
+      <h2 class="goals-title">My Study Goals</h2>
+      <div class="date-navigation">
+        <button class="nav-btn" id="prev-day">
+          <i class="material-icons">chevron_left</i>
+        </button>
+        <div class="current-date" id="current-date">Loading...</div>
+        <button class="nav-btn" id="next-day">
+          <i class="material-icons">chevron_right</i>
+        </button>
+      </div>
+    </div>
+
+    <div class="filter-controls">
+      <button class="filter-btn active" data-filter="all">All Goals</button>
+      <button class="filter-btn" data-filter="pending">Pending</button>
+      <button class="filter-btn" data-filter="completed">Completed</button>
+    </div>
+
+    <div class="goals-grid" id="goals-grid">
+      <!-- Goals will be dynamically inserted here -->
+    </div>
+
+    <div class="empty-state" id="empty-state" style="display: none;">
+      <h3>No goals found</h3>
+      <p>Add a new goal to get started on your learning journey!</p>
+    </div>
+  </main>
+
+  <!-- Floating Action Buttons -->
+  <div class="floating-buttons">
+    <button class="fab ai-chatbot-btn" id="ai-chatbot-btn" title="AI Assistant">
+      <i class="material-icons">smart_toy</i>
+    </button>
+    <button class="fab add-goal-btn" id="add-goal-btn" title="Add Goal">
+      <i class="material-icons">add</i>
+    </button>
+  </div>
+
+  <!-- Add/Edit Goal Modal -->
+  <div class="modal" id="goal-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title">Add New Goal</h2>
+        <button class="close-btn" id="close-modal">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="goal-form">
+          <input type="hidden" id="goal-id">
+
+          <div class="form-group">
+            <label for="goal-title" class="form-label">Title</label>
+            <input type="text" id="goal-title" class="form-input" placeholder="Enter goal title" required>
+          </div>
+
+          <div class="form-group">
+            <label for="goal-description" class="form-label">Description</label>
+            <textarea id="goal-description" class="form-input"
+              placeholder="Enter goal description (optional)"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="goal-date" class="form-label">Date</label>
+            <input type="date" id="goal-date" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label for="goal-time" class="form-label">Time (Optional)</label>
+            <input type="time" id="goal-time" class="form-input">
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Goal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- LeetCode Stats Modal -->
+  <div class="modal" id="leetcode-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">LeetCode Profile</h2>
+        <button class="close-btn" id="close-leetcode-modal">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="leetcode-username-input" class="form-label">LeetCode Username</label>
+          <div class="leetcode-input-group">
+            <input type="text" id="leetcode-username-input" class="form-input"
+              placeholder="Enter your LeetCode username">
+            <button type="button" class="fetch-btn" id="fetch-leetcode-btn">
+              <span class="btn-text">Fetch Stats</span>
+              <div class="loading" id="leetcode-loading" style="display: none;"></div>
+            </button>
+          </div>
+        </div>
+
+        <div class="leetcode-stats" id="leetcode-stats-container">
+          <!-- LeetCode stats will be displayed here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <div class="nav-container">
+      <a href="user_persona.html" class="nav-item">
+        <i class="material-icons">person</i>
+        <span>Profile</span>
+      </a>
+      <a href="course.html" class="nav-item">
+        <i class="material-icons">school</i>
+        <span>Courses</span>
+      </a>
+      <a href="college.html" class="nav-item">
+        <i class="material-icons">event</i>
+        <span>College</span>
+      </a>
+      <a href="achievements.html" class="nav-item">
+        <i class="material-icons">emoji_events</i>
+        <span>Achievements</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+  <script>
+    // Initialize Firebase
+    fetch('https://us-central1-study2-7bdc7.cloudfunctions.net/getConfig')
+      .then(response => response.json())
+      .then(config => {
+        firebase.initializeApp(config.firebase);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+          .then(() => {
+            console.log("Persistence set to LOCAL (30 days)");
+          })
+          .catch((error) => {
+            console.error("Error setting persistence:", error);
+          });
+
+        // DOM Elements
+        const goalsGrid = document.getElementById('goals-grid');
+        const addGoalBtn = document.getElementById('add-goal-btn');
+        const goalModal = document.getElementById('goal-modal');
+        const closeModalBtn = document.getElementById('close-modal');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const goalForm = document.getElementById('goal-form');
+        const modalTitle = document.getElementById('modal-title');
+        const currentDateEl = document.getElementById('current-date');
+        const prevDayBtn = document.getElementById('prev-day');
+        const nextDayBtn = document.getElementById('next-day');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const emptyState = document.getElementById('empty-state');
+        const leetcodeCard = document.getElementById('leetcode-card');
+        const leetcodeModal = document.getElementById('leetcode-modal');
+        const closeLeetcodeModalBtn = document.getElementById('close-leetcode-modal');
+        const leetcodeUsernameInput = document.getElementById('leetcode-username-input');
+        const fetchLeetcodeBtn = document.getElementById('fetch-leetcode-btn');
+        const leetcodeStatsContainer = document.getElementById('leetcode-stats-container');
+        const leetcodeLoading = document.getElementById('leetcode-loading');
+        const aiChatbotBtn = document.getElementById('ai-chatbot-btn');
+
+        // State variables
+        let currentUser = null;
+        let currentSelectedDate = new Date();
+        let currentFilter = 'all';
+        let editingGoalId = null;
+        let leetcodeUsername = '';
+        let dailyGoalsCompleted = 0;
+        let dailyGoalsTotal = 0;
+
+        // Initialize the app
+        function init() {
+          auth.onAuthStateChanged(user => {
+            if (user) {
+              currentUser = user;
+
+              // Load profile photo
+              db.collection('users').doc(user.uid).get()
+                .then(doc => {
+                  const img = document.getElementById('user-profile-img');
+
+                  if (doc.exists && doc.data().photoURL) {
+                    // User has a profile photo
+                    img.src = doc.data().photoURL;
+                  } else {
+                    // No profile photo available - show default image
+                    img.src = 'profile.png';
+
+                    // Show alert with options
+                    const completeProfile = confirm('Complete your profile with a photo?\n\nClick "OK" to go to profile page or "Cancel" to stay here.');
+
+                    if (completeProfile) {
+                      // User clicked "OK" - redirect to profile page
+                      window.location.href = 'profile.html';
+                    }
+                    // If user clicked "Cancel", they stay on current page (no action needed)
+                  }
+                })
+                .catch(error => {
+                  console.error('Error loading profile photo:', error);
+
+                  // On error, also show default image and alert
+                  const img = document.getElementById('user-profile-img');
+                  img.src = 'profile.png';
+
+                  const completeProfile = confirm('Complete your profile with a photo?\n\nClick "OK" to go to profile page or "Cancel" to stay here.');
+
+                  if (completeProfile) {
+                    window.location.href = 'profile.html';
+                  }
+                });
+
+              updateCurrentDateDisplay();
+              loadGoals();
+              loadUserProgress();
+              loadLeetCodeUsername();
+              updateLoginTimestamp();
+            } else {
+              window.location.href = 'auth.html';
+            }
+          });
+
+
+          // Event listeners
+          addGoalBtn.addEventListener('click', openAddGoalModal);
+          closeModalBtn.addEventListener('click', closeModal);
+          cancelBtn.addEventListener('click', closeModal);
+          goalForm.addEventListener('submit', handleGoalSubmit);
+          prevDayBtn.addEventListener('click', () => navigateDate(-1));
+          nextDayBtn.addEventListener('click', () => navigateDate(1));
+          leetcodeCard.addEventListener('click', openLeetCodeModal);
+          closeLeetcodeModalBtn.addEventListener('click', closeLeetCodeModal);
+          fetchLeetcodeBtn.addEventListener('click', fetchLeetCodeStats);
+          aiChatbotBtn.addEventListener('click', toggleChatbot);
+
+          // Close modals when clicking outside
+          goalModal.addEventListener('click', (e) => {
+            if (e.target === goalModal) closeModal();
+          });
+
+          leetcodeModal.addEventListener('click', (e) => {
+            if (e.target === leetcodeModal) closeLeetCodeModal();
+          });
+
+          filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+              filterBtns.forEach(b => b.classList.remove('active'));
+              btn.classList.add('active');
+              currentFilter = btn.dataset.filter;
+              loadGoals();
+            });
+          });
+        }
+
+        // Toggle chatbot
+        function toggleChatbot() {
+          // Create a more sophisticated notification
+          const notification = document.createElement('div');
+          notification.className = 'success-message';
+          notification.style.position = 'fixed';
+          notification.style.top = '20px';
+          notification.style.left = '50%';
+          notification.style.transform = 'translateX(-50%)';
+          notification.style.zIndex = '10000';
+          notification.style.maxWidth = '90%';
+          notification.textContent = 'AI Chatbot feature coming soon! 🤖';
+
+          document.body.appendChild(notification);
+
+          setTimeout(() => {
+            notification.remove();
+          }, 3000);
+        }
+
+        // Load LeetCode username from Firestore
+        async function loadLeetCodeUsername() {
+          if (!currentUser) return;
+
+          try {
+            const userDoc = await db.collection('users').doc(currentUser.uid).get();
+            if (userDoc.exists && userDoc.data().leetcodeUsername) {
+              leetcodeUsername = userDoc.data().leetcodeUsername;
+              leetcodeUsernameInput.value = leetcodeUsername;
+              fetchLeetCodeStats();
+            }
+          } catch (error) {
+            console.error('Error loading LeetCode username:', error);
+          }
+        }
+
+        // Save LeetCode username to Firestore
+        async function saveLeetCodeUsername(username) {
+          if (!currentUser) return;
+
+          try {
+            await db.collection('users').doc(currentUser.uid).set({
+              leetcodeUsername: username
+            }, { merge: true });
+            leetcodeUsername = username;
+          } catch (error) {
+            console.error('Error saving LeetCode username:', error);
+            throw error;
+          }
+        }
+
+        // Open LeetCode modal
+        function openLeetCodeModal() {
+          leetcodeModal.style.display = 'flex';
+        }
+
+        // Close LeetCode modal
+        function closeLeetCodeModal() {
+          leetcodeModal.style.display = 'none';
+        }
+
+        // Fetch LeetCode stats from multiple APIs with fallback
+        async function fetchLeetCodeStats() {
+          const username = leetcodeUsernameInput.value.trim();
+          if (!username) {
+            showError('Please enter your LeetCode username');
+            return;
+          }
+
+          try {
+            await saveLeetCodeUsername(username);
+
+            // Show loading state
+            const btnText = fetchLeetcodeBtn.querySelector('.btn-text');
+            btnText.style.display = 'none';
+            leetcodeLoading.style.display = 'inline-block';
+            fetchLeetcodeBtn.disabled = true;
+
+            leetcodeStatsContainer.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading"></div><p style="margin-top: 12px; color: var(--text-gray);">Loading LeetCode stats...</p></div>';
+
+            // Try multiple APIs for better reliability
+            let data = null;
+            const apis = [
+              `https://leetcode-api-faisalshohag.vercel.app/${username}`,
+              `https://alfa-leetcode-api.onrender.com/${username}`,
+              `https://leetcode-stats-api.herokuapp.com/${username}`
+            ];
+
+            for (const apiUrl of apis) {
+              try {
+                console.log(`Trying API: ${apiUrl}`);
+                const response = await fetch(apiUrl);
+
+                if (!response.ok) {
+                  console.log(`API ${apiUrl} returned status: ${response.status}`);
+                  continue;
+                }
+
+                const apiData = await response.json();
+                console.log(`API ${apiUrl} response:`, apiData);
+
+                // Check if the response contains valid data
+                if (apiData && !apiData.error && !apiData.errors) {
+                  data = apiData;
+                  break;
+                }
+              } catch (error) {
+                console.log(`API ${apiUrl} failed:`, error);
+                continue;
+              }
+            }
+
+            if (!data) {
+              throw new Error('Unable to fetch LeetCode stats. Please check your username and try again.');
+            }
+
+            displayDetailedLeetCodeStats(data, username);
+            updateLeetCodeProgressCard(data);
+
+          } catch (error) {
+            console.error('Error fetching LeetCode stats:', error);
+            showError(error.message);
+          } finally {
+            // Reset loading state
+            const btnText = fetchLeetcodeBtn.querySelector('.btn-text');
+            btnText.style.display = 'inline';
+            leetcodeLoading.style.display = 'none';
+            fetchLeetcodeBtn.disabled = false;
+          }
+        }
+
+        function showError(message) {
+          leetcodeStatsContainer.innerHTML = `<div class="error-message">${message}</div>`;
+        }
+
+        function displayDetailedLeetCodeStats(stats, username) {
+          // Handle different API response formats
+          const totalSolved = stats.totalSolved || stats.solvedProblem || 0;
+          const easySolved = stats.easySolved || stats.easySolved || 0;
+          const mediumSolved = stats.mediumSolved || stats.mediumSolved || 0;
+          const hardSolved = stats.hardSolved || stats.hardSolved || 0;
+          const totalEasy = stats.totalEasy || 800;
+          const totalMedium = stats.totalMedium || 1600;
+          const totalHard = stats.totalHard || 700;
+          const acceptanceRate = stats.acceptanceRate || stats.acceptanceRate || 0;
+          const ranking = stats.ranking || stats.ranking || null;
+
+          const easyPercentage = totalEasy > 0 ? (easySolved / totalEasy * 100).toFixed(1) : 0;
+          const mediumPercentage = totalMedium > 0 ? (mediumSolved / totalMedium * 100).toFixed(1) : 0;
+          const hardPercentage = totalHard > 0 ? (hardSolved / totalHard * 100).toFixed(1) : 0;
+
+          leetcodeStatsContainer.innerHTML = `
+            <div class="profile-header">
+              <div class="profile-name">${username}</div>
+              <div class="profile-rank">Rank: ${ranking ? ranking.toLocaleString() : 'N/A'}</div>
+            </div>
+
+            <div class="difficulty-stats">
+              <div class="difficulty-item">
+                <div class="difficulty-header">
+                  <span class="difficulty-label difficulty-easy">Easy</span>
+                  <span class="difficulty-count">${easySolved}/${totalEasy}</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${easyPercentage}%; background: linear-gradient(90deg, var(--success-green), #34D399);"></div>
+                </div>
+              </div>
+              
+              <div class="difficulty-item">
+                <div class="difficulty-header">
+                  <span class="difficulty-label difficulty-medium">Medium</span>
+                  <span class="difficulty-count">${mediumSolved}/${totalMedium}</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${mediumPercentage}%; background: linear-gradient(90deg, var(--warning-yellow), #FCD34D);"></div>
+                </div>
+              </div>
+              
+              <div class="difficulty-item">
+                <div class="difficulty-header">
+                  <span class="difficulty-label difficulty-hard">Hard</span>
+                  <span class="difficulty-count">${hardSolved}/${totalHard}</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${hardPercentage}%; background: linear-gradient(90deg, var(--accent-red), #FF6B6B);"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-card-title">Total Solved</div>
+                <div class="stat-card-value">${totalSolved}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-title">Acceptance</div>
+                <div class="stat-card-value">${acceptanceRate ? acceptanceRate.toFixed(1) + '%' : 'N/A'}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-title">Easy Solved</div>
+                <div class="stat-card-value">${easySolved}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-title">Hard Solved</div>
+                <div class="stat-card-value">${hardSolved}</div>
+              </div>
+            </div>
+          `;
+        }
+
+        function updateLeetCodeProgressCard(stats) {
+          const totalSolved = stats.totalSolved || stats.solvedProblem || 0;
+          document.getElementById('leetcode-solved').textContent = totalSolved;
+
+          // Calculate progress based on total problems (assuming ~3000 total problems)
+          const progress = Math.min(100, Math.floor((totalSolved / 3000) * 100));
+          document.getElementById('leetcode-progress').style.width = `${progress}%`;
+        }
+
+        // Date navigation
+        function navigateDate(days) {
+          currentSelectedDate.setDate(currentSelectedDate.getDate() + days);
+          updateCurrentDateDisplay();
+          loadGoals();
+        }
+
+        function updateCurrentDateDisplay() {
+          const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+          currentDateEl.textContent = currentSelectedDate.toLocaleDateString(undefined, options);
+        }
+
+        // Modal functions
+        function openAddGoalModal() {
+          editingGoalId = null;
+          modalTitle.textContent = 'Add New Goal';
+          goalForm.reset();
+          document.getElementById('goal-date').valueAsDate = currentSelectedDate;
+          goalModal.style.display = 'flex';
+        }
+
+        function openEditGoalModal(goal) {
+          editingGoalId = goal.id;
+          modalTitle.textContent = 'Edit Goal';
+
+          document.getElementById('goal-id').value = goal.id;
+          document.getElementById('goal-title').value = goal.title;
+          document.getElementById('goal-description').value = goal.description || '';
+
+          const goalDate = goal.date.toDate();
+          document.getElementById('goal-date').valueAsDate = goalDate;
+
+          if (goal.time) {
+            document.getElementById('goal-time').value = goal.time;
+          }
+
+          goalModal.style.display = 'flex';
+        }
+
+        function closeModal() {
+          goalModal.style.display = 'none';
+        }
+
+        // Handle form submission
+        function handleGoalSubmit(e) {
+          e.preventDefault();
+
+          const title = document.getElementById('goal-title').value.trim();
+          const description = document.getElementById('goal-description').value.trim();
+          const date = document.getElementById('goal-date').valueAsDate;
+          const time = document.getElementById('goal-time').value || null;
+
+          const goalData = {
+            title,
+            description: description || null,
+            date: firebase.firestore.Timestamp.fromDate(date),
+            time,
+            completed: false,
+            userId: currentUser.uid,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          };
+
+          if (editingGoalId) {
+            db.collection('goals').doc(editingGoalId).update(goalData)
+              .then(() => {
+                closeModal();
+                loadGoals();
+                showSuccessMessage('Goal updated successfully!');
+              })
+              .catch(error => {
+                console.error('Error updating goal:', error);
+                showErrorMessage('Failed to update goal. Please try again.');
+              });
+          } else {
+            db.collection('goals').add(goalData)
+              .then(() => {
+                closeModal();
+                loadGoals();
+                showSuccessMessage('Goal added successfully!');
+              })
+              .catch(error => {
+                console.error('Error adding goal:', error);
+                showErrorMessage('Failed to add goal. Please try again.');
+              });
+          }
+        }
+
+        function showSuccessMessage(message) {
+          const notification = document.createElement('div');
+          notification.className = 'success-message';
+          notification.style.position = 'fixed';
+          notification.style.top = '20px';
+          notification.style.left = '50%';
+          notification.style.transform = 'translateX(-50%)';
+          notification.style.zIndex = '10000';
+          notification.style.maxWidth = '90%';
+          notification.textContent = message;
+
+          document.body.appendChild(notification);
+
+          setTimeout(() => {
+            notification.remove();
+          }, 3000);
+        }
+
+        function showErrorMessage(message) {
+          const notification = document.createElement('div');
+          notification.className = 'error-message';
+          notification.style.position = 'fixed';
+          notification.style.top = '20px';
+          notification.style.left = '50%';
+          notification.style.transform = 'translateX(-50%)';
+          notification.style.zIndex = '10000';
+          notification.style.maxWidth = '90%';
+          notification.textContent = message;
+
+          document.body.appendChild(notification);
+
+          setTimeout(() => {
+            notification.remove();
+          }, 3000);
+        }
+
+        // Load goals from Firestore
+        function loadGoals() {
+          const startOfDay = new Date(currentSelectedDate);
+          startOfDay.setHours(0, 0, 0, 0);
+
+          const endOfDay = new Date(currentSelectedDate);
+          endOfDay.setHours(23, 59, 59, 999);
+
+          let query = db.collection('goals')
+            .where('userId', '==', currentUser.uid)
+            .where('date', '>=', firebase.firestore.Timestamp.fromDate(startOfDay))
+            .where('date', '<=', firebase.firestore.Timestamp.fromDate(endOfDay))
+            .orderBy('date')
+            .orderBy('time');
+
+          if (currentFilter !== 'all') {
+            query = query.where('completed', '==', (currentFilter === 'completed'));
+          }
+
+          query.get()
+            .then(querySnapshot => {
+              goalsGrid.innerHTML = '';
+              dailyGoalsCompleted = 0;
+              dailyGoalsTotal = 0;
+
+              if (querySnapshot.empty) {
+                emptyState.style.display = 'block';
+                return;
+              }
+
+              emptyState.style.display = 'none';
+
+              querySnapshot.forEach(doc => {
+                const goal = {
+                  id: doc.id,
+                  ...doc.data()
+                };
+                dailyGoalsTotal++;
+                if (goal.completed) dailyGoalsCompleted++;
+                renderGoalCard(goal);
+              });
+
+              checkDailyGoalsCompletion();
+            })
+            .catch(error => {
+              console.error('Error loading goals:', error);
+              emptyState.style.display = 'block';
+              emptyState.innerHTML = `
+                <h3>Error loading goals</h3>
+                <p>Please try again later</p>
+              `;
+            });
+        }
+
+        // Check if all daily goals are completed and update streak
+        async function checkDailyGoalsCompletion() {
+          if (dailyGoalsTotal > 0 && dailyGoalsCompleted === dailyGoalsTotal) {
+            await updateStreak();
+          }
+        }
+
+        // Update streak in Firestore
+        async function updateStreak() {
+          if (!currentUser) return;
+
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          const userRef = db.collection('users').doc(currentUser.uid);
+
+          try {
+            await db.runTransaction(async (transaction) => {
+              const doc = await transaction.get(userRef);
+              const currentStreak = doc.data()?.streak || 0;
+              const lastGoalCompletion = doc.data()?.lastGoalCompletion?.toDate();
+
+              if (lastGoalCompletion && isSameDay(lastGoalCompletion, today)) {
+                return;
+              }
+
+              const shouldIncrementStreak = lastGoalCompletion &&
+                isYesterday(lastGoalCompletion, today);
+
+              const newStreak = shouldIncrementStreak ? currentStreak + 1 : 1;
+
+              transaction.update(userRef, {
+                streak: newStreak,
+                lastGoalCompletion: firebase.firestore.Timestamp.fromDate(today),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+              });
+            });
+          } catch (error) {
+            console.error('Error updating streak:', error);
+          }
+        }
+
+        // Helper function to check if two dates are the same day
+        function isSameDay(date1, date2) {
+          return date1.getDate() === date2.getDate() &&
+            date1.getMonth() === date2.getMonth() &&
+            date1.getFullYear() === date2.getFullYear();
+        }
+
+        // Helper function to check if date1 is yesterday compared to date2
+        function isYesterday(date1, date2) {
+          const yesterday = new Date(date2);
+          yesterday.setDate(yesterday.getDate() - 1);
+
+          return date1.getDate() === yesterday.getDate() &&
+            date1.getMonth() === yesterday.getMonth() &&
+            date1.getFullYear() === yesterday.getFullYear();
+        }
+
+        // Render a goal card
+        function renderGoalCard(goal) {
+          const goalDate = goal.date.toDate();
+          const options = { weekday: 'short', month: 'short', day: 'numeric' };
+          const formattedDate = goalDate.toLocaleDateString(undefined, options);
+
+          const timeString = goal.time ? ` at ${goal.time}` : '';
+
+          const card = document.createElement('div');
+          card.className = 'goal-card';
+          card.innerHTML = `
+            <div class="goal-header">
+              <div class="goal-info">
+                <h3 class="goal-title">${goal.title}</h3>
+                <div class="goal-date">${formattedDate}${timeString}</div>
+              </div>
+              <div class="goal-actions">
+                <button class="action-btn edit-btn" title="Edit">
+                  <i class="material-icons">edit</i>
+                </button>
+                <button class="action-btn delete-btn" title="Delete">
+                  <i class="material-icons">delete</i>
+                </button>
+              </div>
+            </div>
+            ${goal.description ? `<div class="goal-description">${goal.description}</div>` : ''}
+            <div class="goal-footer">
+              <span class="status-badge ${goal.completed ? 'status-completed' : 'status-pending'}">
+                ${goal.completed ? 'Completed' : 'Pending'}
+              </span>
+              ${!goal.completed ? `<button class="complete-btn">Mark Complete</button>` : ''}
+            </div>
+          `;
+
+          if (!goal.completed) {
+            card.querySelector('.complete-btn').addEventListener('click', () => markGoalComplete(goal.id));
+          }
+
+          card.querySelector('.edit-btn').addEventListener('click', () => openEditGoalModal(goal));
+          card.querySelector('.delete-btn').addEventListener('click', () => deleteGoal(goal.id));
+
+          goalsGrid.appendChild(card);
+        }
+
+        // Mark goal as complete
+        async function markGoalComplete(goalId) {
+          try {
+            const userRef = db.collection('users').doc(currentUser.uid);
+            const batch = db.batch();
+
+            const goalRef = db.collection('goals').doc(goalId);
+            batch.update(goalRef, {
+              completed: true,
+              completedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            batch.update(userRef, {
+              credits: firebase.firestore.FieldValue.increment(1),
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            await batch.commit();
+            loadGoals();
+            showSuccessMessage('Goal completed! +1 credit earned 🎉');
+
+          } catch (error) {
+            console.error("Error completing goal:", error);
+            showErrorMessage("Failed to complete goal. Please try again.");
+          }
+        }
+
+        // Delete goal
+        function deleteGoal(goalId) {
+          if (confirm('Are you sure you want to delete this goal?')) {
+            db.collection('goals').doc(goalId).delete()
+              .then(() => {
+                loadGoals();
+                showSuccessMessage('Goal deleted successfully');
+              })
+              .catch(error => {
+                console.error('Error deleting goal:', error);
+                showErrorMessage('Failed to delete goal. Please try again.');
+              });
+          }
+        }
+
+        // Fetch and display user progress
+        async function loadUserProgress() {
+          if (!currentUser) return;
+
+          try {
+            loadQuizProgress();
+            loadGoalsProgress();
+          } catch (error) {
+            console.error('Error loading user progress:', error);
+          }
+        }
+
+        async function loadQuizProgress() {
+          try {
+            const snapshot = await db.collection('quizAttempts')
+              .where('userId', '==', currentUser.uid)
+              .get();
+
+            const completed = snapshot.size;
+            document.getElementById('completed-quizzes').textContent = completed;
+
+            const progress = Math.min(100, Math.floor((completed / 50) * 100));
+            document.getElementById('quiz-progress').style.width = `${progress}%`;
+          } catch (error) {
+            console.error('Error loading quiz progress:', error);
+          }
+        }
+
+        async function loadGoalsProgress() {
+          try {
+            const snapshot = await db.collection('goals')
+              .where('userId', '==', currentUser.uid)
+              .where('completed', '==', true)
+              .get();
+
+            const completed = snapshot.size;
+            document.getElementById('completed-goals').textContent = completed;
+
+            const progress = Math.min(100, Math.floor((completed / 20) * 100));
+            document.getElementById('goals-progress').style.width = `${progress}%`;
+          } catch (error) {
+            console.error('Error loading goals progress:', error);
+          }
+        }
+
+        // Update login info when user signs in
+        function updateLoginTimestamp() {
+          if (!currentUser) return;
+
+          const userRef = db.collection('users').doc(currentUser.uid);
+
+          db.runTransaction(async (transaction) => {
+            const doc = await transaction.get(userRef);
+            const currentStreak = doc.data()?.loginStreak || 0;
+
+            const lastLogin = doc.data()?.lastLogin?.toDate();
+            const shouldIncrementStreak = lastLogin &&
+              isYesterday(lastLogin, new Date());
+
+            transaction.update(userRef, {
+              lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+              loginStreak: shouldIncrementStreak ? currentStreak + 1 : 1,
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+          });
+        }
+
+        // Initialize the app
+        init();
+      })
+      .catch(error => {
+        console.error("Failed to load config:", error);
+      });
+  </script>
+</body>
+
+</html>

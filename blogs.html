@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CSE Tech News Feed</title>
+  <link rel="icon" type="image/png" href="Smart Study.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --primary-color: #0066ff;
+      --bg-color: #f4f9ff;
+      --card-bg: #ffffff;
+      --text-color: #222;
+      --desc-color: #555;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-color);
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      text-align: center;
+      padding: 30px 10px;
+      font-size: 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    section {
+      padding: 40px 5%;
+    }
+    .source-title {
+      font-size: 1.6rem;
+      margin: 30px 0 20px;
+      color: var(--text-color);
+      border-left: 6px solid var(--primary-color);
+      padding-left: 12px;
+    }
+    .blog-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+    }
+    .blog-card {
+      background-color: var(--card-bg);
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s ease;
+    }
+    .blog-card:hover {
+      transform: translateY(-6px);
+    }
+    .blog-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+    .blog-content {
+      padding: 15px 20px;
+      flex-grow: 1;
+    }
+    .blog-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin: 5px 0 10px;
+    }
+    .blog-desc {
+      color: var(--desc-color);
+      font-size: 0.95rem;
+      margin-bottom: 15px;
+    }
+    .read-more {
+      margin-top: auto;
+      text-align: right;
+    }
+    .read-more a {
+      text-decoration: none;
+      color: white;
+      background-color: var(--primary-color);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      transition: background 0.2s ease;
+    }
+    .read-more a:hover {
+      background-color: #0044cc;
+    }
+    @media(max-width: 768px) {
+      header {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>🚀 CSE Tech News: AI, ML, DSA, Web & More</header>
+
+  <section>
+    <div class="source-title">🛠 Dev.to (CSE Tags)</div>
+    <div class="blog-container" id="devto"></div>
+
+    <div class="source-title">📡 Reddit (Top CSE Subreddits)</div>
+    <div class="blog-container" id="reddit"></div>
+
+    <div class="source-title">📰 Newsdata.io (Tech News)</div>
+    <div class="blog-container" id="newsapi"></div>
+  </section>
+
+  <script>
+    // Multiple tags from Dev.to
+    const devTags = ["machinelearning", "ai", "datascience", "cybersecurity", "webdev", "cloud", "blockchain", "cpp", "dsa", "python", "java"];
+
+    async function fetchDevTo() {
+      const container = document.getElementById("devto");
+      for (let tag of devTags) {
+        const res = await fetch(`https://dev.to/api/articles?tag=${tag}&per_page=2`);
+        const data = await res.json();
+        data.forEach(article => {
+          container.innerHTML += `
+            <div class="blog-card">
+              <img src="${article.cover_image || 'https://via.placeholder.com/400x200'}">
+              <div class="blog-content">
+                <div class="blog-title">${article.title}</div>
+                <div class="blog-desc">${article.description || 'No description available.'}</div>
+                <div class="read-more"><a href="${article.url}" target="_blank">Read More</a></div>
+              </div>
+            </div>
+          `;
+        });
+      }
+    }
+
+    // Multiple subreddits for CSE
+    const redditSubs = ["MachineLearning", "ArtificialIntelligence", "datascience", "learnprogramming", "coding"];
+
+    async function fetchReddit() {
+      const container = document.getElementById("reddit");
+      for (let sub of redditSubs) {
+        const res = await fetch(`https://www.reddit.com/r/${sub}.json`);
+        const data = await res.json();
+        data.data.children.slice(0, 2).forEach(post => {
+          const p = post.data;
+          container.innerHTML += `
+            <div class="blog-card">
+              <img src="${p.thumbnail && p.thumbnail.startsWith('http') ? p.thumbnail : 'https://via.placeholder.com/400x200'}">
+              <div class="blog-content">
+                <div class="blog-title">${p.title}</div>
+                <div class="blog-desc">Subreddit: r/${sub} | Upvotes: ${p.ups}</div>
+                <div class="read-more"><a href="https://reddit.com${p.permalink}" target="_blank">Read More</a></div>
+              </div>
+            </div>
+          `;
+        });
+      }
+    }
+
+    // Newsdata.io for tech news
+    async function fetchNewsdata() {
+      const apiKey = "pub_843882e6389b685c81bc2f64a337e8af7269e";
+      const url = `https://newsdata.io/api/1/news?apikey=${apiKey}&category=technology&language=en`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const container = document.getElementById("newsapi");
+        data.results?.slice(0, 6).forEach(article => {
+          container.innerHTML += `
+            <div class="blog-card">
+              <img src="${article.image_url || 'https://via.placeholder.com/400x200'}">
+              <div class="blog-content">
+                <div class="blog-title">${article.title}</div>
+                <div class="blog-desc">${article.description || 'No description.'}</div>
+                <div class="read-more"><a href="${article.link}" target="_blank">Read More</a></div>
+              </div>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error("NewsData API Error:", err);
+      }
+    }
+
+    // Fetch all sources
+    fetchDevTo();
+    fetchReddit();
+    fetchNewsdata();
+  </script>
+   
+   <script>
+    document.addEventListener("contextmenu", function (e) {
+      e.preventDefault();
+    });
+  </script>
+
+</body>
+</html>

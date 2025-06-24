@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whizan AI Viva Master</title>
+    <link rel="icon" type="image/png" href="smart study.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #5b21b6;
+            --secondary: #a855f7;
+            --accent: #c084fc;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --bg-primary: #000000;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --border: #27272a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .floating-shape {
+            position: absolute;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 25s infinite linear;
+        }
+
+        .floating-shape:nth-child(1) {
+            width: 100px;
+            height: 100px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-shape:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            top: 60%;
+            right: 15%;
+            animation-delay: -8s;
+        }
+
+        .floating-shape:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            bottom: 30%;
+            left: 20%;
+            animation-delay: -16s;
+        }
+
+        .floating-shape:nth-child(4) {
+            width: 120px;
+            height: 120px;
+            top: 10%;
+            right: 30%;
+            animation-delay: -24s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.1;
+            }
+            25% {
+                transform: translateY(-30px) rotate(90deg);
+                opacity: 0.2;
+            }
+            50% {
+                transform: translateY(-60px) rotate(180deg);
+                opacity: 0.15;
+            }
+            75% {
+                transform: translateY(-30px) rotate(270deg);
+                opacity: 0.2;
+            }
+            100% {
+                transform: translateY(0px) rotate(360deg);
+                opacity: 0.1;
+            }
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+            border-radius: 8px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        h2, h3 {
+            color: var(--secondary);
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        /* Form Elements */
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Buttons */
+        button {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+        }
+
+        button i {
+            margin-right: 8px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(90deg, var(--success), #059669);
+        }
+
+        /* Difficulty Selector */
+        .difficulty-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .difficulty-option {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid var(--border);
+            background: var(--bg-secondary);
+        }
+
+        .difficulty-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .difficulty-option.active {
+            border-color: var(--primary);
+            background: rgba(124, 58, 237, 0.1);
+            color: var(--primary);
+        }
+
+        .difficulty-option i {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        /* Topic Suggestions */
+        .topic-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .topic-chip {
+            padding: 8px 15px;
+            background: rgba(124, 58, 237, 0.1);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            border: 1px solid var(--border);
+        }
+
+        .topic-chip:hover {
+            background: rgba(124, 58, 237, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Timer */
+        .timer-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .timer {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 2px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0;
+            transition: width 0.5s ease;
+        }
+
+        /* Question Styles */
+        .question-container {
+            margin-bottom: 25px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .question-number {
+            background: var(--primary);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            padding: 15px;
+            background: rgba(124, 58, 237, 0.05);
+            border-left: 4px solid var(--primary);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 15px;
+        }
+
+        /* Feedback Styles */
+        .feedback {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+
+        .feedback-good {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--success);
+        }
+
+        .feedback-average {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--warning);
+        }
+
+        .feedback-poor {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--error);
+        }
+
+        .feedback-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .feedback-title i {
+            margin-right: 8px;
+        }
+
+        /* Loading States */
+        .loading-container {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Results Section */
+        .results-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .score-display {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 20px 0;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .score-label {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        /* Hidden Sections */
+        .hidden {
+            display: none;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.2rem;
+            }
+            
+            .logo {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .container {
+                padding: 20px;
+                margin: 15px;
+            }
+            
+            .difficulty-selector {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .timer {
+                font-size: 1.5rem;
+            }
+            
+            .score-display {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 15px;
+            }
+            
+            .container {
+                padding: 15px;
+                margin: 10px;
+            }
+            
+            .difficulty-selector {
+                grid-template-columns: 1fr;
+            }
+            
+            .question-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            input, textarea, select, button {
+                font-size: 16px; /* Prevent zoom on iOS */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="animated-bg">
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+    </div>
+
+    <div class="header">
+        <img src="smart study.png" alt="Whizan" class="logo">
+        <h1><i class="fas fa-graduation-cap"></i> Whizan AI Viva Master</h1>
+    </div>
+
+    <div class="container">
+        <!-- Topic Selection -->
+        <div id="topicSelection">
+            <h2>Select Your Topic</h2>
+            <label for="topicInput">Enter your viva topic:</label>
+            <input type="text" id="topicInput" placeholder="e.g., Neural Networks, Data Structures...">
+
+            <h3 style="margin-top: 20px;">Popular Topics:</h3>
+            <div class="topic-suggestions">
+                <div class="topic-chip" onclick="setTopic('Data Structures and Algorithms')">Data Structures</div>
+                <div class="topic-chip" onclick="setTopic('Machine Learning')">Machine Learning</div>
+                <div class="topic-chip" onclick="setTopic('Database Systems')">Database Systems</div>
+                <div class="topic-chip" onclick="setTopic('Operating Systems')">Operating Systems</div>
+                <div class="topic-chip" onclick="setTopic('Computer Networks')">Computer Networks</div>
+                <div class="topic-chip" onclick="setTopic('Artificial Intelligence')">AI</div>
+            </div>
+
+            <h3 style="margin-top: 20px;">Select Difficulty:</h3>
+            <div class="difficulty-selector">
+                <div class="difficulty-option" data-level="easy" onclick="setDifficulty('easy')">
+                    <i class="fas fa-smile"></i>
+                    <div>Easy</div>
+                    <small>Basic concepts</small>
+                </div>
+                <div class="difficulty-option active" data-level="medium" onclick="setDifficulty('medium')">
+                    <i class="fas fa-meh"></i>
+                    <div>Medium</div>
+                    <small>Moderate challenge</small>
+                </div>
+                <div class="difficulty-option" data-level="hard" onclick="setDifficulty('hard')">
+                    <i class="fas fa-frown"></i>
+                    <div>Hard</div>
+                    <small>Advanced topics</small>
+                </div>
+                <div class="difficulty-option" data-level="expert" onclick="setDifficulty('expert')">
+                    <i class="fas fa-flask"></i>
+                    <div>Expert</div>
+                    <small>Research-level</small>
+                </div>
+            </div>
+
+            <button onclick="startViva()" style="margin-top: 20px; width: 100%;">
+                <i class="fas fa-play"></i> Start Viva Session
+            </button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden loading-container">
+            <div class="spinner"></div>
+            <div class="loading-text">Preparing your personalized viva questions...</div>
+        </div>
+
+        <!-- Viva Session -->
+        <div id="vivaSession" class="hidden">
+            <div class="timer-container">
+                <div class="timer" id="timer">45:00</div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <div class="question-container">
+                <div class="question-header">
+                    <div class="question-number" id="questionNumber">1</div>
+                    <button class="btn-outline" onclick="markForReview()" id="markReviewBtn">
+                        <i class="far fa-bookmark"></i> Mark for Review
+                    </button>
+                </div>
+
+                <div class="question-text" id="currentQuestion"></div>
+
+                <label for="studentAnswer">Your Answer:</label>
+                <textarea id="studentAnswer" placeholder="Type your detailed answer here..."></textarea>
+
+                <div style="display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn-outline" onclick="previousQuestion()" id="prevBtn" disabled>
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button onclick="evaluateAnswer()" id="submitBtn">
+                        <i class="fas fa-check"></i> Submit Answer
+                    </button>
+                    <button class="btn-outline" onclick="nextQuestion()" id="nextBtn">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="feedbackContainer" class="hidden">
+                <div class="feedback" id="feedbackContent"></div>
+                <button onclick="nextQuestion()" id="continueBtn" class="btn-success" style="width: 100%;">
+                    <i class="fas fa-arrow-right"></i> Continue
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden">
+            <h2><i class="fas fa-trophy"></i> Viva Results</h2>
+
+            <div class="results-container">
+                <div class="score-label">Your Score</div>
+                <div class="score-display" id="scoreDisplay">0</div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="finalProgressBar"></div>
+                </div>
+                <div id="scoreDescription" style="margin-bottom: 20px;"></div>
+
+                <div id="finalFeedback"></div>
+
+                <div style="margin-top: 30px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button onclick="resetViva()" style="flex: 1;">
+                        <i class="fas fa-redo"></i> Try Again
+                    </button>
+                    <button class="btn-outline" onclick="shareResults()" style="flex: 1;">
+                        <i class="fas fa-share"></i> Share Results
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Key for Gemini Flash 2.0
+        const GEMINI_API_KEY = "AIzaSyAM1p730RTRu40S1sHghd1KD4501K6iCsI";
+        const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent";
+
+        // Global variables
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let totalQuestions = 0;
+        let vivaTopic = "";
+        let difficulty = "medium";
+        let timerInterval;
+        let timeLeft = 45 * 60; // 45 minutes in seconds
+        let markedQuestions = [];
+        let questionStartTime = 0;
+
+        // Call Gemini API directly
+        async function callGeminiAPI(prompt) {
+            const payload = {
+                contents: [{
+                    parts: [{
+                        text: prompt
+                    }]
+                }],
+                generationConfig: {
+                    temperature: 0.7,
+                    topK: 40,
+                    topP: 0.95,
+                    maxOutputTokens: 2048,
+                }
+            };
+
+            const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text;
+        }
+
+        // Set topic from suggestion chips
+        function setTopic(topic) {
+            document.getElementById("topicInput").value = topic;
+        }
+
+        // Set difficulty level
+        function setDifficulty(level) {
+            difficulty = level;
+            document.querySelectorAll(".difficulty-option").forEach(opt => {
+                opt.classList.remove("active");
+                if (opt.dataset.level === level) {
+                    opt.classList.add("active");
+                }
+            });
+        }
+
+        // Start the viva process
+        async function startViva() {
+            vivaTopic = document.getElementById("topicInput").value.trim();
+            if (!vivaTopic) {
+                alert("Please enter a topic");
+                return;
+            }
+
+            document.getElementById("topicSelection").classList.add("hidden");
+            document.getElementById("loadingState").classList.remove("hidden");
+            
+            try {
+                // Generate questions using Gemini Flash 2.0
+                const prompt = `Generate 6 comprehensive viva questions about "${vivaTopic}" for a university student at ${difficulty} difficulty level.
+
+Requirements:
+- Format each question as a numbered list (1., 2., etc.)
+- Include a mix of conceptual, practical, and analytical questions
+- Make them progressively more challenging
+- Ensure questions test deep understanding
+
+Topic: ${vivaTopic}
+Difficulty: ${difficulty}`;
+                
+                const text = await callGeminiAPI(prompt);
+                
+                // Parse the questions
+                currentQuestions = text.split('\n')
+                    .filter(line => line.match(/^\d+\./))
+                    .map(q => q.replace(/^\d+\.\s*/, '').trim())
+                    .filter(q => q.length > 0);
+                
+                if (currentQuestions.length === 0) {
+                    throw new Error("Failed to generate questions. Please try again.");
+                }
+                
+                totalQuestions = currentQuestions.length;
+                currentQuestionIndex = 0;
+                score = 0;
+                markedQuestions = [];
+                timeLeft = 45 * 60;
+                
+                // Initialize timer
+                updateTimerDisplay();
+                timerInterval = setInterval(updateTimer, 1000);
+                
+                document.getElementById("loadingState").classList.add("hidden");
+                document.getElementById("vivaSession").classList.remove("hidden");
+                showQuestion();
+            } catch (error) {
+                alert("Error generating questions: " + error.message);
+                console.error(error);
+                resetViva();
+            }
+        }
+
+        // Show current question
+        function showQuestion() {
+            document.getElementById("questionNumber").textContent = currentQuestionIndex + 1;
+            document.getElementById("currentQuestion").textContent = currentQuestions[currentQuestionIndex];
+            document.getElementById("studentAnswer").value = "";
+            document.getElementById("feedbackContainer").classList.add("hidden");
+            document.getElementById("continueBtn").classList.add("hidden");
+            
+            // Update navigation buttons
+            document.getElementById("prevBtn").disabled = currentQuestionIndex === 0;
+            document.getElementById("nextBtn").disabled = currentQuestionIndex === currentQuestions.length - 1;
+            
+            // Update mark for review button
+            const markBtn = document.getElementById("markReviewBtn");
+            if (markedQuestions.includes(currentQuestionIndex)) {
+                markBtn.innerHTML = '<i class="fas fa-bookmark"></i> Marked for Review';
+                markBtn.style.backgroundColor = 'rgba(245, 158, 11, 0.2)';
+            } else {
+                markBtn.innerHTML = '<i class="far fa-bookmark"></i> Mark for Review';
+                markBtn.style.backgroundColor = '';
+            }
+            
+            // Update progress bar
+            const progress = ((currentQuestionIndex) / currentQuestions.length) * 100;
+            document.getElementById("progressBar").style.width = `${progress}%`;
+            
+            // Record question start time
+            questionStartTime = Date.now();
+        }
+
+        // Mark question for review
+        function markForReview() {
+            const index = markedQuestions.indexOf(currentQuestionIndex);
+            if (index === -1) {
+                markedQuestions.push(currentQuestionIndex);
+                document.getElementById("markReviewBtn").innerHTML = '<i class="fas fa-bookmark"></i> Marked for Review';
+                document.getElementById("markReviewBtn").style.backgroundColor = 'rgba(245, 158, 11, 0.2)';
+            } else {
+                markedQuestions.splice(index, 1);
+                document.getElementById("markReviewBtn").innerHTML = '<i class="far fa-bookmark"></i> Mark for Review';
+                document.getElementById("markReviewBtn").style.backgroundColor = '';
+            }
+        }
+
+        // Evaluate answer using Gemini Flash 2.0
+        async function evaluateAnswer() {
+            const answer = document.getElementById("studentAnswer").value.trim();
+            if (!answer) {
+                alert("Please enter an answer");
+                return;
+            }
+
+            document.getElementById("submitBtn").disabled = true;
+            document.getElementById("submitBtn").innerHTML = '<i class="fas fa-spinner fa-spin"></i> Evaluating...';
+            
+            try {
+                const timeSpent = Math.floor((Date.now() - questionStartTime) / 1000);
+                
+                const prompt = `Evaluate this student's viva answer and provide detailed feedback.
+
+Question: "${currentQuestions[currentQuestionIndex]}"
+Student's Answer: "${answer}"
+Topic: ${vivaTopic}
+Difficulty: ${difficulty}
+
+Provide a score from 0-10 and detailed feedback explaining strengths and areas for improvement.`;
+                
+                const text = await callGeminiAPI(prompt);
+                const resultObj = parseGeminiResponse(text);
+                
+                // Update UI with feedback
+                const feedbackContainer = document.getElementById("feedbackContainer");
+                const feedbackContent = document.getElementById("feedbackContent");
+                
+                feedbackContent.innerHTML = `
+                    <div class="feedback-title">
+                        <i class="fas fa-${getScoreIcon(resultObj.score)}"></i>
+                        Score: ${resultObj.score}/10
+                    </div>
+                    <p><strong>Feedback:</strong> ${resultObj.feedback}</p>
+                `;
+                
+                // Set feedback style based on score
+                feedbackContent.className = "feedback " + getFeedbackClass(resultObj.score);
+                
+                // Update score
+                score += resultObj.score;
+                
+                // Show feedback and continue button
+                feedbackContainer.classList.remove("hidden");
+                document.getElementById("continueBtn").classList.remove("hidden");
+                document.getElementById("submitBtn").classList.add("hidden");
+            } catch (error) {
+                alert("Evaluation error: " + error.message);
+                console.error(error);
+            } finally {
+                document.getElementById("submitBtn").disabled = false;
+                document.getElementById("submitBtn").innerHTML = '<i class="fas fa-check"></i> Submit Answer';
+            }
+        }
+
+        // Helper functions
+        function getFeedbackClass(score) {
+            if (score >= 8) return "feedback-good";
+            if (score >= 5) return "feedback-average";
+            return "feedback-poor";
+        }
+
+        function getScoreIcon(score) {
+            if (score >= 8) return "smile";
+            if (score >= 5) return "meh";
+            return "frown";
+        }
+
+        function parseGeminiResponse(text) {
+            try {
+                const scoreMatch = text.match(/(\d+)\/10|score[:\s]*(\d+)/i);
+                const score = scoreMatch ? parseInt(scoreMatch[1] || scoreMatch[2]) : Math.floor(Math.random() * 4) + 6;
+                
+                return {
+                    score: Math.max(0, Math.min(10, score)),
+                    feedback: text
+                };
+            } catch (e) {
+                return {
+                    score: 7,
+                    feedback: text
+                };
+            }
+        }
+
+        // Move to next question
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuestions.length) {
+                showQuestion();
+                document.getElementById("feedbackContainer").classList.add("hidden");
+                document.getElementById("submitBtn").classList.remove("hidden");
+                document.getElementById("continueBtn").classList.add("hidden");
+            } else {
+                endViva();
+            }
+        }
+
+        // Move to previous question
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showQuestion();
+                document.getElementById("feedbackContainer").classList.add("hidden");
+                document.getElementById("submitBtn").classList.remove("hidden");
+                document.getElementById("continueBtn").classList.add("hidden");
+            }
+        }
+
+        // End the viva session
+        function endViva() {
+            clearInterval(timerInterval);
+            document.getElementById("vivaSession").classList.add("hidden");
+            document.getElementById("resultsSection").classList.remove("hidden");
+            
+            // Calculate percentage score
+            const maxPossibleScore = totalQuestions * 10;
+            const percentage = Math.round((score / maxPossibleScore) * 100);
+            document.getElementById("scoreDisplay").textContent = percentage + "%";
+            document.getElementById("finalProgressBar").style.width = `${percentage}%`;
+            
+            // Set score description
+            const scoreDesc = document.getElementById("scoreDescription");
+            if (percentage >= 80) {
+                scoreDesc.innerHTML = '<i class="fas fa-star"></i> Excellent performance!';
+                scoreDesc.style.color = 'var(--success)';
+            } else if (percentage >= 60) {
+                scoreDesc.innerHTML = '<i class="fas fa-thumbs-up"></i> Good attempt!';
+                scoreDesc.style.color = 'var(--warning)';
+            } else {
+                scoreDesc.innerHTML = '<i class="fas fa-lightbulb"></i> Keep practicing!';
+                scoreDesc.style.color = 'var(--error)';
+            }
+            
+            // Generate final feedback
+            generateFinalFeedback(percentage);
+        }
+
+        // Generate final feedback
+        async function generateFinalFeedback(percentage) {
+            document.getElementById("finalFeedback").innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Generating feedback...</p>';
+            
+            try {
+                const prompt = `Generate comprehensive feedback for a student who scored ${percentage}% in a ${vivaTopic} viva at ${difficulty} difficulty level. Include strengths, areas for improvement, and study recommendations.`;
+                
+                const text = await callGeminiAPI(prompt);
+                document.getElementById("finalFeedback").innerHTML = `<div style="padding: 15px; background: var(--bg-secondary); border-radius: 8px;">${text}</div>`;
+            } catch (error) {
+                document.getElementById("finalFeedback").innerHTML = 
+                    `<div style="padding: 15px; background: var(--bg-secondary); border-radius: 8px;">
+                        <h3>Performance Summary</h3>
+                        <p>You achieved ${percentage}% in your ${vivaTopic} viva practice session.</p>
+                        <h4>Next Steps:</h4>
+                        <ul>
+                            <li>Review the marked questions</li>
+                            <li>Focus on weaker areas</li>
+                            <li>Practice explaining concepts clearly</li>
+                            <li>Try again with different difficulty</li>
+                        </ul>
+                    </div>`;
+            }
+        }
+
+        // Reset the viva
+        function resetViva() {
+            clearInterval(timerInterval);
+            document.getElementById("resultsSection").classList.add("hidden");
+            document.getElementById("vivaSession").classList.add("hidden");
+            document.getElementById("loadingState").classList.add("hidden");
+            document.getElementById("topicSelection").classList.remove("hidden");
+            document.getElementById("topicInput").value = "";
+            document.getElementById("studentAnswer").value = "";
+            
+            // Reset variables
+            currentQuestions = [];
+            currentQuestionIndex = 0;
+            score = 0;
+            totalQuestions = 0;
+            vivaTopic = "";
+            markedQuestions = [];
+            timeLeft = 45 * 60;
+        }
+
+        // Share results
+        function shareResults() {
+            const percentage = document.getElementById("scoreDisplay").textContent;
+            const topic = vivaTopic;
+            const text = `I scored ${percentage} on my ${topic} viva practice with Whizan AI Viva Master! 🎓`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My Viva Results',
+                    text: text,
+                    url: window.location.href
+                }).catch(() => {
+                    fallbackShare(text);
+                });
+            } else {
+                fallbackShare(text);
+            }
+        }
+
+        function fallbackShare(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert("Results copied to clipboard!");
+                }).catch(() => {
+                    prompt("Copy your results:", text);
+                });
+            } else {
+                prompt("Copy your results:", text);
+            }
+        }
+
+        // Timer functions
+        function updateTimer() {
+            timeLeft--;
+            updateTimerDisplay();
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                alert("Time's up!");
+                endViva();
+            }
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById("timer").textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft <= 300) { // 5 minutes
+                document.getElementById("timer").style.color = 'var(--error)';
+            }
+        }
+
+        // Prevent context menu
+        document.addEventListener("contextmenu", function(e) {
+            e.preventDefault();
+        });
+    </script>
+</body>
+</html>

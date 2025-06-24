@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Whizan - Handwritten Assignment</title>
+  <link rel="icon" type="image/png" href="smart study.png">
+  <!-- Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Handwriting Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Bad+Script&family=Caveat&family=Cedarville+Cursive&family=Comforter&family=Dancing+Script&family=Gochi+Hand&family=Homemade+Apple&family=Indie+Flower&family=Kalam&family=La+Belle+Aurore&family=Leckerli+One&family=Liu+Jian+Mao+Cao&family=Marck+Script&family=Nanum+Pen+Script&family=Nothing+You+Could+Do&family=Patrick+Hand&family=Patrick+Hand+SC&family=Reenie+Beanie&family=Rock+Salt&family=Sacramento&family=Satisfy&family=Schoolbell&family=Shadows+Into+Light&family=Short+Stack&family=Walter+Turncoat&family=Zeyada&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #8a2be2;
+      --secondary: #00ffff;
+      --danger: #ff4d4d;
+      --dark: #121212;
+      --darker: #0a0a0a;
+      --light: #f5f5f5;
+      --card-bg: rgba(30, 30, 30, 0.7);
+      --card-border: rgba(138, 43, 226, 0.3);
+      --text-primary: #ffffff;
+      --text-secondary: #b3b3b3;
+      --nav-bg: rgba(18, 18, 18, 0.95);
+      --progress-fill: linear-gradient(90deg, var(--primary), var(--secondary));
+      --border-radius-sm: 8px;
+      --border-radius-md: 12px;
+      --border-radius-lg: 20px;
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--dark);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Particle Background */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      background: rgba(138, 43, 226, 0.5);
+      animation: float 15s infinite linear;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+    }
+
+    /* App Header */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      background: linear-gradient(to bottom, rgba(10, 10, 10, 0.9), rgba(10, 10, 10, 0.7));
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-img {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      border-radius: 50%;
+      border: 2px solid var(--primary);
+    }
+
+    .app-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Main Container */
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Panels */
+    .panel {
+      background: var(--card-bg);
+      border-radius: var(--border-radius-lg);
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Tabs */
+    .tab-buttons {
+      display: flex;
+      margin-bottom: 15px;
+      gap: 5px;
+      overflow-x: auto;
+      padding-bottom: 5px;
+    }
+
+    .tab-button {
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-bottom: none;
+      cursor: pointer;
+      border-radius: 10px 10px 0 0;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .tab-button.active {
+      background: rgba(138, 43, 226, 0.3);
+      border-color: var(--primary);
+      color: var(--secondary);
+    }
+
+    .tab-content {
+      display: none;
+      padding: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 0 10px 10px 10px;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Editor and Preview */
+    #responseEditor {
+      width: 100%;
+      height: 300px;
+      resize: none;
+      font-size: 1rem;
+      line-height: 1.5;
+      font-family: 'Poppins', sans-serif;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 1rem;
+      box-sizing: border-box;
+      white-space: pre-wrap;
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      border-radius: 10px;
+      transition: var(--transition);
+    }
+
+    #responseEditor:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.3);
+    }
+
+    #previewArea {
+      width: 100%;
+      min-height: 300px;
+      padding: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(0, 0, 0, 0.2);
+      font-size: 1rem;
+      line-height: 1.6;
+      border-radius: 10px;
+      overflow-y: auto;
+    }
+
+    /* PDF Preview */
+    #pdfPreview {
+      width: 100%;
+      height: 400px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      background: white;
+      margin-top: 15px;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 12px 24px;
+      font-size: 1rem;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      margin-top: 15px;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn:disabled {
+      background: rgba(255, 255, 255, 0.1);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(45deg, var(--secondary), var(--primary));
+    }
+
+    /* File Upload */
+    #uploadLabel {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      color: white;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      margin-bottom: 15px;
+    }
+
+    #uploadLabel:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    #uploadInput {
+      display: none;
+    }
+
+    /* Font Settings */
+    .settings-panel {
+      margin-top: 20px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .settings-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .settings-row label {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+    }
+
+    select, input[type="color"] {
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      color: white;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    select:focus, input[type="color"]:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    /* Font Samples */
+    .font-sample {
+      padding: 15px;
+      margin-bottom: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.2);
+      transition: var(--transition);
+    }
+
+    .font-sample:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Loading Indicators */
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      margin-left: 10px;
+      font-style: italic;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Realism Controls */
+    #realismControls {
+      display: none;
+      margin-top: 20px;
+    }
+
+    .realism-slider {
+      width: 100%;
+      margin: 10px 0;
+      -webkit-appearance: none;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.1);
+      outline: none;
+    }
+
+    .realism-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+    }
+
+    .realism-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+    }
+
+    /* Auth Message */
+    #authMessage {
+      padding: 20px;
+      background: rgba(255, 0, 0, 0.2);
+      color: #ff6b6b;
+      text-align: center;
+      border-radius: 10px;
+      margin: 20px;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      backdrop-filter: blur(5px);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .main-container {
+        padding: 15px;
+      }
+      
+      .panel {
+        padding: 15px;
+      }
+      
+      #responseEditor, #previewArea {
+        height: 250px;
+      }
+      
+      #pdfPreview {
+        height: 300px;
+      }
+      
+      .btn, #uploadLabel {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .app-header {
+        padding: 10px 15px;
+      }
+      
+      .app-title {
+        font-size: 1.1rem;
+      }
+      
+      .settings-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+      }
+      
+      select, input[type="color"] {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Particle Background -->
+  <div class="particles" id="particles"></div>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="logo-container">
+      <img src="smart study.png" alt="Whizan Logo" class="logo-img">
+      <h1 class="app-title">Whizan</h1>
+    </div>
+    <div id="user-display">
+      <i class="material-icons">person</i>
+    </div>
+  </header>
+
+  <!-- Auth Message -->
+  <div id="authMessage">Please wait ensuring you are logged in.</div>
+
+  <!-- Main Content -->
+  <div class="main-container" id="container" style="display:none;">
+    <!-- Editor Panel -->
+    <div class="panel">
+      <h2>Detailed Solutions for Assignment</h2>
+      
+      <div class="tab-buttons">
+        <div class="tab-button active" data-tab="editor">Edit Text</div>
+        <div class="tab-button" data-tab="preview">MathJax Preview</div>
+      </div>
+      
+      <div id="editorTab" class="tab-content active">
+        <textarea id="responseEditor" placeholder="Response will appear here..."></textarea>
+      </div>
+      
+      <div id="previewTab" class="tab-content">
+        <div id="previewArea"></div>
+      </div>
+      
+      <!-- Font Settings -->
+      <div class="settings-panel">
+        <h3>Handwriting Settings</h3>
+        
+        <div class="settings-row">
+          <label for="fontSelect">Handwriting Style:</label>
+          <select id="fontSelect">
+            <option value="Caveat">Caveat (Natural)</option>
+            <option value="Kalam">Kalam (Neat)</option>
+            <option value="Satisfy">Satisfy (Cursive)</option>
+            <option value="Indie Flower">Indie Flower (Student)</option>
+            <option value="Architects Daughter">Architects Daughter (Casual)</option>
+            <option value="Dancing Script">Dancing Script (Elegant)</option>
+            <option value="Gochi Hand">Gochi Hand (Playful)</option>
+            <option value="Patrick Hand">Patrick Hand (School-like)</option>
+            <option value="Patrick Hand SC">Patrick Hand SC (Small Caps)</option>
+            <option value="Shadows Into Light">Shadows Into Light (Sketchy)</option>
+            <option value="Nothing You Could Do">Nothing You Could Do (Casual)</option>
+            <option value="Rock Salt">Rock Salt (Artistic)</option>
+            <option value="Sacramento">Sacramento (Formal)</option>
+            <option value="Short Stack">Short Stack (Child-like)</option>
+            <option value="Walter Turncoat">Walter Turncoat (Rough)</option>
+            <option value="La Belle Aurore">La Belle Aurore (Stylish)</option>
+            <option value="Marck Script">Marck Script (Russian-style)</option>
+            <option value="Amatic SC">Amatic SC (Bold Handwriting)</option>
+            <option value="Bad Script">Bad Script (Russian Cursive)</option>
+            <option value="Cedarville Cursive">Cedarville Cursive (Clean & Elegant)</option>
+            <option value="Comforter">Comforter (Brush Script)</option>
+            <option value="Homemade Apple">Homemade Apple (Pencil-like)</option>
+            <option value="Leckerli One">Leckerli One (Fun & Bouncy)</option>
+            <option value="Liu Jian Mao Cao">Liu Jian Mao Cao (Chinese Brush)</option>
+            <option value="Nanum Pen Script">Nanum Pen Script (Korean Handwriting)</option>
+            <option value="Reenie Beanie">Reenie Beanie (Sketchy & Rough)</option>
+            <option value="Schoolbell">Schoolbell (Child's Printing)</option>
+            <option value="Zeyada">Zeyada (Fancy Script)</option>
+          </select>
+        </div>
+        
+        <div class="settings-row">
+          <label for="fontColor">Ink Color:</label>
+          <input type="color" id="fontColor" value="#000033">
+        </div>
+        
+        <div class="settings-row">
+          <label for="fontSize">Size:</label>
+          <select id="fontSize">
+            <option value="14px">Small</option>
+            <option value="18px" selected>Medium</option>
+            <option value="22px">Large</option>
+          </select>
+        </div>
+        
+        <div class="settings-row">
+          <label for="paperStyle">Paper Style:</label>
+          <select id="paperStyle">
+            <option value="white">Blank White</option>
+            <option value="lined">Lined</option>
+            <option value="graph">Graph</option>
+          </select>
+        </div>
+        
+        <h4>Font Samples:</h4>
+        <div id="fontSamples">
+          <div class="font-sample" style="font-family: 'Caveat', cursive;">
+            <strong>Caveat:</strong> The quick brown fox jumps over the lazy dog.
+            <div>x² + y² + z² = 10</div>
+            <div>∫(x³ + 3x) dx = x⁴/4 + 3x²/2 + C</div>
+          </div>
+          <div class="font-sample" style="font-family: 'Kalam', cursive;">
+            <strong>Kalam:</strong> The quick brown fox jumps over the lazy dog.
+            <div>x² + y² + z² = 10</div>
+            <div>∫(x³ + 3x) dx = x⁴/4 + 3x²/2 + C</div>
+          </div>
+          <div class="font-sample" style="font-family: 'Satisfy', cursive;">
+            <strong>Satisfy:</strong> The quick brown fox jumps over the lazy dog.
+            <div>x² + y² + z² = 10</div>
+            <div>∫(x³ + 3x) dx = x⁴/4 + 3x²/2 + C</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- PDF Panel -->
+    <div class="panel">
+      <h2>Upload Assignment PDF</h2>
+      
+      <label id="uploadLabel" for="uploadInput">
+        <i class="material-icons">upload</i>
+        Choose PDF
+        <div id="uploadSpinner" class="spinner" style="display:none;"></div>
+      </label>
+      <input type="file" id="uploadInput" accept="application/pdf" />
+      
+      <iframe id="pdfPreview" title="PDF Preview"></iframe>
+      
+      <button id="generateBtn" class="btn" disabled>
+        <i class="material-icons">draw</i>
+        Generate Handwritten PDF
+        <div id="genSpinner" class="spinner" style="display:none;"></div>
+      </button>
+      
+      <button id="realismBtn" class="btn btn-secondary" style="display:none;">
+        <i class="material-icons">auto_fix_high</i>
+        Make It More Real
+        <div id="realismSpinner" class="spinner" style="display:none;"></div>
+      </button>
+      
+      <div id="realismControls">
+        <h3>Realism Controls</h3>
+        
+        <div class="realism-label">
+          <label for="inkBleed">Ink Bleed:</label>
+          <span id="inkBleedValue">50%</span>
+        </div>
+        <input type="range" id="inkBleed" class="realism-slider" min="0" max="100" value="50">
+        
+        <div class="realism-label">
+          <label for="paperTexture">Paper Texture:</label>
+          <span id="paperTextureValue">50%</span>
+        </div>
+        <input type="range" id="paperTexture" class="realism-slider" min="0" max="100" value="50">
+        
+        <div class="realism-label">
+          <label for="handwritingVariance">Handwriting Variance:</label>
+          <span id="handwritingVarianceValue">50%</span>
+        </div>
+        <input type="range" id="handwritingVariance" class="realism-slider" min="0" max="100" value="50">
+      </div>
+      
+      <div style="margin-top: 15px; display: flex; align-items: center; gap: 15px;">
+        <span id="loadingGemini" style="display:none;">
+          <div class="spinner"></div>
+          <span class="loading-text">Processing with Gemini...</span>
+        </span>
+        <span id="loadingHandwriting" style="display:none;">
+          <div class="spinner"></div>
+          <span class="loading-text">Converting to handwriting...</span>
+        </span>
+        <span id="loadingRealism" style="display:none;">
+          <div class="spinner"></div>
+          <span class="loading-text">Enhancing realism...</span>
+        </span>
+      </div>
+      
+      <button id="downloadBtn" class="btn" style="display:none;">
+        <i class="material-icons">download</i>
+        Download Handwritten PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+  <script>
+    let currentUser = null;
+    let currentGeminiResponse = "";
+
+    // DOM elements
+    const container = document.getElementById('container');
+    const authMessage = document.getElementById('authMessage');
+    const responseEditor = document.getElementById('responseEditor');
+    const previewArea = document.getElementById('previewArea');
+    const uploadInput = document.getElementById('uploadInput');
+    const uploadSpinner = document.getElementById('uploadSpinner');
+    const pdfPreview = document.getElementById('pdfPreview');
+    const generateBtn = document.getElementById('generateBtn');
+    const genSpinner = document.getElementById('genSpinner');
+    const loadingGemini = document.getElementById('loadingGemini');
+    const loadingHandwriting = document.getElementById('loadingHandwriting');
+    const loadingRealism = document.getElementById('loadingRealism');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const realismBtn = document.getElementById('realismBtn');
+    const realismSpinner = document.getElementById('realismSpinner');
+    const realismControls = document.getElementById('realismControls');
+    const fontSelect = document.getElementById('fontSelect');
+    const fontColor = document.getElementById('fontColor');
+    const fontSize = document.getElementById('fontSize');
+    const paperStyle = document.getElementById('paperStyle');
+    const inkBleed = document.getElementById('inkBleed');
+    const paperTexture = document.getElementById('paperTexture');
+    const handwritingVariance = document.getElementById('handwritingVariance');
+    const inkBleedValue = document.getElementById('inkBleedValue');
+    const paperTextureValue = document.getElementById('paperTextureValue');
+    const handwritingVarianceValue = document.getElementById('handwritingVarianceValue');
+
+    // Initialize the app
+    async function init() {
+      createParticles();
+      const auth = await initializeFirebase();
+      
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          currentUser = user;
+          authMessage.style.display = 'none';
+          container.style.display = 'flex';
+          document.getElementById('user-display').textContent = user.displayName || user.email.split('@')[0];
+        } else {
+          container.style.display = 'none';
+          authMessage.style.display = 'block';
+        }
+      });
+
+      // Tab functionality
+      document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+          document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+          
+          button.classList.add('active');
+          const tabId = button.getAttribute('data-tab');
+          if (tabId === 'editor') {
+            document.getElementById('editorTab').classList.add('active');
+          } else if (tabId === 'preview') {
+            document.getElementById('previewTab').classList.add('active');
+            updateMathPreview();
+          }
+        });
+      });
+
+      // Event listeners
+      responseEditor.addEventListener('input', function() {
+        if (document.querySelector('.tab-button[data-tab="preview"]').classList.contains('active')) {
+          updateMathPreview();
+        }
+      });
+
+      uploadInput.addEventListener('change', handleFileUpload);
+      generateBtn.addEventListener('click', generateHandwritten);
+      realismBtn.addEventListener('click', enhanceRealism);
+      downloadBtn.addEventListener('click', downloadPdf);
+      
+      inkBleed.addEventListener('input', updateRealismControls);
+      paperTexture.addEventListener('input', updateRealismControls);
+      handwritingVariance.addEventListener('input', updateRealismControls);
+      
+      fontSelect.addEventListener('change', updateFontSamples);
+      fontColor.addEventListener('input', updateFontSamples);
+      fontSize.addEventListener('change', updateFontSamples);
+    }
+
+    // Create floating particles
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 30;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        
+        // Random properties
+        const posX = Math.random() * 100;
+        const posY = Math.random() * 100;
+        const size = Math.random() * 3 + 1;
+        const duration = Math.random() * 10 + 10;
+        const delay = Math.random() * 5;
+        
+        particle.style.left = `${posX}%`;
+        particle.style.top = `${posY}%`;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.animationDuration = `${duration}s`;
+        particle.style.animationDelay = `${delay}s`;
+        particle.style.opacity = Math.random() * 0.5 + 0.1;
+        
+        // Random color
+        const colors = ['#8a2be2', '#00ffff', '#ffffff'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.backgroundColor = color;
+        
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    // Initialize Firebase from backend config
+    async function initializeFirebase() {
+      const configResponse = await fetch('https://us-central1-study2-7bdc7.cloudfunctions.net/getConfig');
+      const config = await configResponse.json();
+      firebase.initializeApp(config.firebase);
+      return firebase.auth();
+    }
+
+    // Handle file upload
+    async function handleFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (file.type !== 'application/pdf') {
+        alert('Please upload a PDF file');
+        return;
+      }
+
+      uploadSpinner.style.display = 'inline-block';
+      generateBtn.disabled = true;
+
+      try {
+        previewPDF(file);
+        const base64Pdf = await fileToBase64(file);
+        await callGeminiFlash(base64Pdf);
+      } catch (error) {
+        alert('Error processing file: ' + error.message);
+      } finally {
+        uploadSpinner.style.display = 'none';
+      }
+    }
+
+    // Convert file to base64
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Show PDF preview
+    function previewPDF(file) {
+      const fileURL = URL.createObjectURL(file);
+      pdfPreview.src = fileURL;
+    }
+
+    // Process PDF with Gemini (using backend)
+    async function callGeminiFlash(base64Pdf) {
+      loadingGemini.style.display = 'flex';
+      generateBtn.disabled = true;
+      responseEditor.value = "";
+
+      try {
+        const idToken = await currentUser.getIdToken();
+        
+        const response = await fetch('https://us-central1-study2-7bdc7.cloudfunctions.net/processPdf', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+          },
+          body: JSON.stringify({ pdfBase64: base64Pdf })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to process PDF');
+        }
+
+        const { text } = await response.json();
+        currentGeminiResponse = text;
+        responseEditor.value = text;
+        updateMathPreview();
+      } catch (error) {
+        console.error("Error processing PDF:", error);
+        alert("Error processing PDF: " + error.message);
+      } finally {
+        loadingGemini.style.display = 'none';
+        generateBtn.disabled = false;
+      }
+    }
+
+    // Update MathJax preview
+    function updateMathPreview() {
+      const text = responseEditor.value;
+      let processedText = text
+        .replace(/^# (.*?)$/gm, '<h1>$1</h1>')
+        .replace(/^## (.*?)$/gm, '<h2>$1</h2>')
+        .replace(/^### (.*?)$/gm, '<h3>$1</h3>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\b([a-zA-Z])\*/g, '$1')
+        .replace(/\b([a-zA-Z])²/g, '\\($1^2\\)')
+        .replace(/\b([a-zA-Z])³/g, '\\($1^3\\)')
+        .replace(/∇φ/g, '\\(\\nabla\\phi\\)')
+        .replace(/∫\s*\((.*?)\)\s*d([a-zA-Z])/g, '\\(\\int($1)d$2\\)')
+        .replace(/([a-zA-Z])\*I\*/g, '\\(\\vec{$1}_x\\)')
+        .replace(/([a-zA-Z])\*J\*/g, '\\(\\vec{$1}_y\\)')
+        .replace(/([a-zA-Z])\*K\*/g, '\\(\\vec{$1}_z\\)')
+        .replace(/(\d+)\/(\d+)/g, '\\(\\frac{$1}{$2}\\)')
+        .replace(/(\w+)\s*=\s*(.+)/g, function(match) {
+          if (match.includes('+') || match.includes('-') || match.includes('*') || match.includes('/') || match.includes('^') || match.includes('√')) {
+            return '\\(' + match.replace(/\*/g, '\\cdot ') + '\\)';
+          }
+          return match;
+        })
+        .replace(/Step (\d+):/g, '<strong>Step $1:</strong>')
+        .replace(/\n/g, '<br>');
+
+      previewArea.innerHTML = processedText;
+
+      if (window.MathJax) {
+        MathJax.typesetPromise([previewArea]).catch(function(err) {
+          console.error('MathJax error:', err);
+        });
+      }
+    }
+
+    // Generate handwritten document (using backend)
+    async function generateHandwritten() {
+      const editedText = responseEditor.value.trim();
+      if (!editedText) {
+        alert("Response text is empty.");
+        return;
+      }
+
+      loadingHandwriting.style.display = 'flex';
+      genSpinner.style.display = 'inline-block';
+      generateBtn.disabled = true;
+      downloadBtn.style.display = 'none';
+      realismBtn.style.display = 'none';
+      realismControls.style.display = 'none';
+
+      try {
+        const idToken = await currentUser.getIdToken();
+        const selectedFont = fontSelect.value;
+        const selectedColor = fontColor.value;
+        const selectedSize = fontSize.value;
+        const selectedPaper = paperStyle.value;
+
+        const response = await fetch('https://us-central1-study2-7bdc7.cloudfunctions.net/generateHandwritten', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+          },
+          body: JSON.stringify({
+            text: editedText,
+            font: selectedFont,
+            color: selectedColor,
+            size: selectedSize,
+            paperStyle: selectedPaper
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to generate document');
+        }
+
+        const { htmlContent } = await response.json();
+        
+        const htmlBlob = new Blob([htmlContent], { type: 'text/html' });
+        const mockUrl = URL.createObjectURL(htmlBlob);
+
+        pdfPreview.src = mockUrl;
+        downloadBtn.style.display = 'block';
+        realismBtn.style.display = 'block';
+      } catch (error) {
+        console.error("Error generating handwritten document:", error);
+        alert("Error generating document: " + error.message);
+      } finally {
+        loadingHandwriting.style.display = 'none';
+        genSpinner.style.display = 'none';
+        generateBtn.disabled = false;
+      }
+    }
+
+    // Enhance document with realistic effects (using backend)
+    async function enhanceRealism() {
+      loadingRealism.style.display = 'flex';
+      realismSpinner.style.display = 'inline-block';
+      realismBtn.disabled = true;
+
+      try {
+        const idToken = await currentUser.getIdToken();
+        const selectedFont = fontSelect.value;
+        const selectedColor = fontColor.value;
+        const selectedSize = fontSize.value;
+        const selectedPaper = paperStyle.value;
+        const inkBleedAmount = inkBleed.value;
+        const paperTextureAmount = paperTexture.value;
+        const handwritingVarianceAmount = handwritingVariance.value;
+
+        let content = '';
+        try {
+          content = pdfPreview.contentDocument.body.innerHTML;
+        } catch (e) {
+          console.error("Could not access iframe content:", e);
+          content = document.querySelector('.handwritten').innerHTML;
+        }
+
+        const response = await fetch('https://us-central1-study2-7bdc7.cloudfunctions.net/enhanceDocument', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+          },
+          body: JSON.stringify({
+            content: content,
+            font: selectedFont,
+            color: selectedColor,
+            size: selectedSize,
+            paperStyle: selectedPaper,
+            inkBleed: inkBleedAmount,
+            paperTexture: paperTextureAmount,
+            handwritingVariance: handwritingVarianceAmount
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to enhance document');
+        }
+
+        const { htmlContent } = await response.json();
+        
+        const htmlBlob = new Blob([htmlContent], { type: 'text/html' });
+        const enhancedUrl = URL.createObjectURL(htmlBlob);
+
+        pdfPreview.src = enhancedUrl;
+        realismControls.style.display = 'block';
+      } catch (error) {
+        console.error("Error enhancing document:", error);
+        alert("Error enhancing document: " + error.message);
+      } finally {
+        loadingRealism.style.display = 'none';
+        realismSpinner.style.display = 'none';
+        realismBtn.disabled = false;
+      }
+    }
+
+    // Download PDF
+    async function downloadPdf() {
+      try {
+        let content = '';
+        try {
+          content = pdfPreview.contentDocument.body.innerHTML;
+        } catch (e) {
+          console.error("Could not access iframe content:", e);
+          content = document.querySelector('.handwritten').innerHTML;
+        }
+
+        let styles = '';
+        try {
+          styles = Array.from(pdfPreview.contentDocument.querySelectorAll('style'))
+            .map(style => style.outerHTML)
+            .join('\n');
+        } catch (e) {
+          console.error("Could not access iframe styles:", e);
+          styles = Array.from(document.querySelectorAll('style'))
+            .map(style => style.outerHTML)
+            .join('\n');
+        }
+
+        const completeHtml = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <title>Handwritten Assignment</title>
+            ${styles}
+          </head>
+          <body>
+            ${content}
+          </body>
+          </html>
+        `;
+
+        const opt = {
+          margin: 10,
+          filename: 'handwritten-assignment.pdf',
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(completeHtml).save();
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+        alert("Error generating PDF: " + error.message);
+      }
+    }
+
+    // Update realism control values
+    function updateRealismControls() {
+      inkBleedValue.textContent = `${inkBleed.value}%`;
+      paperTextureValue.textContent = `${paperTexture.value}%`;
+      handwritingVarianceValue.textContent = `${handwritingVariance.value}%`;
+      
+      if (realismControls.style.display === 'block') {
+        enhanceRealism();
+      }
+    }
+
+    // Update font samples
+    function updateFontSamples() {
+      const samples = document.querySelectorAll('.font-sample');
+      samples.forEach(sample => {
+        sample.style.color = fontColor.value;
+        sample.style.fontSize = fontSize.value;
+      });
+    }
+
+    // Initialize the app when loaded
+    window.addEventListener('load', init);
+  </script>
+</body>
+</html>

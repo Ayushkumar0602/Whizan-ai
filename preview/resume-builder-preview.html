@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Whizan's free ATS-friendly resume builder helps you create professional resumes and portfolios that pass applicant tracking systems and impress recruiters.">
+    <meta name="keywords" content="resume maker, resume builder, free resume builder, ATS friendly resume, professional portfolio maker, job application tool">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Whizan - Free ATS-Optimized Resume Builder">
+    <meta property="og:description" content="Create resumes that beat applicant tracking systems and land interviews. Free templates, no sign-up required.">
+    <meta property="og:url" content="https://whizan.xyz/resume-builder-preview.html">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://whizan.xyz/images/resume1">
+    <link rel="canonical" href="https://whizan.xyz/resume-builder-preview.html">
+    <title>Free Resume Builder | ATS-Friendly Templates | Whizan</title>
+    <link rel="icon" href="/preview/Smart Study.jpeg" type="image/jpeg">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "Whizan Resume Builder",
+      "description": "Create ATS-optimized resumes and portfolios for free with professional templates.",
+      "brand": {
+        "@type": "Brand",
+        "name": "Whizan"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What makes a resume ATS-friendly?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "ATS-friendly resumes use clean formatting, standard headings (e.g., 'Work Experience'), keyword optimization, and avoid graphics/tables that confuse parsing algorithms."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is this resume builder really free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! Whizan offers unlimited free resume creation with all features—no paywalls, watermarks, or premium upsells."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I download my resume as PDF?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Absolutely. Export your resume as a PDF, DOCX, or plain text file for easy submission to job portals."
+          }
+        }
+      ]
+    }
+    </script>
+    <style>
+        :root {
+            --primary-green-dark: #2e7d32;
+            --primary-green-light: #4caf50;
+            --secondary-black: #121212;
+            --accent-amber: #ffa000;
+            --text-light: #f5f5f5;
+            --text-dark: #212121;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--secondary-black);
+            color: var(--text-light);
+            overflow-x: hidden;
+            position: relative;
+            line-height: 1.6;
+        }
+        
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, var(--primary-green-dark), var(--secondary-black), var(--primary-green-light), var(--secondary-black));
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        header {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(18, 18, 18, 0.8);
+            border-bottom: 1px solid var(--accent-amber);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo {
+            height: 50px;
+            width: auto;
+            border-radius: 8px;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(to right, var(--accent-amber), var(--primary-green-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .cta-button {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(to right, var(--accent-amber), var(--primary-green-light));
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(255, 160, 0, 0.4);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 160, 0, 0.6);
+        }
+        
+        .hero {
+            padding: 4rem 2rem;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--text-light), #69f0ae);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .highlight {
+            color: #69f0ae;
+            font-weight: bold;
+        }
+        
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .feature-card {
+            background-color: rgba(30, 30, 30, 0.7);
+            border-radius: 15px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 350px;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 160, 0, 0.3);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-amber);
+            box-shadow: 0 10px 25px rgba(255, 160, 0, 0.3);
+        }
+        
+        .feature-card h3 {
+            color: var(--accent-amber);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .feature-card p {
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .demo-section {
+            padding: 4rem 2rem;
+            text-align: center;
+            background-color: rgba(18, 18, 18, 0.7);
+            margin: 3rem 0;
+        }
+        
+        .demo-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--text-light);
+        }
+        
+        .demo-image-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .demo-image {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--accent-amber);
+        }
+        
+        .how-it-works {
+            padding: 4rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .how-it-works h2 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--text-light);
+        }
+        
+        .step {
+            display: flex;
+            margin-bottom: 2rem;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .step-number {
+            background-color: var(--accent-amber);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .step-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent-amber);
+        }
+        
+        .step-content p {
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .faq-section {
+            padding: 4rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .faq-section h2 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--text-light);
+        }
+        
+        .faq-item {
+            margin-bottom: 2rem;
+            background-color: rgba(30, 30, 30, 0.7);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--accent-amber);
+        }
+        
+        .faq-question {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent-amber);
+            margin-bottom: 0.5rem;
+        }
+        
+        .faq-answer {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .pricing {
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+        
+        .pricing h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+        }
+        
+        .pricing p {
+            font-size: 1.5rem;
+            margin-bottom: 3rem;
+            color: var(--accent-amber);
+        }
+        
+        .pricing-features {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: left;
+            background-color: rgba(30, 30, 30, 0.7);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid var(--accent-amber);
+        }
+        
+        .pricing-features ul {
+            list-style-type: none;
+        }
+        
+        .pricing-features li {
+            margin-bottom: 1rem;
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .pricing-features li:before {
+            content: "✓";
+            color: var(--primary-green-light);
+            position: absolute;
+            left: 0;
+        }
+        
+        footer {
+            padding: 3rem 2rem;
+            background-color: rgba(18, 18, 18, 0.9);
+            text-align: center;
+            border-top: 1px solid var(--accent-amber);
+        }
+        
+        .footer-logo {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--accent-amber), var(--primary-green-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent-amber);
+        }
+        
+        .copyright {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .step {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .step-content {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    
+    <header>
+        <div class="logo-container">
+            <img src="/preview/Smart Study.jpeg" alt="Whizan Logo" class="logo" itemprop="logo">
+            <span class="logo-text">Whizan</span>
+        </div>
+        <a href="/auth.html" class="cta-button" itemprop="url">Create Your Resume Now</a>
+    </header>
+    
+    <main>
+        <section class="hero" itemscope itemtype="https://schema.org/Product">
+            <h1 itemprop="name">Build Resumes That <span class="highlight">Beat ATS</span> & Get Interviews</h1>
+            <p itemprop="description">Whizan's <span class="highlight">free resume builder</span> creates ATS-optimized resumes and portfolios that pass applicant tracking systems and impress recruiters. No design skills needed.</p>
+            <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                <meta itemprop="priceCurrency" content="USD" />
+                <meta itemprop="price" content="0.00" />
+                <link itemprop="availability" href="https://schema.org/InStock" />
+            </div>
+            <a href="/auth.html" class="cta-button">Start Building — It's Free</a>
+            <meta itemprop="brand" content="Whizan">
+            <meta itemprop="url" content="https://whizan.xyz/resume-builder-preview.html">
+        </section>
+        
+        <section class="features">
+            <div class="feature-card" itemscope itemtype="https://schema.org/Product">
+              <h3 itemprop="name">ATS-Optimized Templates</h3>
+              <p itemprop="description">
+                Our templates are designed to pass applicant tracking systems (ATS) with clean formatting, proper keyword placement, and scannable sections.
+              </p>
+              <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                <meta itemprop="priceCurrency" content="USD" />
+                <meta itemprop="price" content="0.00" />
+                <link itemprop="availability" href="https://schema.org/InStock" />
+              </div>
+            </div>
+          
+            <div class="feature-card" itemscope itemtype="https://schema.org/Product">
+              <h3 itemprop="name">Real-Time Content Analysis</h3>
+              <p itemprop="description">
+                Get instant feedback on resume strength, keyword optimization, and ATS compatibility as you build—no guessing required.
+              </p>
+              <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                <meta itemprop="priceCurrency" content="USD" />
+                <meta itemprop="price" content="0.00" />
+                <link itemprop="availability" href="https://schema.org/InStock" />
+              </div>
+            </div>
+          
+            <div class="feature-card" itemscope itemtype="https://schema.org/Product">
+              <h3 itemprop="name">Portfolio Integration</h3>
+              <p itemprop="description">
+                Add a professional portfolio page with projects, certifications, or work samples—all hosted for free on your personal Whizan URL.
+              </p>
+              <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                <meta itemprop="priceCurrency" content="USD" />
+                <meta itemprop="price" content="0.00" />
+                <link itemprop="availability" href="https://schema.org/InStock" />
+              </div>
+            </div>
+          </section>
+          
+        
+        <section class="demo-section">
+            <h2>Professional Templates That Work</h2>
+            <div class="demo-image-container">
+                <img src="images /resume1.png" alt="ATS-Friendly Resume Example" class="demo-image" itemprop="image">
+            </div>
+            <p style="margin-top: 1.5rem;">Designed for both humans <i>and</i> applicant tracking systems</p>
+        </section>
+        
+        <section class="how-it-works">
+            <h2>Create Your Perfect Resume in 3 Steps</h2>
+            
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Choose Your Template</h3>
+                    <p>Select from ATS-optimized designs for your industry (tech, creative, corporate, etc.). All templates are recruiter-approved.</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Fill in Your Details</h3>
+                    <p>Our smart editor guides you with examples, auto-suggests power verbs, and ensures you include key details employers want.</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Download & Apply</h3>
+                    <p>Export as a polished PDF, DOCX, or even a shareable portfolio link. No watermarks—just job-ready application materials.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="faq-section">
+            <h2>Resume Builder FAQs</h2>
+            
+            <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <div class="faq-question" itemprop="name">What industries are your templates designed for?</div>
+                <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                    <div itemprop="text">We offer specialized templates for tech (developer, UX), business (marketing, finance), healthcare, education, and creative fields—all optimized for their respective ATS systems.</div>
+                </div>
+            </div>
+            
+            <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <div class="faq-question" itemprop="name">Can I customize colors/fonts?</div>
+                <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                    <div itemprop="text">Yes! While we recommend sticking to ATS-safe designs, you can personalize colors and fonts while maintaining readability.</div>
+                </div>
+            </div>
+            
+            <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <div class="faq-question" itemprop="name">Do you store my resume data?</div>
+                <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                    <div itemprop="text">Your data is encrypted and never shared. You can delete it permanently anytime from your dashboard.</div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="pricing">
+            <h2>100% Free Forever</h2>
+            <p>No Trials. No Credit Card. No Surprises.</p>
+            
+            <div class="pricing-features">
+                <ul>
+                    <li>Unlimited resume creation</li>
+                    <li>ATS optimization tools</li>
+                    <li>Portfolio hosting</li>
+                    <li>Multiple export formats (PDF/DOCX/TXT)</li>
+                    <li>Cloud storage for revisions</li>
+                    <li>No account required</li>
+                </ul>
+            </div>
+            
+            <a href="/auth.html" class="cta-button" style="margin-top: 3rem;">Build Your Resume Now</a>
+        </section>
+    </main>
+    
+    <footer>
+        <div class="footer-logo">Whizan</div>
+        <div class="footer-links">
+            <a href="/index1.html">About Us</a>
+            <a href="/index1.html">Features</a>
+            <a href="subject/contact.html">Contact</a>
+            <a href="subject/privacy.html">Privacy Policy</a>
+            <a href="subject/terms.html">Terms of Service</a>
+        </div>
+        <p class="copyright">© 2025 Whizan. Helping job seekers land their dream roles.</p>
+    </footer>
+    
+    <script>
+        // Animation for feature cards on scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            const featureCards = document.querySelectorAll('.feature-card');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            featureCards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>

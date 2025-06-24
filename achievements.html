@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Achievements</title>
+    <link rel="icon" type="image/png" href="Smart Study.jpeg">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #220218;
+            --primary-light: rgba(255, 0, 170, 0.2);
+            --secondary: #00ffaa;
+            --secondary-dark: #0f16ea;
+            --danger: #11119c;
+            --warning: #5e521f;
+            --dark: #111;
+            --light: #f7fafc;
+            --gray-light: #e2e8f0;
+            --gray-medium: #718096;
+            --gray-dark: #4a5568;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --nav-shadow: 0 -2px 20px rgba(0, 0, 0, 0.3);
+            --border-radius-sm: 8px;
+            --border-radius-md: 15px;
+            --border-radius-lg: 30px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            margin: 0;
+            padding: 20px;
+            color: white;
+            line-height: 1.6;
+            padding-bottom: 90px;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; }
+        }
+
+        /* Header Styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: var(--border-radius-lg);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 10px -10px var(--primary); }
+            to { box-shadow: 0 0 20px 5px var(--primary); }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            background: linear-gradient(45deg, #ff00aa, #00ffaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .credits-display {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px 25px;
+            border-radius: var(--border-radius-lg);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Achievements Grid */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .achievement-card {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--card-shadow);
+            padding: 25px;
+            display: flex;
+            transition: var(--transition);
+            min-height: 180px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .achievement-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+            transition: var(--transition);
+            opacity: 0;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .achievement-card:hover::before {
+            opacity: 1;
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: rotate(30deg) translate(-10%, -10%); }
+            100% { transform: rotate(30deg) translate(10%, 10%); }
+        }
+
+        .achievement-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            font-size: 40px;
+            flex-shrink: 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .achievement-icon::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .achievement-card:hover .achievement-icon::after {
+            opacity: 0.5;
+            animation: pulse 2s infinite;
+        }
+
+        .achievement-icon.locked {
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--gray-medium);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+        }
+
+        .achievement-icon.unlocked {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            border: 2px solid white;
+        }
+
+        .achievement-icon.unlocked::after {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+        }
+
+        .achievement-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .achievement-title {
+            font-weight: 700;
+            margin: 0 0 10px 0;
+            font-size: 1.3rem;
+            color: white;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .achievement-description {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+            font-size: 1rem;
+            flex-grow: 1;
+        }
+
+        .achievement-progress {
+            height: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                          rgba(255,255,255,0) 0%, 
+                          rgba(255,255,255,0.8) 50%, 
+                          rgba(255,255,255,0) 100%);
+            animation: progressShine 2s infinite;
+        }
+
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .achievement-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .claim-btn {
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-md);
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .claim-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(30deg);
+            transition: var(--transition);
+        }
+
+        .claim-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .claim-btn:hover::after {
+            left: 100%;
+        }
+
+        .claim-btn:disabled {
+            background: var(--gray-light);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .claimed-badge {
+            color: var(--secondary);
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-shadow: 0 0 5px rgba(0, 255, 170, 0.5);
+            animation: textGlow 2s infinite alternate;
+        }
+
+        @keyframes textGlow {
+            from { text-shadow: 0 0 5px rgba(0, 255, 170, 0.5); }
+            to { text-shadow: 0 0 15px rgba(0, 255, 170, 0.8); }
+        }
+
+        .claimed-badge i {
+            font-size: 1.2rem;
+        }
+
+        /* Navigation */
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-around;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 0;
+            box-shadow: var(--nav-shadow);
+            z-index: 99;
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            font-size: 0.9rem;
+            padding: 5px 15px;
+            border-radius: var(--border-radius-md);
+            transition: var(--transition);
+            width: 25%;
+            text-align: center;
+            position: relative;
+        }
+
+        .nav-button::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background: var(--primary);
+            transition: var(--transition);
+            border-radius: 3px;
+        }
+
+        .nav-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .nav-button:hover::after {
+            width: 80%;
+        }
+
+        .nav-button.active {
+            color: white;
+            font-weight: 600;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        .nav-button.active::after {
+            width: 80%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .nav-button i {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transition: var(--transition);
+        }
+
+        .nav-button:hover i {
+            transform: scale(1.2);
+        }
+
+        /* Category Header */
+        .category-header {
+            grid-column: 1 / -1;
+            font-size: 1.8rem;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid;
+            border-image: linear-gradient(90deg, var(--primary), var(--secondary)) 1;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+            display: inline-block;
+        }
+
+        .category-header::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.5s ease;
+        }
+
+        .category-header:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        /* Confetti Effect */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            opacity: 0;
+            z-index: 100;
+            animation: confettiFall 5s linear forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Floating Trophy */
+        .floating-trophy {
+            position: fixed;
+            right: 5%;
+            top: 10%;
+            font-size: 3rem;
+            color: gold;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+            animation: floatTrophy 4s ease-in-out infinite;
+            z-index: 2;
+            cursor: pointer;
+        }
+
+        @keyframes floatTrophy {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .achievements-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .achievement-card {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .achievement-icon {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* 3D Card Effect */
+        .achievement-card {
+            perspective: 1000px;
+        }
+
+        .achievement-card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .achievement-card:hover .achievement-card-inner {
+            transform: rotateY(10deg) rotateX(5deg);
+        }
+
+        /* Glowing Border Effect */
+        .glow-border {
+            position: relative;
+        }
+
+        .glow-border::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            z-index: -1;
+            background: linear-gradient(45deg, #ff00aa, #00ffaa, #00aaff, #ff00aa);
+            background-size: 400% 400%;
+            border-radius: var(--border-radius-lg);
+            opacity: 0;
+            transition: 0.5s;
+            animation: glowBorder 3s linear infinite;
+        }
+
+        @keyframes glowBorder {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .achievement-card:hover.glow-border::before {
+            opacity: 1;
+            filter: blur(5px);
+        }
+
+        /* Floating Stars */
+        .floating-stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.2; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Floating Particles Background -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Floating Trophy -->
+    <div class="floating-trophy" id="floating-trophy" title="Your Trophy Case">
+        <i class="material-icons">emoji_events</i>
+    </div>
+
+    <div class="container">
+        <div class="header glow-border">
+            <h1>YOUR ACHIEVEMENTS</h1>
+            <div class="credits-display">
+                <i class="material-icons">monetization_on</i>
+                <span id="user-credits">0</span> CREDITS
+            </div>
+        </div>
+
+        <div class="achievements-grid" id="achievements-grid">
+            <!-- Achievements will be dynamically inserted here -->
+        </div>
+    </div>
+
+    
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVYdfql5aqHrChlA1v3nxRLkIbYyWMvUg",
+            authDomain: "study2-7bdc7.firebaseapp.com",
+            databaseURL: "https://study2-7bdc7-default-rtdb.firebaseio.com",
+            projectId: "study2-7bdc7",
+            storageBucket: "study2-7bdc7.firebasestorage.app",
+            messagingSenderId: "320617984870",
+            appId: "1:320617984870:web:04b61ea4ee88ae057e4ea7",
+            measurementId: "G-VRM14GRNWG"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Achievement data - organized by categories
+        const achievements = {
+            streak: [
+                { 
+                    id: 'streak-3', 
+                    title: '2-Day Streak', 
+                    icon: 'whatshot', 
+                    description: 'Maintain a 2-day study streak', 
+                    required: 2, 
+                    credits: 10 
+                },
+                { 
+                    id: 'streak-7', 
+                    title: '7-Day Streak', 
+                    icon: 'local_fire_department', 
+                    description: 'Maintain a 7-day study streak', 
+                    required: 7, 
+                    credits: 20 
+                },
+                { 
+                    id: 'streak-30', 
+                    title: '30-Day Streak', 
+                    icon: 'stars', 
+                    description: 'Maintain a 30-day study streak', 
+                    required: 30, 
+                    credits: 50 
+                }
+            ],
+            leetcode: [
+                { 
+                    id: 'leetcode-10', 
+                    title: 'LeetCode Novice', 
+                    icon: 'code', 
+                    description: 'Solve 10 LeetCode problems', 
+                    required: 10, 
+                    credits: 10 
+                },
+                { 
+                    id: 'leetcode-50', 
+                    title: 'LeetCode Intermediate', 
+                    icon: 'data_object', 
+                    description: 'Solve 50 LeetCode problems', 
+                    required: 50, 
+                    credits: 20 
+                },
+                { 
+                    id: 'leetcode-100', 
+                    title: 'LeetCode Master', 
+                    icon: 'terminal', 
+                    description: 'Solve 100 LeetCode problems', 
+                    required: 100, 
+                    credits: 50 
+                }
+            ],
+            goals: [
+                { 
+                    id: 'goals-5', 
+                    title: 'Goal Setter', 
+                    icon: 'flag', 
+                    description: 'Complete 5 study goals', 
+                    required: 5, 
+                    credits: 10 
+                },
+                { 
+                    id: 'goals-20', 
+                    title: 'Goal Achiever', 
+                    icon: 'emoji_events', 
+                    description: 'Complete 20 study goals', 
+                    required: 20, 
+                    credits: 20 
+                },
+                { 
+                    id: 'goals-50', 
+                    title: 'Goal Master', 
+                    icon: 'military_tech', 
+                    description: 'Complete 50 study goals', 
+                    required: 50, 
+                    credits: 50 
+                }
+            ],
+            special: [
+                { 
+                    id: 'perfect-week', 
+                    title: 'Perfect Week', 
+                    icon: 'check_circle', 
+                    description: 'Complete all daily goals for 7 consecutive days', 
+                    required: 1, 
+                    credits: 30 
+                },
+                { 
+                    id: 'daily-5', 
+                    title: 'Daily Grind', 
+                    icon: 'all_inclusive', 
+                    description: 'Complete 5 goals in a single day', 
+                    required: 1, 
+                    credits: 20 
+                },
+                { 
+                    id: 'balanced', 
+                    title: 'Balanced Learner', 
+                    icon: 'balance', 
+                    description: 'Complete goals in 3 different categories', 
+                    required: 1, 
+                    credits: 20 
+                }
+            ]
+        };
+
+        // User state
+        const userState = {
+            currentUser: null,
+            credits: 0,
+            achievements: {
+                streak: [],
+                leetcode: [],
+                goals: [],
+                special: []
+            },
+            progress: {
+                streak: 0,
+                leetcode: 0,
+                goals: 0
+            }
+        };
+
+        // Initialize the app
+        function init() {
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    userState.currentUser = user;
+                    loadUserData();
+                } else {
+                    window.location.href = 'auth.html';
+                }
+            });
+        }
+
+        /**
+         * Load user data including credits and achievements
+         */
+        async function loadUserData() {
+            try {
+                const userDoc = await db.collection('users').doc(userState.currentUser.uid).get();
+                
+                if (userDoc.exists) {
+                    const data = userDoc.data();
+                    
+                    // Update user state
+                    userState.credits = data.credits || 0;
+                    document.getElementById('user-credits').textContent = userState.credits;
+                    
+                    if (data.achievements) {
+                        userState.achievements = data.achievements;
+                    }
+
+                    // Load current progress and render achievements
+                    await loadProgressAndRenderAchievements();
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                showToast('Failed to load user data', 'error');
+            }
+        }
+
+        /**
+         * Load progress data and render achievements
+         */
+        async function loadProgressAndRenderAchievements() {
+            try {
+                // Get current streak
+                const userDoc = await db.collection('users').doc(userState.currentUser.uid).get();
+                userState.progress.streak = userDoc.data()?.streak || 0;
+
+                // Get LeetCode problems solved (placeholder - implement your integration)
+                userState.progress.leetcode = 0;
+
+                // Get goals completed
+                const goalsSnapshot = await db.collection('goals')
+                    .where('userId', '==', userState.currentUser.uid)
+                    .where('completed', '==', true)
+                    .get();
+                userState.progress.goals = goalsSnapshot.size;
+
+                // Check for newly completed achievements
+                await checkForNewAchievements();
+
+                // Render achievements with current progress
+                renderAchievements();
+            } catch (error) {
+                console.error('Error loading progress:', error);
+                showToast('Failed to load progress data', 'error');
+            }
+        }
+
+        /**
+         * Check if any new achievements have been unlocked
+         */
+        async function checkForNewAchievements() {
+            try {
+                let updatesNeeded = false;
+                const updates = {};
+                
+                // Check each achievement category
+                Object.keys(achievements).forEach(category => {
+                    achievements[category].forEach(achievement => {
+                        const isUnlocked = userState.achievements[category]?.includes(achievement.id);
+                        const isClaimed = userState.achievements[category]?.includes(`${achievement.id}-claimed`);
+                        
+                        if (!isUnlocked && !isClaimed) {
+                            let conditionMet = false;
+                            
+                            // Check condition based on category
+                            switch(category) {
+                                case 'streak':
+                                    conditionMet = userState.progress.streak >= achievement.required;
+                                    break;
+                                case 'leetcode':
+                                    conditionMet = userState.progress.leetcode >= achievement.required;
+                                    break;
+                                case 'goals':
+                                    conditionMet = userState.progress.goals >= achievement.required;
+                                    break;
+                                case 'special':
+                                    // Implement special conditions here
+                                    break;
+                            }
+                            
+                            if (conditionMet) {
+                                userState.achievements[category].push(achievement.id);
+                                updates[`achievements.${category}`] = userState.achievements[category];
+                                updatesNeeded = true;
+                            }
+                        }
+                    });
+                });
+                
+                if (updatesNeeded) {
+                    await db.collection('users').doc(userState.currentUser.uid).update(updates);
+                    showToast('New achievements unlocked!', 'success');
+                }
+            } catch (error) {
+                console.error('Error checking for new achievements:', error);
+            }
+        }
+
+        /**
+         * Render all achievements with progress
+         */
+        function renderAchievements() {
+            const grid = document.getElementById('achievements-grid');
+            grid.innerHTML = '';
+
+            // Render each category
+            Object.keys(achievements).forEach(category => {
+                // Add category header
+                const categoryHeader = document.createElement('h2');
+                categoryHeader.className = 'category-header';
+                categoryHeader.textContent = `${category.charAt(0).toUpperCase() + category.slice(1)} Achievements`;
+                grid.appendChild(categoryHeader);
+
+                // Render achievements in this category
+                achievements[category].forEach(achievement => {
+                    const isUnlocked = userState.achievements[category]?.includes(achievement.id) || 
+                                     userState.achievements[category]?.includes(`${achievement.id}-claimed`);
+                    const isClaimed = userState.achievements[category]?.includes(`${achievement.id}-claimed`);
+
+                    // Calculate current progress
+                    let currentProgress = 0;
+                    switch(category) {
+                        case 'streak':
+                            currentProgress = userState.progress.streak;
+                            break;
+                        case 'leetcode':
+                            currentProgress = userState.progress.leetcode;
+                            break;
+                        case 'goals':
+                            currentProgress = userState.progress.goals;
+                            break;
+                        case 'special':
+                            currentProgress = 0; // Implement special tracking
+                            break;
+                    }
+
+                    const progressPercent = Math.min(100, (currentProgress / achievement.required) * 100);
+                    const isCompleted = currentProgress >= achievement.required;
+
+                    const card = document.createElement('div');
+                    card.className = 'achievement-card';
+                    
+                    // Add pulse animation for newly unlocked achievements
+                    if (isUnlocked && !isClaimed) {
+                        card.classList.add('pulse');
+                    }
+                    
+                    card.innerHTML = `
+                        <div class="achievement-icon ${isUnlocked ? 'unlocked' : 'locked'}">
+                            <i class="material-icons">${achievement.icon}</i>
+                        </div>
+                        <div class="achievement-content">
+                            <h3 class="achievement-title">${achievement.title}</h3>
+                            <p class="achievement-description">${achievement.description}</p>
+                            <div class="achievement-progress">
+                                <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                            </div>
+                            <div class="achievement-status">
+                                <span>${isUnlocked ? 'Unlocked!' : `${Math.min(currentProgress, achievement.required)}/${achievement.required}`}</span>
+                                ${isUnlocked ? 
+                                    (isClaimed ? 
+                                        '<span class="claimed-badge"><i class="material-icons">check_circle</i>+${achievement.credits} Credits</span>' : 
+                                        `<button class="claim-btn" data-category="${category}" data-id="${achievement.id}" data-credits="${achievement.credits}">
+                                            Claim ${achievement.credits} Credits
+                                        </button>`) : 
+                                    (isCompleted ? 'Complete! Refresh to claim' : '')}
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            });
+
+            // Add event listeners to claim buttons
+            document.querySelectorAll('.claim-btn').forEach(btn => {
+                btn.addEventListener('click', claimAchievement);
+            });
+        }
+
+        /**
+         * Handle claiming an achievement
+         */
+        async function claimAchievement(e) {
+            const btn = e.target;
+            const category = btn.dataset.category;
+            const achievementId = btn.dataset.id;
+            const credits = parseInt(btn.dataset.credits);
+
+            // Disable button during processing
+            btn.disabled = true;
+            btn.textContent = 'Processing...';
+
+            try {
+                // Update user data in Firestore
+                await db.collection('users').doc(userState.currentUser.uid).update({
+                    [`achievements.${category}`]: firebase.firestore.FieldValue.arrayUnion(`${achievementId}-claimed`),
+                    credits: firebase.firestore.FieldValue.increment(credits)
+                });
+
+                // Update local state
+                userState.achievements[category].push(`${achievementId}-claimed`);
+                userState.credits += credits;
+                document.getElementById('user-credits').textContent = userState.credits;
+
+                // Re-render achievements
+                renderAchievements();
+
+                // Show success message
+                showToast(`+${credits} credits claimed!`, 'success');
+            } catch (error) {
+                console.error('Error claiming achievement:', error);
+                showToast('Failed to claim achievement', 'error');
+                btn.disabled = false;
+                btn.textContent = `Claim ${credits} Credits`;
+            }
+        }
+
+        /**
+         * Show toast notification
+         */
+        function showToast(message, type = 'info') {
+            // In a real app, you'd implement a proper toast notification system
+            alert(`${type.toUpperCase()}: ${message}`);
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+
+     
+<script>
+    // This script will obfuscate the main code when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        const scripts = document.getElementsByTagName('script');
+        for (let i = 0; i < scripts.length; i++) {
+            const scriptContent = scripts[i].textContent;
+            // Check for Firebase initialization or key achievement functions
+            if (
+                scriptContent.includes('firebase.initializeApp') || 
+                scriptContent.includes('init') || 
+                scriptContent.includes('loadUserData') || 
+                scriptContent.includes('loadProgressAndRenderAchievements') || 
+                scriptContent.includes('checkForNewAchievements') || 
+                scriptContent.includes('renderAchievements')
+            ) {
+                const originalContent = scriptContent;
+                // Convert each character to hex code
+                const obfuscated = originalContent
+                    .split('')
+                    .map(c => c.charCodeAt(0).toString(16))
+                    .join('');
+                // Replace the script content with an eval that decodes and executes the original code
+                scripts[i].textContent = `eval(unescape('${escape(obfuscated)}'.replace(/../g, '%$&')))`;
+            }
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener("contextmenu", function (e) {
+      e.preventDefault();
+    });
+  </script>
+
+</body>
+</html>

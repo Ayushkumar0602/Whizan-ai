@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Resume</title>
+  <link rel="icon" type="image/png" href="Smart Study.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+      margin: 0;
+      padding: 0;
+      color: #2c3e50;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 880px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 36px 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(44,62,80,0.15);
+    }
+    h1, h2, h3 {
+      color: #1a2980;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    #resumePreview {
+      margin-top: 16px;
+      background: #f6faff;
+      padding: 32px;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(44,62,80,0.08);
+      min-height: 300px;
+    }
+    .skill-bar-container {
+      margin: 6px 0;
+    }
+    .skill-bar-label {
+      font-weight: 500;
+      margin-bottom: 2px;
+      display: inline-block;
+    }
+    .skill-bar {
+      width: 100%;
+      background: #e0e0e0;
+      border-radius: 3px;
+      overflow: hidden;
+      height: 16px;
+      margin-bottom: 2px;
+    }
+    .skill-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3498db, #27ae60);
+    }
+    .loading {
+      color: #1a2980;
+      font-weight: bold;
+      margin-top: 24px;
+    }
+    .error-msg {
+      color: #c0392b;
+      font-weight: bold;
+      margin: 20px 0;
+      background: #ffeaea;
+      padding: 12px 18px;
+      border-radius: 6px;
+    }
+    #downloadBtn {
+      margin-top: 24px;
+      background: linear-gradient(90deg, #26d0ce, #1a2980);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      padding: 12px 28px;
+      border-radius: 6px;
+      font-weight: bold;
+      letter-spacing: 0.2px;
+      transition: background 0.2s;
+    }
+    #downloadBtn:hover {
+      background: linear-gradient(90deg, #1a2980, #26d0ce);
+    }
+  </style>
+  <!-- Firebase & html2pdf.js CDN -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Resume Viewer</h1>
+    <div id="loading" class="loading">Loading resume...</div>
+    <div id="errorMsg" class="error-msg" style="display:none"></div>
+    <div id="resumePreview"></div>
+    <button id="downloadBtn" style="display:none;">Download as PDF</button>
+  </div>
+  <script>
+    // Firebase config (same as your main app)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCVYdfql5aqHrChlA1v3nxRLkIbYyWMvUg",
+      authDomain: "study2-7bdc7.firebaseapp.com",
+      databaseURL: "https://study2-7bdc7-default-rtdb.firebaseio.com",
+      projectId: "study2-7bdc7",
+      storageBucket: "study2-7bdc7.appspot.com",
+      messagingSenderId: "320617984870",
+      appId: "1:320617984870:web:04b61ea4ee88ae057e4ea7",
+      measurementId: "G-VRM14GRNWG"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Get id from URL
+    function getQueryParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+
+    function renderResumePreview(data) {
+      let html = `
+        <h2>${data.name || ''}</h2>
+        <div><b>Email:</b> ${data.email || ''} | <b>Phone:</b> ${data.phone || ''} | <b>Location:</b> ${data.location || ''}</div>
+        <div>
+          ${data.linkedin ? `<a href="${data.linkedin}" target="_blank">LinkedIn</a> | ` : ""}
+          ${data.github ? `<a href="${data.github}" target="_blank">GitHub</a> | ` : ""}
+          ${data.portfolio ? `<a href="${data.portfolio}" target="_blank">Portfolio</a>` : ""}
+        </div>
+        <hr>
+        <h3>Professional Summary</h3>
+        <p>${data.summary || ''}</p>
+        <h3>Education</h3>
+        <ul>
+          ${(data.education || []).map(e => `<li><b>${e['edu-degree']}</b>, ${e['edu-inst']} (${e['edu-year']})</li>`).join('')}
+        </ul>
+        <h3>Experience</h3>
+        <ul>
+          ${(data.experience || []).map(e => `
+            <li>
+              <b>${e['exp-title']}</b> at ${e['exp-company']} (${e['exp-duration']}, ${e['exp-location']})
+              <ul>
+                <li>${e['exp-desc']}</li>
+              </ul>
+            </li>
+          `).join('')}
+        </ul>
+        <h3>Projects</h3>
+        <ul>
+          ${(data.projects || []).map(p => `
+            <li>
+              <b>${p['proj-name']}</b>
+              ${p['proj-link'] ? `<a href="${p['proj-link']}" target="_blank">[Link]</a>` : ""}
+              <ul>
+                <li>${p['proj-desc']}</li>
+              </ul>
+            </li>
+          `).join('')}
+        </ul>
+        <h3>Skills</h3>
+        <div>
+          ${(data.skills || []).map(skill => `
+            <div class="skill-bar-container">
+              <span class="skill-bar-label">${skill}</span>
+              <div class="skill-bar"><div class="skill-bar-fill" style="width:${60 + Math.random()*40}%"></div></div>
+            </div>
+          `).join('')}
+        </div>
+        <h3>Certifications</h3>
+        <ul>
+          ${(data.certifications || []).map(c => `<li>${c}</li>`).join('')}
+        </ul>
+      `;
+      document.getElementById('resumePreview').innerHTML = html;
+    }
+
+    // Main logic
+    (function() {
+      const id = getQueryParam('id');
+      if (!id) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('errorMsg').textContent = "No resume ID provided in the URL.";
+        document.getElementById('errorMsg').style.display = 'block';
+        return;
+      }
+      db.ref('publicResumes/' + id).once('value').then(snap => {
+        document.getElementById('loading').style.display = 'none';
+        if (!snap.exists()) {
+          document.getElementById('errorMsg').textContent = "Resume not found or has been removed.";
+          document.getElementById('errorMsg').style.display = 'block';
+          return;
+        }
+        const data = snap.val();
+        renderResumePreview(data);
+        document.getElementById('downloadBtn').style.display = 'inline-block';
+      }).catch(err => {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('errorMsg').textContent = "Error loading resume: " + err.message;
+        document.getElementById('errorMsg').style.display = 'block';
+      });
+    })();
+
+    // PDF Download
+    document.getElementById('downloadBtn').onclick = function() {
+      const element = document.getElementById('resumePreview');
+      const opt = {
+        margin:       0.5,
+        filename:     'resume.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+      html2pdf().from(element).set(opt).save();
+    };
+  </script>
+
+   
+<script>
+  document.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+  });
+</script>
+</script>
+</body>
+</html>

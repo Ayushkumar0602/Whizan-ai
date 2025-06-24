@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>YouTube Shorts Viewer</title>
+  <link rel="icon" type="image/png" href="Smart Study.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Roboto', Arial, sans-serif;
+    }
+
+    /* Return Button */
+    #returnButton {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #returnButton:hover {
+      background: white;
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    #playerContainer {
+      width: 100%;
+      max-width: 360px;
+      height: 640px;
+      background: black;
+      position: relative;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+      border-radius: 15px;
+      overflow: hidden;
+      touch-action: pan-y; /* Allow vertical panning for swipes */
+      user-select: none; /* Prevent text selection during swipes */
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    #startOverlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(30, 30, 30, 0.9));
+      color: white;
+      font-size: 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      text-align: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    #startOverlay::before {
+      content: "▶";
+      display: block;
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      border-radius: 50%;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      animation: pulse 2s infinite;
+    }
+
+    /* Swipe instruction overlay */
+    .swipe-hint {
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      z-index: 6;
+      animation: fadeInOut 3s ease-in-out;
+      pointer-events: none;
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .nav-buttons {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 5;
+      box-sizing: border-box;
+    }
+
+    .nav-buttons button {
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 25px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .nav-buttons button:hover {
+      background: white;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-buttons button:active {
+      transform: translateY(0);
+    }
+
+    /* Load More Button */
+    #loadMoreButton {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      z-index: 15;
+      display: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 0.5s ease;
+    }
+
+    #loadMoreButton:hover {
+      transform: translate(-50%, -50%) scale(1.05);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    /* Progress indicator */
+    #progressIndicator {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 12px;
+      z-index: 5;
+    }
+
+    /* Mobile Portrait: Force 9:16 aspect ratio */
+    @media (max-width: 600px) and (orientation: portrait) {
+      #playerContainer {
+        width: 100vw;
+        height: calc(100vw * 16 / 9);
+        max-width: none;
+        border-radius: 0;
+      }
+
+      #startOverlay {
+        font-size: 16px;
+        padding: 10px;
+      }
+
+      .nav-buttons button {
+        padding: 10px 14px;
+        font-size: 13px;
+      }
+
+      #returnButton {
+        top: 10px;
+        left: 10px;
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+      }
+    }
+
+    /* Small landscape devices */
+    @media (max-height: 500px) and (orientation: landscape) {
+      #playerContainer {
+        height: 100vh;
+        width: calc(100vh * 9 / 16);
+        max-width: none;
+        border-radius: 0;
+      }
+
+      .nav-buttons {
+        bottom: 5px;
+      }
+    }
+
+    /* Tablet and up */
+    @media (min-width: 768px) {
+      #playerContainer {
+        max-width: 405px;
+        height: 720px;
+      }
+    }
+
+    /* General low-height fix */
+    @media (max-height: 700px) {
+      #playerContainer {
+        height: 100vh;
+        max-width: none;
+        border-radius: 0;
+      }
+
+      .nav-buttons {
+        bottom: 10px;
+      }
+    }
+
+    /* Loading spinner */
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    #statusMessage {
+      color: #fff;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Return Button -->
+<button id="returnButton" onclick="returnToUserPersona()" title="Return to User Persona">
+  ←
+</button>
+
+<div id="playerContainer">
+  <div id="startOverlay">
+    🔥 Tap to Start Spicy Shorts
+    <div id="statusMessage"></div>
+  </div>
+  <iframe id="videoFrame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  
+  <!-- Progress Indicator -->
+  <div id="progressIndicator">0/0</div>
+  
+  <!-- Load More Button -->
+  <button id="loadMoreButton" onclick="loadMoreReels()">
+    Load More Reels ✨
+  </button>
+
+  <div class="nav-buttons">
+    <button onclick="changeVideo('prev')">⏮️ Prev</button>
+    <button onclick="changeVideo('next')">⏭️ Next</button>
+  </div>
+</div>
+
+<script>
+  // Array of YouTube API keys to rotate through
+  const youtubeApiKeys = [
+    "AIzaSyBjkmFJtDvJD-ciiX_KRyynIwInlGdb5Jc",
+    "AIzaSyCoBeOf90UzMby6rZmIFInhS2DHhbAzbS4",
+    "AIzaSyDvdyjYPX0MTlDPEwWIiCW1MdtQ6K9ri6Y",
+    "AIzaSyACa-hDsfwmTJ4lQHx-EThm8s4-i5fJbnA",
+    "AIzaSyDvdyjYPX0MTlDPEwWIiCW1MdtQ6K9ri6Y",
+    "AIzaSyBQ3XJ9X9X9X9X9X9X9X9X9X9X9X9X9X9"
+  ];
+  
+  // Channel configuration
+  const channels = {
+    priority: [
+      "UCaLrqmCHLN6y7cUkpaVlkMw",
+      "UC1eDpSjujSxygPbUByKLWdA",
+      "UCvJKmLOE4fqIJBasRcW-cKg",
+      "UCIKlJ-xmsLSSNRjFidOS4Dw",
+      "UCUIJFgCAtnQc-zgTl9oyBlw",
+      "UCiCpghPdh3korHJm2j8slSQ",
+      "UCR4tGf4v3PvxQeb6wwjcdSg"
+    ],
+    regular: [
+      "UCaLrqmCHLN6y7cUkpaVlkMw",
+      "UC1eDpSjujSxygPbUByKLWdA",
+      "UCwSozl89jl2zUDzQ4jGJD3g",
+      "UCNQ6FEtztATuaVhZKCY28Yw",
+      "UCeVMnSShP_Iviwkknt83cww"
+    ]
+  };
+  
+  // Enhanced variables for load-more functionality
+  let allVideoIds = []; // Store all fetched videos
+  let videoIds = []; // Currently loaded videos (max 10)
+  let currentIndex = 0;
+  let canNavigate = false;
+  let player;
+  let checkEndInterval;
+  let seenVideos = new Set();
+  let lastVideoId = null;
+  let isFirstLoad = true;
+  let fetchInProgress = false;
+  let currentBatch = 0; // Track which batch we're on
+  const VIDEOS_PER_BATCH = 10; // Load 10 videos at a time
+  
+  // Touch/swipe variables
+  let startY = 0;
+  let startX = 0;
+  let currentY = 0;
+  let currentX = 0;
+  let isTouch = false;
+  let lastSwipeTime = 0;
+  const SWIPE_THRESHOLD = 50; // Minimum distance for swipe
+  const SWIPE_VELOCITY_THRESHOLD = 0.3; // Minimum velocity for swipe
+
+  // Return to user persona function
+  function returnToUserPersona() {
+    window.location.href = 'user_persona.html';
+  }
+
+  // Update progress indicator
+  function updateProgressIndicator() {
+    const indicator = document.getElementById('progressIndicator');
+    indicator.textContent = `${currentIndex + 1}/${videoIds.length}`;
+  }
+
+  // Show/hide load more button
+  function toggleLoadMoreButton(show) {
+    const button = document.getElementById('loadMoreButton');
+    button.style.display = show ? 'block' : 'none';
+  }
+
+  // Load more reels function
+  async function loadMoreReels() {
+    const button = document.getElementById('loadMoreButton');
+    button.textContent = 'Loading... ⏳';
+    button.disabled = true;
+    
+    try {
+      // If we have more videos in allVideoIds, load next batch
+      const startIndex = (currentBatch + 1) * VIDEOS_PER_BATCH;
+      const endIndex = startIndex + VIDEOS_PER_BATCH;
+      
+      if (startIndex < allVideoIds.length) {
+        // Load next batch from existing videos
+        const nextBatch = allVideoIds.slice(startIndex, endIndex);
+        videoIds.push(...nextBatch);
+        currentBatch++;
+        
+        console.log(`Loaded batch ${currentBatch + 1}: ${nextBatch.length} videos`);
+      } else {
+        // Fetch more videos from API
+        await fetchNewVideos();
+        
+        // Add new videos to the current playlist
+        const newStartIndex = currentBatch * VIDEOS_PER_BATCH + videoIds.length;
+        const newEndIndex = newStartIndex + VIDEOS_PER_BATCH;
+        const newBatch = allVideoIds.slice(newStartIndex, newEndIndex);
+        
+        if (newBatch.length > 0) {
+          videoIds.push(...newBatch);
+          currentBatch++;
+          console.log(`Fetched and loaded new batch: ${newBatch.length} videos`);
+        }
+      }
+      
+      updateProgressIndicator();
+      toggleLoadMoreButton(false);
+      
+    } catch (error) {
+      console.error('Error loading more reels:', error);
+      button.textContent = 'Error - Try Again';
+    } finally {
+      button.disabled = false;
+      setTimeout(() => {
+        button.textContent = 'Load More Reels ✨';
+      }, 1000);
+    }
+  }
+
+  // Cache storage functions remain the same...
+  const videoCache = {
+    save: function(channelId, videos) {
+      try {
+        const cacheKey = `ytshorts_${channelId}`;
+        const cacheData = {
+          videos: videos,
+          timestamp: Date.now()
+        };
+        localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+      } catch (e) {
+        console.warn("Failed to save to cache:", e);
+      }
+    },
+    
+    get: function(channelId) {
+      try {
+        const cacheKey = `ytshorts_${channelId}`;
+        const cacheStr = localStorage.getItem(cacheKey);
+        if (!cacheStr) return null;
+        
+        const cache = JSON.parse(cacheStr);
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000;
+        
+        if (now - cache.timestamp < oneDay) {
+          return cache.videos;
+        }
+        
+        return null;
+      } catch (e) {
+        console.warn("Failed to retrieve from cache:", e);
+        return null;
+      }
+    }
+  };
+  
+  // API manager remains the same...
+  const apiManager = {
+    currentKeyIndex: 0,
+    quotaUsed: {},
+    
+    initialize: function() {
+      try {
+        const savedQuota = localStorage.getItem('ytshorts_quota');
+        if (savedQuota) {
+          this.quotaUsed = JSON.parse(savedQuota);
+          
+          const today = new Date().toISOString().split('T')[0];
+          for (const key in this.quotaUsed) {
+            if (this.quotaUsed[key].date !== today) {
+              delete this.quotaUsed[key];
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("Failed to load quota data:", e);
+      }
+    },
+    
+    getNextKey: function() {
+      const today = new Date().toISOString().split('T')[0];
+      
+      for (let i = 0; i < youtubeApiKeys.length; i++) {
+        const keyIndex = (this.currentKeyIndex + i) % youtubeApiKeys.length;
+        const key = youtubeApiKeys[keyIndex];
+        
+        if (!this.quotaUsed[key] || this.quotaUsed[key].date !== today) {
+          this.quotaUsed[key] = { date: today, count: 0 };
+        }
+        
+        if (this.quotaUsed[key].count < 80) {
+          this.currentKeyIndex = keyIndex;
+          return key;
+        }
+      }
+      
+      this.currentKeyIndex = 0;
+      document.getElementById("statusMessage").textContent = "API quota may be exceeded.";
+      return youtubeApiKeys[0];
+    },
+    
+    recordUsage: function(key) {
+      const today = new Date().toISOString().split('T')[0];
+      
+      if (!this.quotaUsed[key]) {
+        this.quotaUsed[key] = { date: today, count: 0 };
+      }
+      
+      this.quotaUsed[key].count++;
+      
+      try {
+        localStorage.setItem('ytshorts_quota', JSON.stringify(this.quotaUsed));
+      } catch (e) {
+        console.warn("Failed to save quota data:", e);
+      }
+    }
+  };
+
+  function hasEnoughCachedVideos() {
+    let cachedCount = 0;
+    
+    [...channels.priority, ...channels.regular].forEach(channelId => {
+      const videos = videoCache.get(channelId);
+      if (videos && videos.length > 0) {
+        cachedCount += videos.length;
+      }
+    });
+    
+    return cachedCount >= VIDEOS_PER_BATCH;
+  }
+
+  // YouTube Player API functions
+  function onYouTubeIframeAPIReady() {
+    player = new YT.Player('videoFrame', {
+      events: {
+        'onReady': onPlayerReady,
+        'onStateChange': onPlayerStateChange
+      }
+    });
+  }
+
+  function onPlayerReady(event) {
+    startProgressChecker();
+  }
+
+  function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.PLAYING) {
+      startProgressChecker();
+    } else if (event.data === YT.PlayerState.ENDED) {
+      changeVideo('next');
+    }
+  }
+
+  function startProgressChecker() {
+    if (checkEndInterval) clearInterval(checkEndInterval);
+    
+    checkEndInterval = setInterval(() => {
+      try {
+        if (player && player.getCurrentTime && player.getDuration) {
+          const currentTime = player.getCurrentTime();
+          const duration = player.getDuration();
+          
+          if (duration > 0 && currentTime > 0 && (currentTime / duration) > 0.999) {
+            console.log("Auto-advancing to next video at 99.9% completion");
+            changeVideo('next');
+          }
+        }
+      } catch (e) {
+        console.log("Progress check error:", e);
+      }
+    }, 200);
+  }
+
+  function shuffleWithMemory(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      let attempts = 0;
+      let j;
+      do {
+        j = Math.floor(Math.random() * (i + 1));
+        attempts++;
+        if (attempts > 5) break;
+      } while (i > 0 && shuffled[i] === shuffled[j]);
+      
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }
+
+  function createSmartPlaylist(priorityVideos, regularVideos) {
+    const shuffledPriority = shuffleWithMemory(priorityVideos);
+    const shuffledRegular = shuffleWithMemory(regularVideos);
+    
+    const playlist = [];
+    const maxLength = Math.max(shuffledPriority.length, shuffledRegular.length);
+    
+    for (let i = 0; i < maxLength; i++) {
+      if (i < shuffledPriority.length) {
+        playlist.push(shuffledPriority[i]);
+      }
+      if (i < shuffledRegular.length) {
+        playlist.push(shuffledRegular[i]);
+      }
+    }
+    
+    const uniquePlaylist = [];
+    const seen = new Set();
+    
+    for (const videoId of playlist) {
+      if (!seen.has(videoId)) {
+        seen.add(videoId);
+        uniquePlaylist.push(videoId);
+      }
+    }
+    
+    return uniquePlaylist;
+  }
+
+  // Modified fetch function for batch loading
+  async function fetchShorts() {
+    if (fetchInProgress) return;
+    fetchInProgress = true;
+    
+    const overlay = document.getElementById("startOverlay");
+    const statusMsg = document.getElementById("statusMessage");
+    
+    try {
+      apiManager.initialize();
+      
+      if (hasEnoughCachedVideos() && !isFirstLoad) {
+        statusMsg.textContent = "Using cached videos...";
+      } else {
+        if (isFirstLoad) {
+          overlay.innerHTML = `
+            <div class="spinner"></div>
+            🔥 Loading spicy shorts...
+            <div id="statusMessage">Fetching videos...</div>
+          `;
+        } else {
+          statusMsg.textContent = "Fetching new videos...";
+        }
+        
+        await fetchNewVideos();
+      }
+      
+      // Gather all videos
+      const priorityVideos = [];
+      const regularVideos = [];
+      
+      channels.priority.forEach(channelId => {
+        const videos = videoCache.get(channelId);
+        if (videos && videos.length > 0) {
+          priorityVideos.push(...videos);
+        }
+      });
+      
+      channels.regular.forEach(channelId => {
+        const videos = videoCache.get(channelId);
+        if (videos && videos.length > 0) {
+          regularVideos.push(...videos);
+        }
+      });
+      
+      // Create full playlist
+      allVideoIds = createSmartPlaylist(priorityVideos, regularVideos);
+      
+      // Load only first batch
+      videoIds = allVideoIds.slice(0, VIDEOS_PER_BATCH);
+      currentBatch = 0;
+      
+      if (videoIds.length === 0) {
+        throw new Error("No shorts found in any channel");
+      }
+      
+      console.log(`Loaded first batch: ${videoIds.length}/${allVideoIds.length} shorts`);
+      updateProgressIndicator();
+      isFirstLoad = false;
+      
+    } catch (error) {
+      console.error("Error fetching shorts:", error);
+      overlay.style.display = "flex";
+      overlay.innerHTML = "Error loading shorts. Tap to try again.";
+      canNavigate = false;
+    } finally {
+      fetchInProgress = false;
+    }
+  }
+
+  async function fetchNewVideos() {
+    async function fetchChannelVideos(channelId, maxResults = 10) {
+      const apiKey = apiManager.getNextKey();
+      const url = `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${channelId}&part=snippet&maxResults=${maxResults}&type=video&order=date&videoDuration=short`;
+      
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        apiManager.recordUsage(apiKey);
+        
+        if (data.items && data.items.length > 0) {
+          const videos = data.items.map(item => item.id.videoId);
+          videoCache.save(channelId, videos);
+          return videos;
+        }
+        return [];
+      } catch (error) {
+        console.error(`Error fetching from channel ${channelId}:`, error);
+        return [];
+      }
+    }
+    
+    const priorityPromises = channels.priority.map(channelId => 
+      fetchChannelVideos(channelId, 15)
+    );
+    
+    await Promise.all(priorityPromises);
+    
+    let totalVideos = 0;
+    channels.priority.forEach(channelId => {
+      const videos = videoCache.get(channelId);
+      if (videos) totalVideos += videos.length;
+    });
+    
+    if (totalVideos < 20) {
+      const regularPromises = channels.regular.map(channelId => 
+        fetchChannelVideos(channelId, 10)
+      );
+      
+      await Promise.all(regularPromises);
+    }
+  }
+
+  function loadVideo(index) {
+    if (videoIds.length === 0) return;
+    
+    index = (index + videoIds.length) % videoIds.length;
+    currentIndex = index;
+    
+    const videoId = videoIds[currentIndex];
+    
+    if (videoId === lastVideoId) {
+      changeVideo('next');
+      return;
+    }
+    
+    lastVideoId = videoId;
+    seenVideos.add(videoId);
+    
+    if (checkEndInterval) {
+      clearInterval(checkEndInterval);
+      checkEndInterval = null;
+    }
+    
+    if (player && player.loadVideoById) {
+      player.loadVideoById({
+        videoId: videoId,
+        startSeconds: 0,
+        suggestedQuality: 'large'
+      });
+    } else {
+      const iframe = document.getElementById("videoFrame");
+      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&fs=0&showinfo=0&iv_load_policy=3&disablekb=1&cc_load_policy=0`;
+    }
+    
+    updateProgressIndicator();
+    
+    // Show load more button when near the end
+    if (currentIndex >= videoIds.length - 2) {
+      toggleLoadMoreButton(true);
+    }
+  }
+
+  function changeVideo(direction) {
+    if (!canNavigate || videoIds.length === 0) return;
+    
+    const step = direction === "next" ? 1 : -1;
+    loadVideo(currentIndex + step);
+  }
+
+  // Touch event handlers for swipe functionality
+  function handleTouchStart(e) {
+    if (!canNavigate) return;
+    
+    const touch = e.touches[0];
+    startY = touch.clientY;
+    startX = touch.clientX;
+    isTouch = true;
+    lastSwipeTime = Date.now();
+  }
+
+  function handleTouchMove(e) {
+    if (!isTouch || !canNavigate) return;
+    
+    e.preventDefault(); // Prevent scrolling
+    const touch = e.touches[0];
+    currentY = touch.clientY;
+    currentX = touch.clientX;
+  }
+
+  function handleTouchEnd(e) {
+    if (!isTouch || !canNavigate) return;
+    
+    const deltaY = startY - currentY;
+    const deltaX = startX - currentX;
+    const deltaTime = Date.now() - lastSwipeTime;
+    const velocity = Math.abs(deltaY) / deltaTime;
+    
+    // Check if it's a vertical swipe (not horizontal)
+    if (Math.abs(deltaY) > Math.abs(deltaX)) {
+      // Swipe up (next video)
+      if (deltaY > SWIPE_THRESHOLD || velocity > SWIPE_VELOCITY_THRESHOLD) {
+        changeVideo('next');
+      }
+      // Swipe down (previous video)
+      else if (deltaY < -SWIPE_THRESHOLD || velocity > SWIPE_VELOCITY_THRESHOLD) {
+        changeVideo('prev');
+      }
+    }
+    
+    isTouch = false;
+  }
+
+  // Keyboard navigation
+  function handleKeyDown(e) {
+    if (!canNavigate) return;
+    
+    switch(e.key) {
+      case 'ArrowUp':
+        e.preventDefault();
+        changeVideo('prev');
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        changeVideo('next');
+        break;
+      case ' ': // Spacebar
+        e.preventDefault();
+        changeVideo('next');
+        break;
+    }
+  }
+
+  // Mouse wheel support
+  function handleWheel(e) {
+    if (!canNavigate) return;
+    
+    e.preventDefault();
+    const delta = e.deltaY;
+    
+    if (Math.abs(delta) > 50) {
+      if (delta > 0) {
+        changeVideo('next');
+      } else {
+        changeVideo('prev');
+      }
+    }
+  }
+
+  document.getElementById("startOverlay").addEventListener("click", () => {
+    document.getElementById("startOverlay").style.display = "none";
+    
+    const overlay = document.getElementById("startOverlay");
+    overlay.innerHTML = `
+      <div class="spinner"></div>
+      🔥 Loading spicy shorts...
+      <div id="statusMessage">Fetching videos...</div>
+    `;
+    
+    fetchShorts().then(() => {
+      if (videoIds.length > 0) {
+        document.getElementById("startOverlay").style.display = "none";
+        loadVideo(0);
+        canNavigate = true;
+        
+        // Add event listeners for swipe functionality
+        const playerContainer = document.getElementById('playerContainer');
+        
+        // Touch events for mobile
+        playerContainer.addEventListener('touchstart', handleTouchStart, { passive: false });
+        playerContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
+        playerContainer.addEventListener('touchend', handleTouchEnd, { passive: false });
+        
+        // Keyboard events
+        document.addEventListener('keydown', handleKeyDown);
+        
+        // Mouse wheel for desktop
+        playerContainer.addEventListener('wheel', handleWheel, { passive: false });
+        
+        // Show swipe hint after first video loads
+        setTimeout(() => {
+          const hint = document.createElement('div');
+          hint.className = 'swipe-hint';
+          hint.textContent = '↑ Swipe up for next video ↓';
+          playerContainer.appendChild(hint);
+          
+          setTimeout(() => {
+            if (hint.parentNode) {
+              hint.parentNode.removeChild(hint);
+            }
+          }, 3000);
+        }, 1000);
+        
+        console.log('Swipe functionality activated! 🔥');
+        console.log('- Swipe up or scroll down: Next video');
+        console.log('- Swipe down or scroll up: Previous video');
+        console.log('- Arrow keys and spacebar also work');
+      }
+    });
+  });
+
+  // Load YouTube API
+  var tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/iframe_api";
+  var firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+</script>
+<script src="https://www.youtube.com/iframe_api"></script>
+
+</body>
+</html>

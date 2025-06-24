@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title> Resume & Portfolio Builder</title>
+  <link rel="icon" type="image/png" href="Smart Study.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --color1: #ff4d4d;
+      --color2: #4d79ff;
+      --color3: #4dff4d;
+      --color4: #ff4dff;
+    }
+
+    /* Color Background Animation */
+    .color-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.15;
+    }
+
+    .color {
+      position: absolute;
+      filter: blur(150px);
+      border-radius: 50%;
+      animation: moveColors 15s infinite alternate;
+    }
+
+    .color:nth-child(1) {
+      background: var(--color1);
+      width: 600px;
+      height: 600px;
+      top: -100px;
+      left: -100px;
+      animation-delay: 0s;
+    }
+
+    .color:nth-child(2) {
+      background: var(--color2);
+      width: 500px;
+      height: 500px;
+      bottom: -150px;
+      left: 200px;
+      animation-delay: -5s;
+    }
+
+    .color:nth-child(3) {
+      background: var(--color3);
+      width: 400px;
+      height: 400px;
+      top: 200px;
+      right: -100px;
+      animation-delay: -10s;
+    }
+
+    .color:nth-child(4) {
+      background: var(--color4);
+      width: 300px;
+      height: 300px;
+      bottom: 100px;
+      right: 100px;
+      animation-delay: -15s;
+    }
+
+    @keyframes moveColors {
+      0% {
+        transform: translate(0, 0);
+      }
+
+      25% {
+        transform: translate(50px, 50px);
+      }
+
+      50% {
+        transform: translate(-50px, 100px);
+      }
+
+      75% {
+        transform: translate(100px, -50px);
+      }
+
+      100% {
+        transform: translate(-100px, -100px);
+      }
+    }
+
+    /* Base Styles */
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      color: white;
+      min-height: 100vh;
+      background: #121212;
+    }
+
+    .container {
+      max-width: 880px;
+      margin: 40px auto;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 36px 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: var(--color2);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(45deg, var(--color1), var(--color2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    /* Form Elements */
+    form input,
+    form textarea,
+    form button,
+    select {
+      display: block;
+      width: 100%;
+      margin: 14px 0;
+      padding: 12px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      font-size: 1em;
+      font-family: inherit;
+      background: rgba(0, 0, 0, 0.2);
+      color: white;
+      transition: all 0.3s;
+    }
+
+    form input:focus,
+    form textarea:focus,
+    select:focus {
+      border-color: var(--color2);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(77, 121, 255, 0.3);
+    }
+
+    form button {
+      background: linear-gradient(90deg, var(--color1), var(--color2));
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      width: auto;
+      padding: 12px 28px;
+      border-radius: 30px;
+      margin: 20px 0;
+      font-weight: bold;
+      letter-spacing: 0.2px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    form button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Resume Preview */
+    #resumePreview {
+      margin-top: 40px;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 32px;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+      min-height: 300px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Buttons */
+    #downloadBtn,
+    #shareBtn {
+      margin-top: 24px;
+      background: linear-gradient(90deg, var(--color2), var(--color3));
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      padding: 12px 28px;
+      border-radius: 30px;
+      margin-right: 10px;
+      font-weight: bold;
+      letter-spacing: 0.2px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #downloadBtn:hover,
+    #shareBtn:hover {
+      background: linear-gradient(90deg, var(--color3), var(--color2));
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .remove-btn {
+      background: #e74c3c;
+      color: #fff;
+      margin-top: 6px;
+      width: auto;
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: none;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    .remove-btn:hover {
+      background: #c0392b;
+      transform: translateY(-2px);
+    }
+
+    /* Sections */
+    .section-group {
+      margin-bottom: 16px;
+      padding: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .section-group:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Loading State */
+    .loading {
+      color: var(--color2);
+      font-weight: bold;
+      margin-top: 24px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Logout Button */
+    .logout-btn {
+      background: linear-gradient(90deg, var(--color4), var(--color1));
+      color: #fff;
+      margin: 10px 0;
+      border-radius: 30px;
+      border: none;
+      padding: 10px 20px;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: linear-gradient(90deg, var(--color1), var(--color4));
+      transform: translateY(-3px);
+    }
+
+    /* Error Message */
+    .error-msg {
+      color: #ff6b6b;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    /* Public Link Box */
+    #publicLinkBox {
+      margin-top: 18px;
+      padding: 12px 18px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      color: var(--color2);
+      font-size: 1em;
+      word-break: break-all;
+      border: 1px solid rgba(77, 121, 255, 0.3);
+    }
+
+    /* Skill Bars */
+    .skill-bar-container {
+      margin: 10px 0;
+    }
+
+    .skill-bar-label {
+      font-weight: 500;
+      margin-bottom: 4px;
+      display: inline-block;
+    }
+
+    .skill-bar {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      height: 8px;
+    }
+
+    .skill-bar-fill {
+      height: 100%;
+      transition: width 0.7s;
+      background: linear-gradient(90deg, var(--color2), var(--color3));
+    }
+
+    /* Template Selector */
+    .template-selector {
+      margin: 20px 0;
+      display: flex;
+      gap: 12px;
+    }
+
+    .template-option {
+      flex: 1;
+      padding: 16px;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.2);
+      transition: all 0.3s;
+      user-select: none;
+      color: white;
+    }
+
+    .template-option.selected {
+      border-color: var(--color2);
+      background: rgba(77, 121, 255, 0.2);
+      font-weight: bold;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* QR Code Styles */
+    .qr-code {
+      width: 80px;
+      height: 80px;
+      margin-left: 8px;
+      background: white;
+      padding: 4px;
+      border-radius: 8px;
+    }
+
+    /* Content Editable Summary */
+    #summary[contenteditable="true"] {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      min-height: 100px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 12px;
+      outline: none;
+      color: white;
+      transition: all 0.3s;
+    }
+
+    #summary[contenteditable="true"]:focus {
+      border-color: var(--color2);
+      box-shadow: 0 0 0 2px rgba(77, 121, 255, 0.3);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .container {
+        margin: 20px;
+        padding: 20px;
+      }
+
+      .template-selector {
+        flex-direction: column;
+      }
+
+      #downloadBtn,
+      #shareBtn {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+      }
+
+      .certification-entry,
+      .project-entry {
+        flex-direction: column;
+      }
+
+      .certification-entry input[type="text"],
+      .project-entry input[type="text"],
+      .certification-entry input[type="url"],
+      .project-entry input[type="url"] {
+        width: 100%;
+      }
+    }
+
+    /* Animation for form elements */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    form input,
+    form textarea,
+    form button,
+    select,
+    .section-group {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--color2);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--color1);
+    }
+  </style>
+  <!-- Firebase & html2pdf.js CDN -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- QRCode.js for QR codes -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Auto Resume & Portfolio Builder</h1>
+
+    <!-- Theme Selector -->
+    <label for="themeSelect"><b>Choose Resume Theme:</b></label>
+    <select id="themeSelect">
+      <option value="classic">Classic (Navy & White)</option>
+      <option value="modern">Modern (Charcoal & Blue)</option>
+      <option value="elegant">Elegant (Gold & Black)</option>
+      <option value="teal">Teal & Gray</option>
+    </select>
+
+    <!-- New: Resume Template Selector -->
+    <h3>Select Resume Template</h3>
+    <div class="template-selector" id="templateSelector">
+      <div class="template-option selected" data-template="single-column">Single Column</div>
+      <div class="template-option" data-template="double-column">Double Column</div>
+      <div class="template-option" data-template="sidebar">Sidebar Layout</div>
+    </div>
+
+    <!-- Login Form -->
+    <form id="loginForm">
+      <h2>Sign In</h2>
+      <input type="email" id="loginEmail" placeholder="Email" required />
+      <input type="password" id="loginPassword" placeholder="Password" required />
+      <button type="submit">Sign In</button>
+      <button type="button" id="registerBtn">Register</button>
+      <div id="loginError" class="error-msg"></div>
+    </form>
+
+    <!-- Logout Button -->
+    <button id="logoutBtn" class="logout-btn hidden">Logout</button>
+
+    <!-- Resume Builder Form -->
+    <form id="resumeForm" autocomplete="off" class="hidden">
+      <h2>Personal Information</h2>
+      <input type="text" id="name" placeholder="Full Name" required />
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="text" id="phone" placeholder="Phone Number" required />
+      <input type="text" id="location" placeholder="City, State, Country" required />
+      <input type="text" id="linkedin" placeholder="LinkedIn URL" />
+      <input type="text" id="github" placeholder="GitHub URL" />
+      <input type="text" id="portfolio" placeholder="Portfolio URL" />
+
+      <!-- New: Industry and Job Role for ATS Keywords -->
+      <h3>Industry & Job Role (for ATS Keyword Suggestions)</h3>
+      <input type="text" id="industry" placeholder="Industry (e.g. Software Development)" />
+      <input type="text" id="jobRole" placeholder="Job Role (e.g. Frontend Developer)" />
+      <button type="button" id="getKeywordsBtn">Get ATS Keyword Suggestions</button>
+      <textarea id="keywordSuggestions" rows="4" readonly
+        placeholder="Keyword suggestions will appear here..."></textarea>
+
+      <!-- New: Import LinkedIn Profile -->
+      <h3>Import LinkedIn Profile</h3>
+      <input type="url" id="linkedinProfileUrl" placeholder="Enter your public LinkedIn profile URL" />
+      <button type="button" id="importLinkedInBtn">Import Data</button>
+      <div id="linkedinImportStatus" style="color: green; margin-top: 6px;"></div>
+
+      <h2>Professional Summary</h2>
+      <div id="summary" contenteditable="true" placeholder="Brief summary about yourself (optional)"></div>
+
+      <h2>Education</h2>
+      <div id="educationSection"></div>
+      <button type="button" onclick="addEducation()">Add Education</button>
+
+      <h2>Experience</h2>
+      <div id="experienceSection"></div>
+      <button type="button" onclick="addExperience()">Add Experience</button>
+
+      <h2>Projects</h2>
+      <div id="projectsSection"></div>
+      <button type="button" onclick="addProject()">Add Project</button>
+
+      <h2>Skills</h2>
+      <input type="text" id="skills" placeholder="Comma-separated skills" required />
+
+      <h2>Certifications & Achievements</h2>
+      <div id="certificationsSection"></div>
+      <button type="button" onclick="addCertification()">Add Certification / Achievement</button>
+
+      <button type="submit">Generate Resume</button>
+    </form>
+
+    <div id="loading" class="loading" style="display:none;">Generating your resume with AI...</div>
+    <div id="resumePreview"></div>
+    <button id="downloadBtn" style="display:none;">Download as PDF</button>
+    <button id="shareBtn" style="display:none;">Share Resume Link</button>
+    <div id="publicLinkBox" class="hidden"></div>
+  </div>
+
+  <script>
+    // Firebase config (unchanged)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCVYdfql5aqHrChlA1v3nxRLkIbYyWMvUg",
+      authDomain: "study2-7bdc7.firebaseapp.com",
+      databaseURL: "https://study2-7bdc7-default-rtdb.firebaseio.com",
+      projectId: "study2-7bdc7",
+      storageBucket: "study2-7bdc7.appspot.com",
+      messagingSenderId: "320617984870",
+      appId: "1:320617984870:web:04b61ea4ee88ae057e4ea7",
+      measurementId: "G-VRM14GRNWG"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // --- Auth Logic (unchanged) ---
+    const loginForm = document.getElementById('loginForm');
+    const resumeForm = document.getElementById('resumeForm');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const loginError = document.getElementById('loginError');
+    const publicLinkBox = document.getElementById('publicLinkBox');
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        loginForm.classList.add('hidden');
+        resumeForm.classList.remove('hidden');
+        logoutBtn.classList.remove('hidden');
+        document.getElementById('email').value = user.email || '';
+      } else {
+        loginForm.classList.remove('hidden');
+        resumeForm.classList.add('hidden');
+        logoutBtn.classList.add('hidden');
+        downloadBtn.style.display = 'none';
+        shareBtn.style.display = 'none';
+        document.getElementById('resumePreview').innerHTML = '';
+        publicLinkBox.classList.add('hidden');
+      }
+    });
+
+    loginForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      loginError.textContent = '';
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .catch(err => {
+          loginError.textContent = err.message;
+        });
+    });
+
+    document.getElementById('registerBtn').addEventListener('click', function () {
+      loginError.textContent = '';
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      if (!email || !password) {
+        loginError.textContent = "Enter email and password to register.";
+        return;
+      }
+      firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then(() => {
+          loginError.textContent = "Registration successful. You are now logged in.";
+        })
+        .catch(err => {
+          loginError.textContent = err.message;
+        });
+    });
+
+    logoutBtn.addEventListener('click', function () {
+      firebase.auth().signOut();
+    });
+
+    // --- Resume Form Logic (unchanged except additions below) ---
+    function addEducation() {
+      const div = document.createElement('div');
+      div.className = "section-group";
+      div.innerHTML = `
+        <input type="text" placeholder="Degree" class="edu-degree" required />
+        <input type="text" placeholder="Institution" class="edu-inst" required />
+        <input type="text" placeholder="Year" class="edu-year" required />
+        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">Remove</button>
+      `;
+      document.getElementById('educationSection').appendChild(div);
+    }
+    function addExperience() {
+      const div = document.createElement('div');
+      div.className = "section-group";
+      div.innerHTML = `
+        <input type="text" placeholder="Job Title" class="exp-title" required />
+        <input type="text" placeholder="Company" class="exp-company" required />
+        <input type="text" placeholder="Location" class="exp-location" required />
+        <input type="text" placeholder="Duration (e.g. Jan 2022 - Mar 2024)" class="exp-duration" required />
+        <textarea placeholder="Description (responsibilities, achievements, results)" class="exp-desc" required></textarea>
+        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">Remove</button>
+      `;
+      document.getElementById('experienceSection').appendChild(div);
+    }
+    function addProject() {
+      const div = document.createElement('div');
+      div.className = "section-group project-entry";
+      div.innerHTML = `
+        <input type="text" placeholder="Project Name" class="proj-name" required />
+        <textarea placeholder="Project Description" class="proj-desc" required></textarea>
+        <input type="url" placeholder="Project Link (optional)" class="proj-link" />
+        <div class="qr-code" title="QR code for project link"></div>
+        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">Remove</button>
+      `;
+      document.getElementById('projectsSection').appendChild(div);
+      updateProjectQRCodes();
+    }
+    function addCertification() {
+      const div = document.createElement('div');
+      div.className = "section-group certification-entry";
+      div.innerHTML = `
+        <input type="text" placeholder="Certification / Achievement Name" class="cert-name" required />
+        <input type="url" placeholder="Link to certificate or achievement (optional)" class="cert-link" />
+        <div class="qr-code" title="QR code for certification link"></div>
+        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">Remove</button>
+      `;
+      document.getElementById('certificationsSection').appendChild(div);
+      updateCertificationQRCodes();
+    }
+    function getSectionValues(classNameSets) {
+      const sections = [];
+      const firstClass = classNameSets[0];
+      const elements = document.querySelectorAll(`.${firstClass}`);
+      for (let i = 0; i < elements.length; i++) {
+        const entry = {};
+        classNameSets.forEach(cls => {
+          entry[cls] = document.getElementsByClassName(cls)[i].value;
+        });
+        sections.push(entry);
+      }
+      return sections;
+    }
+
+    // Update QR codes for projects
+    function updateProjectQRCodes() {
+      const projects = document.querySelectorAll('#projectsSection .project-entry');
+      projects.forEach(proj => {
+        const linkInput = proj.querySelector('.proj-link');
+        const qrDiv = proj.querySelector('.qr-code');
+        qrDiv.innerHTML = '';
+        if (linkInput.value) {
+          new QRCode(qrDiv, {
+            text: linkInput.value,
+            width: 80,
+            height: 80,
+            colorDark: "#1a2980",
+            colorLight: "#f6faff"
+          });
+        }
+      });
+    }
+    // Update QR codes for certifications
+    function updateCertificationQRCodes() {
+      const certs = document.querySelectorAll('#certificationsSection .certification-entry');
+      certs.forEach(cert => {
+        const linkInput = cert.querySelector('.cert-link');
+        const qrDiv = cert.querySelector('.qr-code');
+        qrDiv.innerHTML = '';
+        if (linkInput.value) {
+          new QRCode(qrDiv, {
+            text: linkInput.value,
+            width: 80,
+            height: 80,
+            colorDark: "#1a2980",
+            colorLight: "#f6faff"
+          });
+        }
+      });
+    }
+
+    // Listen for changes to update QR codes live
+    document.getElementById('projectsSection').addEventListener('input', e => {
+      if (e.target.classList.contains('proj-link')) updateProjectQRCodes();
+    });
+    document.getElementById('certificationsSection').addEventListener('input', e => {
+      if (e.target.classList.contains('cert-link')) updateCertificationQRCodes();
+    });
+
+    // Gemini API integration (unchanged)
+    async function generateWithGemini(prompt) {
+      const apiKey = "AIzaSyAM1p730RTRu40S1sHghd1KD4501K6iCsI";
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+      const body = {
+        contents: [{ parts: [{ text: prompt }] }]
+      };
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const data = await response.json();
+      if (data && data.candidates && data.candidates.length > 0) {
+        return data.candidates[0].content.parts[0].text;
+      } else {
+        return "";
+      }
+    }
+
+    // --- PDF & Share Logic (unchanged) ---
+    let lastResumeId = null;
+
+    // Render resume preview with template support
+    function renderResumePreview(data, aiSummary, aiExpBullets, aiProjBullets, selectedTemplate) {
+      // Template wrappers
+      let containerClass = "";
+      if (selectedTemplate === "double-column") {
+        containerClass = "double-column-template";
+      } else if (selectedTemplate === "sidebar") {
+        containerClass = "sidebar-template";
+      } else {
+        containerClass = "single-column-template";
+      }
+
+      // Build skills html
+      const skillsHtml = (data.skills || []).map(skill => `
+        <div class="skill-bar-container">
+          <span class="skill-bar-label">${skill}</span>
+          <div class="skill-bar"><div class="skill-bar-fill" style="width:${60 + Math.random() * 40}%"></div></div>
+        </div>
+      `).join('');
+
+      // Build education html
+      const educationHtml = (data.education || []).map(e => `<li><b>${e['edu-degree']}</b>, ${e['edu-inst']} (${e['edu-year']})</li>`).join('');
+
+      // Build experience html with AI bullets fallback
+      const experienceHtml = (data.experience || []).map((e, idx) => `
+        <li>
+          <b>${e['exp-title']}</b> at ${e['exp-company']} (${e['exp-duration']}, ${e['exp-location']})
+          <ul>
+            ${(aiExpBullets && aiExpBullets[idx]) ? aiExpBullets[idx] : `<li>${e['exp-desc']}</li>`}
+          </ul>
+        </li>
+      `).join('');
+
+      // Projects with AI bullets fallback and QR codes for links
+      const projectsHtml = (data.projects || []).map((p, idx) => `
+        <li>
+          <b>${p['proj-name']}</b>
+          ${p['proj-link'] ? `<a href="${p['proj-link']}" target="_blank">[Link]</a>` : ""}
+          <ul>
+            <li>${(aiProjBullets && aiProjBullets[idx]) ? aiProjBullets[idx] : p['proj-desc']}</li>
+          </ul>
+          ${p['proj-link'] ? `<img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(p['proj-link'])}" alt="QR code" style="margin-top:6px;"/>` : ""}
+        </li>
+      `).join('');
+
+      // Certifications with QR codes
+      const certificationsHtml = (data.certifications || []).map(c => {
+        if (typeof c === "object" && c.name) {
+          return `<li>${c.name}${c.link ? ` <a href="${c.link}" target="_blank">[Link]</a> <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(c.link)}" alt="QR code" style="vertical-align:middle; margin-left:6px;"/>` : ""}</li>`;
+        }
+        return `<li>${c}</li>`;
+      }).join('');
+
+      // Compose final HTML
+      const html = `
+        <div class="${containerClass}">
+          <h2>${data.name}</h2>
+          <div><b>Email:</b> ${data.email} | <b>Phone:</b> ${data.phone} | <b>Location:</b> ${data.location}</div>
+          <div>
+            ${data.linkedin ? `<a href="${data.linkedin}" target="_blank">LinkedIn</a> | ` : ""}
+            ${data.github ? `<a href="${data.github}" target="_blank">GitHub</a> | ` : ""}
+            ${data.portfolio ? `<a href="${data.portfolio}" target="_blank">Portfolio</a>` : ""}
+          </div>
+          <hr>
+          <h3>Professional Summary</h3>
+          <p>${aiSummary || data.summary}</p>
+          <h3>Education</h3>
+          <ul>${educationHtml}</ul>
+          <h3>Experience</h3>
+          <ul>${experienceHtml}</ul>
+          <h3>Projects</h3>
+          <ul>${projectsHtml}</ul>
+          <h3>Skills</h3>
+          <div>${skillsHtml}</div>
+          <h3>Certifications & Achievements</h3>
+          <ul>${certificationsHtml}</ul>
+        </div>
+      `;
+      document.getElementById('resumePreview').innerHTML = html;
+    }
+
+    // --- Resume Template Selector Logic ---
+    const templateSelector = document.getElementById('templateSelector');
+    let selectedTemplate = 'single-column';
+    templateSelector.addEventListener('click', e => {
+      if (e.target.classList.contains('template-option')) {
+        [...templateSelector.children].forEach(child => child.classList.remove('selected'));
+        e.target.classList.add('selected');
+        selectedTemplate = e.target.dataset.template;
+        // If resume preview exists, re-render with new template
+        if (lastResumeData) {
+          renderResumePreview(lastResumeData.data, lastResumeData.aiSummary, lastResumeData.aiExpBullets, lastResumeData.aiProjBullets, selectedTemplate);
+        }
+      }
+    });
+
+    // --- ATS Keyword Suggestions ---
+    const getKeywordsBtn = document.getElementById('getKeywordsBtn');
+    const keywordSuggestions = document.getElementById('keywordSuggestions');
+    getKeywordsBtn.addEventListener('click', async () => {
+      const industry = document.getElementById('industry').value.trim();
+      const jobRole = document.getElementById('jobRole').value.trim();
+      if (!industry || !jobRole) {
+        alert("Please enter both Industry and Job Role for keyword suggestions.");
+        return;
+      }
+      getKeywordsBtn.disabled = true;
+      keywordSuggestions.value = "Fetching keyword suggestions...";
+      try {
+        const prompt = `Generate a list of 10-15 important ATS-friendly keywords relevant for a resume in the industry "${industry}" and job role "${jobRole}". Provide keywords separated by commas only.`;
+        const keywordsText = await generateWithGemini(prompt);
+        keywordSuggestions.value = keywordsText.trim();
+      } catch (err) {
+        keywordSuggestions.value = "Error fetching keywords: " + err.message;
+      }
+      getKeywordsBtn.disabled = false;
+    });
+
+    // --- Import LinkedIn Profile (basic demo) ---
+    const importLinkedInBtn = document.getElementById('importLinkedInBtn');
+    const linkedinProfileUrl = document.getElementById('linkedinProfileUrl');
+    const linkedinImportStatus = document.getElementById('linkedinImportStatus');
+
+    importLinkedInBtn.addEventListener('click', async () => {
+      const url = linkedinProfileUrl.value.trim();
+      linkedinImportStatus.textContent = '';
+      if (!url) {
+        alert("Please enter a LinkedIn profile URL.");
+        return;
+      }
+      importLinkedInBtn.disabled = true;
+      linkedinImportStatus.textContent = "Importing data from LinkedIn...";
+      try {
+        // NOTE: LinkedIn API requires OAuth and is complex.
+        // For demo, we simulate import by extracting name from URL or dummy data.
+        // You should replace this with real LinkedIn API integration.
+        const dummyData = {
+          name: "John Doe",
+          location: "San Francisco, CA, USA",
+          summary: "Experienced software engineer with a passion for frontend development.",
+          skills: ["JavaScript", "React", "CSS", "HTML"],
+          education: [
+            { "edu-degree": "B.Sc Computer Science", "edu-inst": "University of Example", "edu-year": "2018" }
+          ],
+          experience: [
+            { "exp-title": "Frontend Developer", "exp-company": "Tech Corp", "exp-location": "San Francisco, CA", "exp-duration": "2019 - Present", "exp-desc": "Developed user-friendly web applications." }
+          ]
+        };
+        // Fill form fields with dummy data
+        document.getElementById('name').value = dummyData.name;
+        document.getElementById('location').value = dummyData.location;
+        document.getElementById('summary').innerText = dummyData.summary;
+        document.getElementById('skills').value = dummyData.skills.join(', ');
+        // Clear and add education
+        document.getElementById('educationSection').innerHTML = '';
+        dummyData.education.forEach(e => {
+          addEducation();
+          const lastEdu = document.querySelectorAll('#educationSection .section-group:last-child input');
+          lastEdu[0].value = e['edu-degree'];
+          lastEdu[1].value = e['edu-inst'];
+          lastEdu[2].value = e['edu-year'];
+        });
+        // Clear and add experience
+        document.getElementById('experienceSection').innerHTML = '';
+        dummyData.experience.forEach(e => {
+          addExperience();
+          const lastExp = document.querySelectorAll('#experienceSection .section-group:last-child input, #experienceSection .section-group:last-child textarea');
+          lastExp[0].value = e['exp-title'];
+          lastExp[1].value = e['exp-company'];
+          lastExp[2].value = e['exp-location'];
+          lastExp[3].value = e['exp-duration'];
+          lastExp[4].value = e['exp-desc'];
+        });
+        linkedinImportStatus.textContent = "Import successful (demo data). Replace with real LinkedIn API integration.";
+      } catch (err) {
+        linkedinImportStatus.textContent = "Error importing LinkedIn data: " + err.message;
+      }
+      importLinkedInBtn.disabled = false;
+    });
+
+    // --- Resume Form Submission (updated to support certifications with links) ---
+    let lastResumeData = null;
+    resumeForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('resumePreview').innerHTML = '';
+      downloadBtn.style.display = 'none';
+      shareBtn.style.display = 'none';
+      publicLinkBox.classList.add('hidden');
+
+      const user = firebase.auth().currentUser;
+      if (!user) {
+        alert("You must be signed in to generate a resume.");
+        return;
+      }
+
+      // Gather data
+      const data = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        location: document.getElementById('location').value,
+        linkedin: document.getElementById('linkedin').value,
+        github: document.getElementById('github').value,
+        portfolio: document.getElementById('portfolio').value,
+        summary: document.getElementById('summary').innerText,
+        education: getSectionValues(['edu-degree', 'edu-inst', 'edu-year']),
+        experience: getSectionValues(['exp-title', 'exp-company', 'exp-location', 'exp-duration', 'exp-desc']),
+        projects: getSectionValues(['proj-name', 'proj-desc', 'proj-link']),
+        skills: document.getElementById('skills').value.split(',').map(s => s.trim()).filter(Boolean),
+        certifications: []
+      };
+
+      // Gather certifications with links
+      const certEntries = document.querySelectorAll('#certificationsSection .certification-entry');
+      certEntries.forEach(cert => {
+        const name = cert.querySelector('.cert-name').value.trim();
+        const link = cert.querySelector('.cert-link').value.trim();
+        if (name) {
+          if (link) {
+            data.certifications.push({ name, link });
+          } else {
+            data.certifications.push(name);
+          }
+        }
+      });
+
+      // Save to Firebase under a unique push ID (for shareable link)
+      const resumeRef = db.ref('publicResumes').push();
+      await resumeRef.set(data);
+      lastResumeId = resumeRef.key;
+
+      // Gemini Prompts
+      let summaryPrompt = `Write a concise, ATS-optimized professional summary (max 4 sentences) for a resume. The candidate is named ${data.name}, located in ${data.location}, with skills: ${data.skills.join(', ')}. Experience: ${data.experience.map(e => `${e['exp-title']} at ${e['exp-company']}`).join('; ')}. Education: ${data.education.map(e => `${e['edu-degree']} from ${e['edu-inst']}`).join('; ')}.`;
+      if (data.summary) summaryPrompt += ` User provided summary: "${data.summary}"`;
+      let expPrompt = `For each job below, generate 3-4 impactful, ATS-friendly bullet points highlighting responsibilities and quantifiable achievements. Use strong action verbs. Jobs: ${data.experience.map(e => `${e['exp-title']} at ${e['exp-company']} (${e['exp-duration']}): ${e['exp-desc']}`).join(' | ')}`;
+      let projPrompt = `For each project below, write a 1-2 sentence ATS-friendly description focusing on impact, technologies, and outcomes. Projects: ${data.projects.map(p => `${p['proj-name']}: ${p['proj-desc']}`).join(' | ')}`;
+
+      // Gemini API calls
+      let aiSummary = await generateWithGemini(summaryPrompt);
+      let aiExpRaw = await generateWithGemini(expPrompt);
+      let aiProjRaw = await generateWithGemini(projPrompt);
+
+      // Parse bullets (simple split for demo)
+      let aiExpBullets = [];
+      if (aiExpRaw) {
+        aiExpBullets = aiExpRaw.split(/\n(?=\d+\.)|(?=\*\s)/).map(bul =>
+          `<li>${bul.replace(/^\d+\.\s*|\*\s*/, '')}</li>`
+        );
+        let expCount = data.experience.length;
+        let bulletsPerJob = Math.ceil(aiExpBullets.length / expCount);
+        aiExpBullets = Array.from({ length: expCount }, (_, i) =>
+          aiExpBullets.slice(i * bulletsPerJob, (i + 1) * bulletsPerJob).join('')
+        );
+      }
+      let aiProjBullets = [];
+      if (aiProjRaw) {
+        aiProjBullets = aiProjRaw.split(/\n(?=\d+\.)|(?=\*\s)/).map(bul =>
+          bul.replace(/^\d+\.\s*|\*\s*/, '')
+        );
+      }
+
+      lastResumeData = { data, aiSummary, aiExpBullets, aiProjBullets };
+
+      renderResumePreview(data, aiSummary, aiExpBullets, aiProjBullets, selectedTemplate);
+
+      document.getElementById('loading').style.display = 'none';
+      downloadBtn.style.display = 'inline-block';
+      shareBtn.style.display = 'inline-block';
+    });
+
+    // --- PDF Download Fix ---
+    downloadBtn.onclick = function () {
+      const element = document.getElementById('resumePreview');
+      const opt = {
+        margin: 0.5,
+        filename: 'resume.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+      html2pdf().from(element).set(opt).save();
+    };
+
+    // --- Public Link Logic ---
+    shareBtn.onclick = function () {
+      if (!lastResumeId) return;
+      const url = `${location.origin}/public-resume.html?id=${lastResumeId}`;
+      publicLinkBox.textContent = "Sharable Resume Link: " + url;
+      publicLinkBox.classList.remove('hidden');
+      navigator.clipboard && navigator.clipboard.writeText(url);
+    };
+
+    // Expose addEducation, addExperience, addProject, addCertification for inline onclick
+    window.addEducation = addEducation;
+    window.addExperience = addExperience;
+    window.addProject = addProject;
+    window.addCertification = addCertification;
+  </script>
+
+<script>
+  document.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+  });
+</script>
+ 
+</body>
+
+</html>

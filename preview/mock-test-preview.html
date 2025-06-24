@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Whizan's mock test platform helps you analyze performance across online mock tests, DSA tests, coding challenges and more. Get detailed analytics to improve your scores.">
+    <meta name="keywords" content="online mock test, DSA mock test, coding mock test, test performance analysis, exam preparation platform">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Whizan Mock Test Platform | Performance Analytics">
+    <meta property="og:description" content="Analyze your mock test results across all categories - DSA, coding, aptitude and more. Identify strengths/weaknesses to improve.">
+    <meta property="og:url" content="https://whizan.xyz/preview/mock-test-preview.html">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://whizan.xyz/preview/images/mock-test-analytics-og.jpg">
+    <link rel="canonical" href="https://whizan.xyz/preview/mock-test-preview.html">
+    <link rel="icon" type="image/png" href="/preview/Smart Study.jpeg">
+    <title>Mock Test Performance Analytics | DSA & Coding Tests | Whizan</title>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "Whizan Mock Test Analytics",
+      "description": "Platform for analyzing performance across online mock tests including DSA, coding, and aptitude tests",
+      "brand": {
+        "@type": "Brand",
+        "name": "Whizan"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      }
+    }
+    </script>
+    <style>
+        :root {
+            --primary-indigo-dark: #3949ab;
+            --primary-indigo-light: #5c6bc0;
+            --secondary-gray: #f5f5f5;
+            --accent-amber: #ffb300;
+            --text-dark: #212121;
+            --text-light: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--secondary-gray);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-indigo-dark), var(--primary-indigo-light));
+            color: var(--text-light);
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .logo {
+            height: 50px;
+            width: auto;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background-color: var(--accent-amber);
+            color: var(--text-dark);
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 179, 0, 0.4);
+        }
+        
+        .test-types {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-types h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: var(--primary-indigo-dark);
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .test-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            border-top: 3px solid var(--accent-amber);
+        }
+        
+        .test-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .test-card h3 {
+            color: var(--primary-indigo-dark);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .analytics-showcase {
+            padding: 4rem 2rem;
+            background-color: var(--primary-indigo-dark);
+            color: var(--text-light);
+        }
+        
+        .analytics-showcase h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .analytics-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .analytics-card {
+            background-color: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+        
+        .analytics-card h3 {
+            color: var(--accent-amber);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .how-it-works {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .how-it-works h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: var(--primary-indigo-dark);
+        }
+        
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .step {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .step-number {
+            background-color: var(--primary-indigo-dark);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .step-content h3 {
+            color: var(--primary-indigo-dark);
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+        
+        footer {
+            background-color: var(--primary-indigo-dark);
+            color: var(--text-light);
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent-amber);
+        }
+        
+        .copyright {
+            margin-top: 2rem;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .step {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .step-number {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="/preview/Smart Study.jpeg" alt="Whizan Logo" class="logo">
+            <span class="logo-text">Whizan</span>
+        </div>
+        <div class="hero">
+            <h1>Master Your Mock Test Performance</h1>
+            <p>Analyze results from online mock tests, DSA tests, coding challenges and more. Get actionable insights to improve your scores.</p>
+            <a href="/auth.html" class="cta-button">Analyze Your Tests Now</a>
+        </div>
+    </header>
+    
+    <main>
+        <section class="test-types">
+            <h2>Comprehensive Test Analysis</h2>
+            <div class="test-grid">
+                <div class="test-card">
+                    <h3>Online Mock Tests</h3>
+                    <p>Track your progress across full-length simulated exams with detailed section-wise breakdowns.</p>
+                </div>
+                <div class="test-card">
+                    <h3>DSA Mock Tests</h3>
+                    <p>Analyze your data structures and algorithms performance with time complexity evaluations.</p>
+                </div>
+                <div class="test-card">
+                    <h3>Coding Challenges</h3>
+                    <p>Review your coding test results with line-by-line efficiency analysis and optimal solution comparisons.</p>
+                </div>
+                <div class="test-card">
+                    <h3>Aptitude Tests</h3>
+                    <p>Identify patterns in your quantitative, verbal and logical reasoning performance.</p>
+                </div>
+                <div class="test-card">
+                    <h3>Subject-Specific Tests</h3>
+                    <p>Get detailed analytics for technical subjects like OS, DBMS, Computer Networks and more.</p>
+                </div>
+                <div class="test-card">
+                    <h3>Language Proficiency</h3>
+                    <p>Track improvement in English and communication skills tests over time.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="analytics-showcase">
+            <h2>Advanced Performance Analytics</h2>
+            <div class="analytics-features">
+                <div class="analytics-card">
+                    <h3>Strength-Weakness Analysis</h3>
+                    <p>Visual heatmaps show your strongest and weakest areas across all test categories.</p>
+                </div>
+                <div class="analytics-card">
+                    <h3>Time Management</h3>
+                    <p>See where you're spending too much or too little time with interactive time charts.</p>
+                </div>
+                <div class="analytics-card">
+                    <h3>Progress Tracking</h3>
+                    <p>Compare current performance with past attempts to measure improvement.</p>
+                </div>
+                <div class="analytics-card">
+                    <h3>Peer Benchmarking</h3>
+                    <p>See how you compare with other test-takers in percentiles and rankings.</p>
+                </div>
+                <div class="analytics-card">
+                    <h3>Question-Level Feedback</h3>
+                    <p>Detailed explanations for every question you attempted or skipped.</p>
+                </div>
+                <div class="analytics-card">
+                    <h3>Personalized Recommendations</h3>
+                    <p>AI-powered suggestions for what to practice next based on your gaps.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="how-it-works">
+            <h2>How Our Test Analytics Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Take Mock Tests</h3>
+                        <p>Complete any of our online mock tests, DSA tests, or coding challenges across various difficulty levels.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Get Instant Analysis</h3>
+                        <p>Our system automatically generates detailed performance reports the moment you submit your test.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Review & Improve</h3>
+                        <p>Use the insights to focus your preparation where it matters most for maximum score improvement.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <div class="footer-links">
+            <a href="subject/privacy.html">Privacy Policy</a>
+            <a href="subject/terms.html">Terms of Service</a>
+            <a href="subject/contact.html">Contact Us</a>
+            <a href="subject/contact.html">FAQ</a>
+        </div>
+        <p class="copyright">© 2025 Whizan Mock Test Platform. All rights reserved.</p>
+    </footer>
+</body>
+</html>

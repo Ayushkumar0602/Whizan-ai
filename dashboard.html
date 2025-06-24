@@ -1,0 +1,2881 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lecture Dashboard </title>
+  <link rel="icon" type="image/png" href="Smart Study.jpeg">
+  <link href="https://cdn.plyr.io/3.6.8/plyr.css" rel="stylesheet" />
+  <!-- Add this in your head section -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Add this in your head section -->
+  <link rel="stylesheet" data-name="vs/editor/editor.main"
+    href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.47.0/min/vs/editor/editor.main.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #0f0f0f;
+      color: #fff;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      flex: 3;
+      height: 100vh;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .main-video {
+      width: 100%;
+      flex: 2;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      min-height: 30vh;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .video-title {
+      margin-top: 10px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      padding: 0 5px;
+    }
+
+    .chatbot-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: #1e1e1e;
+      border-radius: 10px;
+      margin-top: 10px;
+      overflow: hidden;
+      min-height: 200px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .chatbot-container.minimized {
+      height: 40px !important;
+      min-height: 40px;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background-color: #2a2a2a;
+      padding: 10px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #3a3a3a;
+      cursor: pointer;
+    }
+
+    .gemini-logo {
+      height: 24px;
+      margin-right: 10px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .message {
+      padding: 10px;
+      border-radius: 8px;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+
+    .user-message {
+      background-color: #4285f4;
+      align-self: flex-end;
+    }
+
+    .bot-message {
+      background-color: #2a2a2a;
+      align-self: flex-start;
+    }
+
+    .chat-input {
+      display: flex;
+      padding: 10px;
+      background-color: #2a2a2a;
+      border-top: 1px solid #3a3a3a;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 20px;
+      border: none;
+      background-color: #3a3a3a;
+      color: #fff;
+      outline: none;
+    }
+
+    .chat-input button {
+      margin-left: 10px;
+      padding: 10px 15px;
+      border-radius: 20px;
+      border: none;
+      background-color: #4285f4;
+      color: #fff;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .chat-input button:hover {
+      background-color: #5c95f5;
+    }
+
+    .chat-input button:disabled,
+    .chat-input input:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .playlist {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      background-color: #1e1e1e;
+      padding: 10px;
+      gap: 10px;
+      scroll-snap-type: x mandatory;
+    }
+
+    .playlist-item {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      background-color: #2a2a2a;
+      border-radius: 8px;
+      padding: 5px;
+      scroll-snap-align: start;
+      width: 140px;
+      transition: transform 0.2s;
+    }
+
+    .playlist-item:hover {
+      transform: scale(1.05);
+    }
+
+    .playlist-item img {
+      width: 100%;
+      height: auto;
+      border-radius: 5px;
+    }
+
+    .playlist-title {
+      font-size: 0.8rem;
+      text-align: center;
+      margin-top: 5px;
+      padding: 0 5px;
+    }
+
+    @media (min-width: 768px) {
+      .container {
+        flex-direction: row;
+      }
+
+      .main-content {
+        padding: 20px;
+      }
+
+      .playlist {
+        flex: 1;
+        flex-direction: column;
+        overflow-y: auto;
+        gap: 15px;
+        height: 100vh;
+      }
+
+      .playlist-item {
+        flex-direction: row;
+        width: 100%;
+        align-items: center;
+      }
+
+      .playlist-item img {
+        width: 120px;
+        height: 68px;
+        margin-right: 10px;
+      }
+
+      .playlist-title {
+        text-align: left;
+        font-size: 1rem;
+        margin-top: 0;
+      }
+    }
+
+    /* Loading spinner */
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      background-color: #2a2a2a;
+      padding: 10px;
+      border-radius: 8px;
+      align-self: flex-start;
+      gap: 5px;
+    }
+
+    .typing-indicator span {
+      width: 8px;
+      height: 8px;
+      background-color: #999;
+      border-radius: 50%;
+      display: inline-block;
+      animation: bounce 1.5s infinite ease-in-out;
+    }
+
+    .typing-indicator span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-indicator span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-5px);
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Code styling in chat messages */
+    pre {
+      background-color: #222;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-family: monospace;
+      margin: 5px 0;
+      color: #fff;
+    }
+
+    code {
+      font-family: monospace;
+      background-color: #333;
+      padding: 2px 4px;
+      border-radius: 3px;
+      color: #e0e0e0;
+    }
+
+    /* Enhanced markdown styling */
+    .bot-message strong,
+    .bot-message b {
+      font-weight: bold;
+      color: #ffcc00;
+    }
+
+    .bot-message em,
+    .bot-message i {
+      font-style: italic;
+      color: #e0e0e0;
+    }
+
+    .bot-message blockquote {
+      border-left: 3px solid #4285f4;
+      padding-left: 10px;
+      margin-left: 10px;
+      color: #bbbbbb;
+    }
+
+    /* Lists in bot messages */
+    .bot-message ul,
+    .bot-message ol {
+      padding-left: 20px;
+      margin: 5px 0;
+    }
+
+    .bot-message li {
+      margin-bottom: 5px;
+    }
+
+    /* Minimize button */
+    .minimize-btn {
+      background: none;
+      border: none;
+      color: #8e8ea0;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 0 5px;
+      transition: all 0.2s ease;
+    }
+
+    .minimize-btn:hover {
+      color: #fff;
+      transform: scale(1.1);
+    }
+
+    /* Floating minimized chat */
+    .floating-chat {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #4285f4;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: none;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      transition: all 0.3s ease;
+      animation: pulse 2s infinite;
+    }
+
+    .floating-chat:hover {
+      background-color: #5c95f5;
+      transform: scale(1.05);
+      animation: none;
+    }
+
+    /* Notification badge for unread messages */
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: #ff4444;
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      display: none;
+    }
+
+    .load-more-container {
+      text-align: center;
+      padding: 15px;
+      background-color: #1e1e1e;
+    }
+
+    .load-more-btn {
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+
+    .load-more-btn:hover {
+      background-color: #5c95f5;
+    }
+
+    .load-more-btn:disabled {
+      background-color: #555;
+      cursor: not-allowed;
+    }
+
+    /* Pulse animation for the floating chat button */
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    /* Animation for minimize/restore */
+    .chatbot-container.minimizing {
+      animation: minimize 0.3s forwards;
+    }
+
+    .chatbot-container.restoring {
+      animation: restore 0.3s forwards;
+    }
+
+    @keyframes minimize {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      to {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+    }
+
+    /* Adjust spacing between floating buttons */
+    #openQuiz {
+      bottom: 100px;
+      right: 30px;
+    }
+
+    #openNotes {
+      bottom: 30px;
+      right: 30px;
+    }
+
+    @keyframes restore {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Analytics Tab Styles */
+    .analyticsTab {
+      padding: 8px 15px;
+      background: none;
+      border: none;
+      color: #aaa;
+      cursor: pointer;
+      font-size: 14px;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .analyticsTab:hover {
+      color: #fff;
+    }
+
+    .analyticsTab.active {
+      color: #4285f4;
+      border-bottom: 2px solid #4285f4;
+    }
+
+    .analyticsTabContent {
+      display: none;
+    }
+
+    .analyticsTabContent.active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="main-content">
+      <div class="main-video">
+        <iframe id="videoPlayer" src="" frameborder="0" allowfullscreen></iframe>
+        <div id="course-title" style="font-size: 1rem; color: #aaa; margin-bottom: 5px;"></div>
+        <div class="video-title" id="videoTitle">Loading...</div>
+      </div>
+      <div class="chatbot-container" id="chatbotContainer">
+        <div class="chat-header" id="chatHeader">
+          <div style="display: flex; align-items: center;">
+            <svg class="gemini-logo" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+              <path fill="#8e8ea0"
+                d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 5.52 4.48 10 10 10s10-4.48 10-10zM12 14l-2.8-2.8 1.4-1.4 1.4 1.4 3.6-3.6 1.4 1.4L12 14z" />
+            </svg>
+            Gemini 2.0 DSA Helper
+          </div>
+          <div style="display: flex; align-items: center;">
+            <small id="chat-video-title"></small>
+            <button class="minimize-btn" id="minimizeBtn">−</button>
+          </div>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input">
+          <input type="text" id="userInput" placeholder="Ask about this DSA topic..." />
+          <button id="sendMessage">Send</button>
+        </div>
+      </div>
+    </div>
+    <div class="playlist" id="playlist"></div>
+    
+
+  </div>
+
+
+
+
+  <!-- Add this near your other floating buttons (quiz, notes, analytics) -->
+  <!-- Code Editor Button -->
+  <div id="openCodeEditor"
+    style="position: fixed; bottom: 230px; right: 30px; width: 60px; height: 60px; background-color: #673AB7; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.3s ease;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="16 18 22 12 16 6"></polyline>
+      <polyline points="8 6 2 12 8 18"></polyline>
+    </svg>
+  </div>
+
+  <!-- Code Editor Popup -->
+  <div id="codeEditorPopup"
+    style="display: none; position: fixed; bottom: 100px; right: 30px; width: 600px; height: 500px; background: #1e1e1e; color: #fff; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 1001; resize: both; overflow: hidden; min-width: 300px; min-height: 300px;">
+    <div
+      style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #2a2a2a; border-bottom: 1px solid #3a3a3a; cursor: move;">
+      <h4 style="margin: 0; padding: 0; user-select: none;">C++ Code Editor</h4>
+      <div>
+        <button id="runCodeBtn"
+          style="background: #4CAF50; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer; margin-right: 5px;">Run</button>
+        <button id="saveCodeBtn"
+          style="background: #2196F3; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer; margin-right: 5px;">Save</button>
+        <button onclick="closeCodeEditor()"
+          style="background: #555; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">Close</button>
+      </div>
+    </div>
+    <!-- Editor Container -->
+    <div id="editorContainer" style="width: 100%; height: calc(100% - 140px);"></div>
+
+    <!-- Output Container - Important: higher z-index and explicitly positioned -->
+    <div id="outputContainer"
+      style="width: 100%; height: 100px; background: #252526; border-top: 1px solid #3a3a3a; padding: 10px; overflow-y: auto; display: none; position: relative; z-index: 10;">
+    </div>
+  </div>
+
+  <!-- 1. First, add the quiz button floating above notes icon -->
+  <!-- Add this code after the notes button in your HTML -->
+  <div id="openQuiz"
+    style="position: fixed; bottom: 100px; right: 30px; width: 60px; height: 60px; background-color: #ff6b6b; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.3s ease;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+    </svg>
+  </div>
+
+  <!-- 2. Add the Quiz Modal -->
+  <div id="quizModal"
+    style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 700px; max-height: 90vh; overflow-y: auto; background: #2a2a2a; color: #fff; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); padding: 20px; z-index: 1002;">
+    <div
+      style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #3a3a3a;">
+      <h3 id="quizTitle" style="margin: 0; padding: 0;">Quiz: Loading...</h3>
+      <button id="closeQuiz"
+        style="background: #555; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">Close</button>
+    </div>
+
+    <!-- Quiz States Container -->
+    <div id="quizContainer">
+      <!-- Initial State -->
+      <div id="quizInitial">
+        <p>Test your knowledge with a quick quiz on this topic!</p>
+        <p id="quizStatus"></p>
+        <button id="startQuiz"
+          style="background: #4285f4; color: white; border: none; border-radius: 4px; padding: 10px 20px; cursor: pointer; font-size: 16px;">Start
+          Quiz</button>
+      </div>
+
+      <!-- Loading State -->
+      <div id="quizLoading" style="display: none; text-align: center; padding: 30px 0;">
+        <div
+          style="display: inline-block; width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: quiz-spin 1s ease-in-out infinite;">
+        </div>
+        <p>Generating your personalized quiz...</p>
+        <style>
+          @keyframes quiz-spin {
+            to {
+              transform: rotate(360deg);
+            }
+          }
+        </style>
+      </div>
+
+      <!-- Questions State -->
+      <div id="quizQuestions" style="display: none;">
+        <div id="quizProgress" style="margin-bottom: 15px; font-size: 14px;">Question 1 of 10</div>
+        <div id="questionContainer">
+          <p id="currentQuestion" style="font-size: 18px; margin-bottom: 15px;"></p>
+          <div id="optionsContainer" style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Options will be inserted here dynamically -->
+          </div>
+        </div>
+        <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+          <button id="prevQuestion"
+            style="background: #555; color: white; border: none; border-radius: 4px; padding: 8px 15px; cursor: pointer;">Previous</button>
+          <button id="nextQuestion"
+            style="background: #4285f4; color: white; border: none; border-radius: 4px; padding: 8px 15px; cursor: pointer;">Next</button>
+        </div>
+      </div>
+
+      <!-- Results State -->
+      <div id="quizResults" style="display: none;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h3>Quiz Results</h3>
+          <div id="scoreDisplay" style="font-size: 24px; margin: 15px 0;">
+            You scored: <span id="userScore">0</span>/<span id="totalQuestions">10</span>
+          </div>
+          <div id="scorePercentage" style="font-size: 18px; margin-bottom: 20px;"></div>
+        </div>
+
+        <div id="quizReview" style="margin-top: 20px;">
+          <h4>Review Your Answers</h4>
+          <div id="answersReview">
+            <!-- Review content will be dynamically inserted here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analytics Modal -->
+  <div id="analyticsModal"
+    style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 900px; max-height: 90vh; overflow-y: auto; background: #2a2a2a; color: #fff; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); padding: 20px; z-index: 1002;">
+    <div
+      style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #3a3a3a;">
+      <h3 style="margin: 0; padding: 0;">Your Learning Analytics</h3>
+      <button id="closeAnalytics"
+        style="background: #555; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">Close</button>
+    </div>
+
+    <div id="analyticsTabs" style="display: flex; margin-bottom: 15px; border-bottom: 1px solid #3a3a3a;">
+      <button class="analyticsTab active" data-tab="progress">Progress</button>
+      <button class="analyticsTab" data-tab="mastery">Topic Mastery</button>
+      <button class="analyticsTab" data-tab="time">Time Spent</button>
+    </div>
+
+    <div id="analyticsContent">
+      <!-- Progress Charts Tab -->
+      <div id="progressTab" class="analyticsTabContent active">
+        <h4>Your Learning Progress</h4>
+        <div style="background: #1e1e1e; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+          <canvas id="progressChart" height="300"></canvas>
+        </div>
+      </div>
+
+      <!-- Topic Mastery Tab -->
+      <div id="masteryTab" class="analyticsTabContent">
+        <h4>Topic Mastery Heatmap</h4>
+        <div style="background: #1e1e1e; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+          <canvas id="masteryChart" height="300"></canvas>
+        </div>
+      </div>
+
+      <!-- Time Spent Tab -->
+      <div id="timeTab" class="analyticsTabContent">
+        <h4>Time Spent per Lecture</h4>
+        <div style="background: #1e1e1e; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+          <canvas id="timeChart" height="300"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Replace your existing notes HTML with this enhanced version -->
+
+  <!-- Floating Button with improved styling -->
+  <div id="openNotes"
+    style="position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background-color: #4285f4; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.3s ease;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+      <polyline points="14 2 14 8 20 8"></polyline>
+      <line x1="16" y1="13" x2="8" y2="13"></line>
+      <line x1="16" y1="17" x2="8" y2="17"></line>
+      <polyline points="10 9 9 9 8 9"></polyline>
+    </svg>
+  </div>
+
+  <!-- Notes Card with improved styling -->
+  <div id="notesCard"
+    style="display: none; position: fixed; bottom: 100px; right: 30px; width: 350px; background: #2a2a2a; color: #fff; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); padding: 15px; z-index: 1001; transition: all 0.3s ease;">
+    <div
+      style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #3a3a3a;">
+      <h4 style="margin: 0; padding: 0; cursor: move; user-select: none;">📝 Notes for this lecture</h4>
+      <div>
+        <button onclick="saveNote()"
+          style="background: #4285f4; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer; margin-right: 5px;">Save</button>
+        <button onclick="closeNotes()"
+          style="background: #555; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">Close</button>
+      </div>
+    </div>
+    <textarea id="notesTextarea"
+      style="width: 100%; height: 200px; background: #1e1e1e; color: #fff; border: 1px solid #3a3a3a; border-radius: 5px; padding: 10px; margin-top: 5px; font-family: Arial, sans-serif; resize: vertical;"></textarea>
+    <div style="margin-top: 10px; font-size: 0.8rem; color: #aaa;">
+      Notes are automatically saved for each video
+    </div>
+  </div>
+
+  <!-- Add this after the quiz button in your HTML -->
+  <div id="openAnalytics"
+    style="position: fixed; bottom: 170px; right: 30px; width: 60px; height: 60px; background-color: #4CAF50; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.3s ease;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="18" y1="20" x2="18" y2="10"></line>
+      <line x1="12" y1="20" x2="12" y2="4"></line>
+      <line x1="6" y1="20" x2="6" y2="14"></line>
+    </svg>
+  </div>
+
+
+  <div class="floating-chat" id="floatingChat">
+    <div class="notification-badge" id="notificationBadge">0</div>
+    <svg class="gemini-logo" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+      <path fill="#fff"
+        d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 5.52 4.48 10 10 10s10-4.48 10-10zM12 14l-2.8-2.8 1.4-1.4 1.4 1.4 3.6-3.6 1.4 1.4L12 14z" />
+    </svg>
+    Gemini Chat
+  </div>
+
+  <div class="load-more-container">
+    <button id="loadMoreBtn" class="load-more-btn">Load More Videos</button>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <!-- Gemini API Script -->
+  <script src="https://www.gstatic.com/javascripts/api/v1/app.js"></script>
+
+  <script>
+    // Debug configuration
+    const DEBUG_MODE = true;
+    function debugLog(...args) {
+      if (DEBUG_MODE) {
+        console.log('[DEBUG]', new Date().toISOString(), ...args);
+      }
+    }
+
+    function debugError(...args) {
+      console.error('[ERROR]', new Date().toISOString(), ...args);
+    }
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCVYdfql5aqHrChlA1v3nxRLkIbYyWMvUg",
+      authDomain: "study2-7bdc7.firebaseapp.com",
+      databaseURL: "https://study2-7bdc7-default-rtdb.firebaseio.com",
+      projectId: "study2-7bdc7",
+      storageBucket: "study2-7bdc7.firebasestorage.app",
+      messagingSenderId: "320617984870",
+      appId: "1:320617984870:web:04b61ea4ee88ae057e4ea7",
+      measurementId: "G-VRM14GRNWG"
+    };
+
+    debugLog('Initializing Firebase...');
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Randomly select one of the YouTube API keys
+    const youtubeApiKeys = [
+      'AIzaSyCoBeOf90UzMby6rZmIFInhS2DHhbAzbS4',
+      'AIzaSyDvdyjYPX0MTlDPEwWIiCW1MdtQ6K9ri6Y',
+      'AIzaSyACa-hDsfwmTJ4lQHx-EThm8s4-i5fJbnA'
+    ];
+    const apiKey = youtubeApiKeys[Math.floor(Math.random() * youtubeApiKeys.length)];
+
+
+    const geminiApiKey = 'AIzaSyAM1p730RTRu40S1sHghd1KD4501K6iCsI'; // Gemini API key
+    const urlParams = new URLSearchParams(window.location.search);
+    const playlistId = urlParams.get('playlistId') || 'PLfqMhTWNBTe137I_EPQd34TsgV6IO55pt'; // Fall
+    const videoPlayer = document.getElementById('videoPlayer');
+    const videoTitle = document.getElementById('videoTitle');
+    const chatVideoTitle = document.getElementById('chat-video-title');
+    const playlistContainer = document.getElementById('playlist');
+    const chatMessages = document.getElementById('chatMessages');
+    const userInput = document.getElementById('userInput');
+    const sendMessageBtn = document.getElementById('sendMessage');
+    const chatbotContainer = document.getElementById('chatbotContainer');
+    const minimizeBtn = document.getElementById('minimizeBtn');
+    const chatHeader = document.getElementById('chatHeader');
+    const floatingChat = document.getElementById('floatingChat');
+    const notificationBadge = document.getElementById('notificationBadge');
+    // Add this after your other event listeners
+    document.getElementById('loadMoreBtn').addEventListener('click', () => {
+      fetchPlaylist(true);
+    });
+
+    let currentVideoId = '';
+    let currentUserId = '';
+    let currentVideoTitle = '';
+    let isChatMinimized = false;
+    let unreadMessages = 0;
+
+    // Auth check
+    auth.onAuthStateChanged(user => {
+      debugLog('Auth state changed, user:', user ? user.uid : 'null');
+      if (!user) {
+        debugLog('No user found, redirecting to auth page');
+        return window.location.href = "auth.html";
+      }
+
+      currentUserId = user.uid;
+      debugLog('User authenticated:', currentUserId);
+    });
+
+    // Toggle chat minimize with animation - Fixed functionality
+    function toggleChatMinimize() {
+      debugLog('Toggling chat minimize, current state:', isChatMinimized);
+
+      if (isChatMinimized) {
+        // Restore chat
+        debugLog('Restoring chat...');
+        floatingChat.style.display = 'none';
+        chatbotContainer.classList.remove('minimized');
+
+        // Reset notification counter
+        unreadMessages = 0;
+        notificationBadge.style.display = 'none';
+        notificationBadge.textContent = '0';
+      } else {
+        // Minimize chat
+        debugLog('Minimizing chat...');
+        chatbotContainer.classList.add('minimized');
+        floatingChat.style.display = 'flex';
+        floatingChat.style.alignItems = 'center';
+        floatingChat.style.gap = '8px';
+        debugLog('Chat minimized');
+      }
+
+      isChatMinimized = !isChatMinimized;
+    }
+
+    // Update notification badge
+    function updateNotificationBadge() {
+      debugLog('Updating notification badge, current count:', unreadMessages);
+      if (isChatMinimized) {
+        unreadMessages++;
+        notificationBadge.textContent = unreadMessages;
+        notificationBadge.style.display = 'flex';
+        debugLog('Notification badge updated to:', unreadMessages);
+      }
+    }
+
+    // Event listeners for minimize/restore
+    minimizeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleChatMinimize();
+    });
+
+    chatHeader.addEventListener('click', (e) => {
+      if (isChatMinimized && !e.target.classList.contains('minimize-btn')) {
+        toggleChatMinimize();
+      }
+    });
+
+    floatingChat.addEventListener('click', toggleChatMinimize);
+
+    // Fetch YouTube playlist
+    let nextPageToken = '';
+    const maxResults = 10; // Number of videos to load per request
+
+    async function fetchPlaylist(loadMore = false) {
+      debugLog('Fetching YouTube playlist...');
+      try {
+        let url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=${maxResults}&playlistId=${playlistId}&key=${apiKey}`;
+
+        if (loadMore && nextPageToken) {
+          url += `&pageToken=${nextPageToken}`;
+        }
+
+        debugLog('YouTube API request URL:', url);
+
+        const res = await fetch(url);
+        if (!res.ok) {
+          throw new Error(`YouTube API responded with status ${res.status}`);
+        }
+
+        const data = await res.json();
+        debugLog('YouTube API response:', data);
+        const videos = data.items;
+
+        if (videos && videos.length > 0) {
+          debugLog(`Found ${videos.length} videos in playlist`);
+
+          // Store next page token for pagination
+          nextPageToken = data.nextPageToken || '';
+
+          // Hide load more button if there are no more videos
+          document.getElementById('loadMoreBtn').style.display = nextPageToken ? 'inline-block' : 'none';
+
+          // Only load first video if it's the initial load
+          if (!loadMore) {
+            loadVideo(videos[0].snippet.resourceId.videoId, videos[0].snippet.title);
+          }
+
+          videos.forEach(video => {
+            const vid = video.snippet.resourceId.videoId;
+            const title = video.snippet.title;
+            const thumb = video.snippet.thumbnails.medium.url;
+            const item = document.createElement('div');
+            item.className = 'playlist-item';
+            item.innerHTML = `<img src="${thumb}" alt="${title}"><div class="playlist-title">${title}</div>`;
+            item.addEventListener('click', () => loadVideo(vid, title));
+            playlistContainer.appendChild(item);
+          });
+        } else {
+          debugError('No videos found in playlist');
+          videoTitle.textContent = 'No videos found in playlist';
+          document.getElementById('loadMoreBtn').style.display = 'none';
+        }
+      } catch (error) {
+        debugError("Error fetching playlist:", error);
+        videoTitle.textContent = 'Error loading playlist';
+        document.getElementById('loadMoreBtn').style.display = 'none';
+      }
+    }
+
+
+
+
+
+    function loadVideo(videoId, title) {
+      debugLog('Loading video:', videoId, title);
+      currentVideoId = videoId;
+      currentVideoTitle = title;
+      videoPlayer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+      videoTitle.textContent = title;
+      chatVideoTitle.textContent = title;
+      quizTitle.textContent = `Quiz: ${title}`;
+
+      quizAttempted = false;
+      currentQuestionIndex = 0;
+      userAnswers = [];
+      quizScore = 0;
+
+      // Reset UI elements
+      startQuizBtn.disabled = false;
+      startQuizBtn.style.opacity = '1';
+      startQuizBtn.textContent = 'Start Quiz';
+      quizInitial.style.display = 'block';
+      quizQuestions_el.style.display = 'none';
+      quizResults.style.display = 'none';
+      quizStatus.textContent = "Test your knowledge with a quick quiz on this topic!";
+      /////////////
+      answersReview.innerHTML = '';
+
+      // Clear chat messages when changing videos
+      chatMessages.innerHTML = '';
+      debugLog('Cleared chat messages for new video');
+    }
+
+    // Enhanced markdown processing for bot messages
+    function processMarkdown(text) {
+      debugLog('Processing markdown for message:', text.substring(0, 50) + (text.length > 50 ? '...' : ''));
+
+      // Convert code blocks with language specification
+      text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+        return `<pre class="language-${lang || 'plaintext'}">${code.trim()}</pre>`;
+      });
+
+      // Convert inline code
+      text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+      // Convert bold text
+      text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      text = text.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+
+      // Convert italic text
+      text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+      text = text.replace(/_([^_]+)_/g, '<em>$1</em>');
+
+      // Convert blockquotes
+      text = text.replace(/^>\s(.+)$/gm, '<blockquote>$1</blockquote>');
+
+      // Convert ordered lists
+      text = text.replace(/^(\d+)\.\s(.+)$/gm, (match, number, item) => {
+        return `<ol start="${number}"><li>${item}</li></ol>`;
+      });
+
+      // Convert unordered lists
+      text = text.replace(/^[-*]\s(.+)$/gm, '<ul><li>$1</li></ul>');
+
+      // Clean up nested lists
+      text = text.replace(/<\/ol>\s*<ol[^>]*>/g, '');
+      text = text.replace(/<\/ul>\s*<ul>/g, '');
+
+      // Convert newlines to <br> (except within code blocks)
+      text = text.replace(/\n(?!<\/(pre|code|blockquote|ol|ul|li)>)/g, '<br>');
+
+      return text;
+    }
+
+    // Add message to UI with enhanced formatting - Removed Firestore saving
+    function addMessageToUI(message, sender) {
+      debugLog(`Adding message to UI (sender: ${sender}):`, message.substring(0, 50) + (message.length > 50 ? '...' : ''));
+
+      const messageElement = document.createElement('div');
+      messageElement.className = `message ${sender === 'user' ? 'user-message' : 'bot-message'}`;
+
+      // Process markdown-like formatting for bot messages
+      if (sender === 'bot') {
+        message = processMarkdown(message);
+      }
+
+      messageElement.innerHTML = message;
+      chatMessages.appendChild(messageElement);
+
+      // Update notification badge if chat is minimized and this is a bot message
+      if (sender === 'bot' && isChatMinimized) {
+        updateNotificationBadge();
+      }
+
+      scrollToBottom();
+    }
+
+    // Show typing indicator
+    function showTypingIndicator() {
+      debugLog('Showing typing indicator');
+      const indicator = document.createElement('div');
+      indicator.className = 'typing-indicator';
+      indicator.id = 'typingIndicator';
+      indicator.innerHTML = '<span></span><span></span><span></span>';
+      chatMessages.appendChild(indicator);
+      scrollToBottom();
+    }
+
+    // Hide typing indicator
+    function hideTypingIndicator() {
+      debugLog('Hiding typing indicator');
+      const indicator = document.getElementById('typingIndicator');
+      if (indicator) {
+        indicator.remove();
+      }
+    }
+
+    // Scroll to bottom of chat
+    function scrollToBottom() {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Send message to Gemini API
+    async function sendToGemini(message) {
+      try {
+        const prompt = `You are a helpful DSA (Data Structures and Algorithms) tutor. 
+      The user is watching a video about "${currentVideoTitle}". 
+      Respond to their question in a concise, helpful way. 
+      Use markdown formatting for better readability:
+      - Use \`\`\`language for code blocks with proper language specification
+      - Use \`inline code\` for short code snippets
+      - Use **bold** for important concepts
+      - Use *italics* for emphasis
+      - Use > for important notes or tips
+      - Use numbered lists for steps or sequences
+      - Use bullet points for related concepts
+      
+      Keep your responses focused on DSA concepts and provide accurate, educational content.
+      
+      User question: ${message}`;
+
+        debugLog("Sending request to Gemini 2.0 Flash API...");
+        debugLog("Request payload:", {
+          contents: [{
+            parts: [{
+              text: prompt
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 1024,
+          },
+          safetySettings: [
+            {
+              "category": "HARM_CATEGORY_HARASSMENT",
+              "threshold": "BLOCK_ONLY_HIGH"
+            },
+            {
+              "category": "HARM_CATEGORY_HATE_SPEECH",
+              "threshold": "BLOCK_ONLY_HIGH"
+            },
+            {
+              "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+              "threshold": "BLOCK_ONLY_HIGH"
+            },
+            {
+              "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+              "threshold": "BLOCK_ONLY_HIGH"
+            }
+          ]
+        });
+
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: prompt
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 1024,
+            },
+            safetySettings: [
+              {
+                "category": "HARM_CATEGORY_HARASSMENT",
+                "threshold": "BLOCK_ONLY_HIGH"
+              },
+              {
+                "category": "HARM_CATEGORY_HATE_SPEECH",
+                "threshold": "BLOCK_ONLY_HIGH"
+              },
+              {
+                "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                "threshold": "BLOCK_ONLY_HIGH"
+              },
+              {
+                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                "threshold": "BLOCK_ONLY_HIGH"
+              }
+            ]
+          })
+        });
+
+        debugLog("Gemini API response status:", response.status);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          debugError("API Error:", response.status, errorText);
+          throw new Error(`API Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        debugLog("Gemini API Response:", data);
+
+        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+          const botReply = data.candidates[0].content.parts[0].text;
+          debugLog("Successfully received bot reply");
+          return botReply;
+        } else if (data.promptFeedback && data.promptFeedback.blockReason) {
+          debugError("Content blocked:", data.promptFeedback);
+          return "Sorry, I can't respond to that query due to content guidelines. Please try asking something else about DSA concepts.";
+        } else {
+          debugError("Unexpected API response format:", data);
+          throw new Error("Invalid response format from Gemini API");
+        }
+      } catch (error) {
+        debugError("Error calling Gemini API:", error);
+
+        // Fallback to a more graceful error message
+        return "I'm having trouble connecting to my knowledge base right now. This might be due to high traffic or a temporary API issue. Here are some things you can try:\n\n1. **Ask your question again** in a few moments\n2. **Refresh the page** and try again\n3. **Be more specific** about the DSA concept you're asking about";
+      }
+    }
+
+    // Handle sending messages - Removed Firestore storage
+    async function handleSendMessage() {
+      const message = userInput.value.trim();
+      if (!message) return;
+
+      debugLog('Handling send message:', message);
+
+      // Disable input while processing
+      userInput.disabled = true;
+      sendMessageBtn.disabled = true;
+
+      try {
+        // Clear input
+        userInput.value = '';
+
+        // Add user message to UI
+        addMessageToUI(message, 'user');
+
+        // Show typing indicator
+        showTypingIndicator();
+        scrollToBottom();
+
+        // Get response from Gemini
+        const botResponse = await sendToGemini(message);
+
+        // Hide typing indicator
+        hideTypingIndicator();
+
+        // Add bot response to UI
+        addMessageToUI(botResponse, 'bot');
+
+        scrollToBottom();
+      } catch (error) {
+        debugError("Error in message handling:", error);
+        hideTypingIndicator();
+        addMessageToUI("Sorry, there was an error processing your message. Please try again.", "bot");
+      } finally {
+        // Re-enable input
+        userInput.disabled = false;
+        sendMessageBtn.disabled = false;
+        userInput.focus();
+      }
+    }
+
+    // Event listeners
+    sendMessageBtn.addEventListener('click', handleSendMessage);
+    userInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        handleSendMessage();
+      }
+    });
+
+    // Add a welcome message - Removed Firestore storage
+    function addWelcomeMessage() {
+      debugLog('Adding welcome message');
+      setTimeout(() => {
+        const welcomeMessage = "👋 Hi there! I'm your learning assistant powered by **Gemini 2.0 AI**. Ask me anything about Any topic related to the video you're watching!\n\n> **Pro tip:** I can explain code, provide examples, and help clarify complex DSA concepts.";
+        addMessageToUI(welcomeMessage, 'bot');
+      }, 1000);
+    }
+
+    // Handle errors gracefully
+    window.addEventListener('error', function (event) {
+      debugError('Global error caught:', event.error);
+
+      // Only show user-facing error if it's not already being handled
+      const errorMessage = "I encountered a technical issue. Please refresh the page or try again later.";
+
+      // Check if we're in the middle of API call
+      if (document.getElementById('typingIndicator')) {
+        hideTypingIndicator();
+        addMessageToUI(errorMessage, 'bot');
+
+        // Re-enable input if it was disabled
+        userInput.disabled = false;
+        sendMessageBtn.disabled = false;
+      }
+    });
+
+    // Initialize
+    debugLog('Initializing application...');
+    fetchPlaylist();
+    document.getElementById('loadMoreBtn').style.display = 'none';
+    fetchPlaylist();
+    addWelcomeMessage();
+    debugLog('Application initialized');
+
+
+
+    // Add these functions to your existing JavaScript
+
+    // 1. Notes functionality
+    function setupNotesFeature() {
+      const openNotesBtn = document.getElementById('openNotes');
+      const notesCard = document.getElementById('notesCard');
+      const notesTextarea = document.getElementById('notesTextarea');
+
+      // Add click event for opening notes
+      openNotesBtn.addEventListener('click', () => {
+        notesCard.style.display = 'block';
+        loadNotes();
+      });
+
+      // Make notes draggable (optional enhancement)
+      makeDraggable(notesCard);
+    }
+
+    // 2. Close notes function
+    function closeNotes() {
+      document.getElementById('notesCard').style.display = 'none';
+    }
+
+    // 3. Save notes function
+    function saveNote() {
+      if (!currentUserId || !currentVideoId || !playlistId) {
+        showNotification('Error: Cannot save notes right now.');
+        return;
+      }
+
+      const notesText = document.getElementById('notesTextarea').value;
+      const noteDocId = `${currentUserId}_${currentVideoId}_${playlistId}`;
+
+      db.collection('notes')
+        .doc(noteDocId)
+        .set({
+          userId: currentUserId,
+          videoId: currentVideoId,
+          playlistId: playlistId,
+          videoTitle: currentVideoTitle,
+          content: notesText,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then(() => {
+          showNotification('Notes saved successfully!');
+        })
+        .catch(error => {
+          debugError('Error saving notes:', error);
+          showNotification('Error saving notes. Please try again.');
+        });
+    }
+
+    // 4. Load notes function
+    function loadNotes() {
+      if (!currentUserId || !currentVideoId || !playlistId) {
+        return;
+      }
+
+      const notesTextarea = document.getElementById('notesTextarea');
+      const noteDocId = `${currentUserId}_${currentVideoId}_${playlistId}`;
+      notesTextarea.value = "Loading your notes...";
+
+      db.collection('notes')
+        .doc(noteDocId)
+        .get()
+        .then(doc => {
+          if (doc.exists) {
+            notesTextarea.value = doc.data().content;
+          } else {
+            notesTextarea.value = ""; // No note yet
+          }
+        })
+        .catch(error => {
+          debugError('Error loading notes:', error);
+          notesTextarea.value = "";
+          showNotification('Error loading notes. Please try again.');
+        });
+    }
+
+
+    // 5. Simple notification function
+    function showNotification(message) {
+      // Create a notification element
+      const notification = document.createElement('div');
+      notification.textContent = message;
+      notification.style.position = 'fixed';
+      notification.style.bottom = '20px';
+      notification.style.left = '50%';
+      notification.style.transform = 'translateX(-50%)';
+      notification.style.backgroundColor = '#4285f4';
+      notification.style.color = 'white';
+      notification.style.padding = '10px 20px';
+      notification.style.borderRadius = '5px';
+      notification.style.zIndex = '1002';
+
+      document.body.appendChild(notification);
+
+      // Remove after 3 seconds
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => document.body.removeChild(notification), 500);
+      }, 3000);
+    }
+
+    // 6. Optional: Make the notes card draggable
+    function makeDraggable(element) {
+      let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+      // Find the header or create one
+      const header = element.querySelector('h4');
+
+      if (header) {
+        header.style.cursor = 'move';
+        header.onmousedown = dragMouseDown;
+      } else {
+        element.onmousedown = dragMouseDown;
+      }
+
+      function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // Get cursor position at startup
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        // Call function on cursor move
+        document.onmousemove = elementDrag;
+      }
+
+      function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // Calculate new position
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        // Set new position
+        element.style.top = (element.offsetTop - pos2) + "px";
+        element.style.left = (element.offsetLeft - pos1) + "px";
+        element.style.right = "auto"; // Override any right positioning
+      }
+
+      function closeDragElement() {
+        // Stop moving when mouse button is released
+        document.onmouseup = null;
+        document.onmousemove = null;
+      }
+    }
+
+    // 7. Update the loadVideo function to also load notes
+    // Find the loadVideo function in your code and update it to include this:
+    function loadVideo(videoId, title) {
+
+      // Add this to your loadVideo function or initialization:
+      function updateCourseTitle() {
+        const course = courses.find(c => c.playlistId === playlistId);
+        if (course) {
+          document.getElementById('course-title').textContent = course.title;
+        }
+      }
+      debugLog('Loading video:', videoId, title);
+      currentVideoId = videoId;
+
+      currentVideoTitle = title;
+      videoPlayer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+      videoTitle.textContent = title;
+      chatVideoTitle.textContent = title;
+
+      trackVideoWatchTime();
+
+      // Clear chat messages when changing videos
+      chatMessages.innerHTML = '';
+      debugLog('Cleared chat messages for new video');
+
+      if (isEditorOpen) {
+        loadCode();
+      }
+
+      // If notes are open, load notes for this video
+      if (document.getElementById('notesCard').style.display === 'block') {
+        loadNotes();
+      }
+    }
+
+    // 8. Initialize notes feature when the page loads
+    // Add this call to your initialization code
+    window.addEventListener('DOMContentLoaded', () => {
+      setupNotesFeature();
+    });
+
+
+    // Quiz System Implementation
+
+    // Variables for quiz functionality
+    let quizQuestions = [];
+    let currentQuestionIndex = 0;
+    let userAnswers = [];
+    let quizAttempted = false;
+    let quizScore = 0;
+
+    // DOM Elements
+    const openQuizBtn = document.getElementById('openQuiz');
+    const quizModal = document.getElementById('quizModal');
+    const closeQuizBtn = document.getElementById('closeQuiz');
+    const quizTitle = document.getElementById('quizTitle');
+    const quizInitial = document.getElementById('quizInitial');
+    const quizLoading = document.getElementById('quizLoading');
+    const quizQuestions_el = document.getElementById('quizQuestions');
+    const quizResults = document.getElementById('quizResults');
+    const startQuizBtn = document.getElementById('startQuiz');
+    const quizStatus = document.getElementById('quizStatus');
+    const currentQuestion_el = document.getElementById('currentQuestion');
+    const optionsContainer = document.getElementById('optionsContainer');
+    const prevQuestionBtn = document.getElementById('prevQuestion');
+    const nextQuestionBtn = document.getElementById('nextQuestion');
+    const quizProgress = document.getElementById('quizProgress');
+    const userScoreEl = document.getElementById('userScore');
+    const totalQuestionsEl = document.getElementById('totalQuestions');
+    const scorePercentageEl = document.getElementById('scorePercentage');
+    const answersReview = document.getElementById('answersReview');
+
+    // Initialize quiz system
+    function initQuizSystem() {
+      debugLog('Initializing quiz system...');
+
+      // Open quiz modal event
+      openQuizBtn.addEventListener('click', () => {
+        debugLog('Quiz button clicked');
+        quizModal.style.display = 'block';
+        loadQuizState();
+      });
+
+      // Close quiz modal event
+      closeQuizBtn.addEventListener('click', () => {
+        quizModal.style.display = 'none';
+      });
+
+      // Start quiz event
+      startQuizBtn.addEventListener('click', startQuiz);
+
+      // Navigation events
+      prevQuestionBtn.addEventListener('click', showPreviousQuestion);
+      nextQuestionBtn.addEventListener('click', handleNextQuestion);
+
+      debugLog('Quiz system initialized');
+    }
+
+    // Load quiz state based on current video and user
+    function loadQuizState() {
+      if (!currentUserId || !currentVideoId) {
+        showNotification('Error: Cannot load quiz. Please sign in.');
+        return;
+      }
+
+      quizTitle.textContent = `Quiz: ${currentVideoTitle}`;
+
+      // Check if user has already attempted this quiz
+      db.collection('quizAttempts')
+        .doc(`${currentUserId}_${currentVideoId}_${playlistId}`)
+
+        .doc(`${currentUserId}_${currentVideoId}`)
+        .get()
+        .then(doc => {
+          if (doc.exists) {
+            // User has already attempted this quiz
+            quizAttempted = true;
+            quizScore = doc.data().score;
+            const totalQuestions = doc.data().totalQuestions || 10;
+
+            // Update status message
+            quizStatus.innerHTML = `
+            <div style="background-color: rgba(66, 133, 244, 0.2); padding: 10px; border-radius: 5px; margin: 15px 0;">
+              <p>You've already completed this quiz!</p>
+              <p>Your score: <strong>${quizScore} out of ${totalQuestions}</strong> (${Math.round((quizScore / totalQuestions) * 100)}%)</p>
+              <p>Review your answers below:</p>
+            </div>
+          `;
+
+            // Disable start button and show results
+            startQuizBtn.disabled = true;
+            startQuizBtn.style.opacity = '0.5';
+            startQuizBtn.textContent = 'Already Completed';
+
+            // Get quiz data to show review
+            db.collection('quizData')
+              .doc(`${currentUserId}_${currentVideoId}`)
+              .get()
+              .then(quizDoc => {
+                if (quizDoc.exists) {
+                  const quizData = quizDoc.data();
+                  quizQuestions = quizData.questions;
+                  userAnswers = quizData.userAnswers;
+
+                  // Generate and show review
+                  generateQuizReview();
+                  quizInitial.style.display = 'none';
+                  quizResults.style.display = 'block';
+                }
+              });
+
+          } else {
+            // User hasn't attempted this quiz yet
+            quizAttempted = false;
+            quizStatus.textContent = "You haven't attempted this quiz yet.";
+            startQuizBtn.disabled = false;
+            startQuizBtn.style.opacity = '1';
+            startQuizBtn.textContent = 'Start Quiz';
+
+            // Reset quiz state
+            currentQuestionIndex = 0;
+            userAnswers = [];
+          }
+        })
+        .catch(error => {
+          debugError('Error checking quiz attempts:', error);
+          quizStatus.textContent = "Error loading quiz status. Please try again.";
+        });
+    }
+
+    // Start the quiz by generating questions
+    async function startQuiz() {
+      if (quizAttempted) {
+        showNotification('You have already completed this quiz.');
+        return;
+      }
+
+      // Show loading state
+      quizInitial.style.display = 'none';
+      quizLoading.style.display = 'block';
+
+      try {
+        // Generate quiz questions using Gemini API
+        const questions = await generateQuizQuestions();
+        quizQuestions = questions;
+
+        // Initialize user answers array with nulls
+        userAnswers = new Array(quizQuestions.length).fill(null);
+
+        // Set up the quiz interface
+        totalQuestionsEl.textContent = quizQuestions.length;
+
+        // Show first question
+        currentQuestionIndex = 0;
+        showQuestion(currentQuestionIndex);
+
+        // Switch to questions view
+        quizLoading.style.display = 'none';
+        quizQuestions_el.style.display = 'block';
+
+      } catch (error) {
+        debugError('Error generating quiz:', error);
+        quizLoading.style.display = 'none';
+        quizInitial.style.display = 'block';
+        quizStatus.innerHTML = `
+        <div style="color: #ff6b6b; margin: 10px 0;">
+          Error generating quiz. Please try again.
+        </div>
+      `;
+      }
+    }
+
+    // Generate quiz questions using Gemini API
+    async function generateQuizQuestions() {
+      // Create a prompt for Gemini to generate quiz questions
+      const prompt = `
+    You are a DSA (Data Structures and Algorithms) expert creating a multiple-choice quiz.
+    
+    Create 10 multiple-choice questions based on the following video title: "${currentVideoTitle}"
+    
+    For each question:
+    1. Create a clear, concise question about an important DSA concept from this topic
+    2. Provide exactly 4 options (labeled A, B, C, D)
+    3. Indicate the correct answer
+    4. Provide a brief explanation for why the answer is correct
+    
+    Format each question as a JSON object with the following structure:
+    {
+      "question": "Question text here",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctAnswer": 0, // Index of correct option (0-3)
+      "explanation": "Explanation of the correct answer"
+    }
+    
+    Return an array of 10 question objects in valid JSON format.
+    Output ONLY the JSON array, with no additional text before or after.
+    `;
+
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: prompt
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 2048,
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`API Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+          const responseText = data.candidates[0].content.parts[0].text;
+
+          // Extract the JSON array from the response (handling potential text around it)
+          const jsonMatch = responseText.match(/\[[\s\S]*\]/);
+          if (jsonMatch) {
+            const jsonStr = jsonMatch[0];
+            const questions = JSON.parse(jsonStr);
+            debugLog(`Successfully generated ${questions.length} quiz questions`);
+            return questions;
+          } else {
+            throw new Error("Could not extract valid JSON from the response");
+          }
+        } else {
+          throw new Error("Invalid response format from Gemini API");
+        }
+      } catch (error) {
+        debugError("Error generating quiz questions:", error);
+        throw error;
+      }
+    }
+
+    // Show a specific question
+    function showQuestion(index) {
+      const question = quizQuestions[index];
+      currentQuestion_el.textContent = `${index + 1}. ${question.question}`;
+
+      // Update progress indicator
+      quizProgress.textContent = `Question ${index + 1} of ${quizQuestions.length}`;
+
+      // Clear and rebuild options
+      optionsContainer.innerHTML = '';
+
+      // Add options with appropriate event listeners
+      question.options.forEach((option, optionIndex) => {
+        const optionBtn = document.createElement('button');
+        optionBtn.className = 'quiz-option';
+
+        // Check if this option is the user's current answer
+        const isSelected = userAnswers[index] === optionIndex;
+
+        optionBtn.style.cssText = `
+        background-color: ${isSelected ? '#4285f4' : '#3a3a3a'};
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 15px;
+        text-align: left;
+        cursor: pointer;
+        width: 100%;
+        font-size: 16px;
+        transition: background-color 0.2s;
+        display: flex;
+        align-items: center;
+      `;
+
+        // Use letters for options (A, B, C, D)
+        const letters = ['A', 'B', 'C', 'D'];
+
+        optionBtn.innerHTML = `
+        <span style="display: inline-block; width: 25px; height: 25px; background-color: ${isSelected ? 'white' : 'rgba(255,255,255,0.2)'};
+        color: ${isSelected ? '#4285f4' : 'white'}; border-radius: 50%; text-align: center; margin-right: 10px; line-height: 25px; font-weight: bold;">
+          ${letters[optionIndex]}
+        </span>
+        ${option}
+      `;
+
+        optionBtn.addEventListener('click', () => selectOption(optionIndex));
+        optionBtn.addEventListener('mouseover', () => {
+          if (userAnswers[index] !== optionIndex) {
+            optionBtn.style.backgroundColor = '#555';
+          }
+        });
+        optionBtn.addEventListener('mouseout', () => {
+          if (userAnswers[index] !== optionIndex) {
+            optionBtn.style.backgroundColor = '#3a3a3a';
+          }
+        });
+
+        optionsContainer.appendChild(optionBtn);
+      });
+
+      // Update navigation buttons
+      prevQuestionBtn.disabled = index === 0;
+      prevQuestionBtn.style.opacity = index === 0 ? '0.5' : '1';
+
+      // Change Next to Finish on the last question
+      if (index === quizQuestions.length - 1) {
+        nextQuestionBtn.textContent = 'Finish Quiz';
+      } else {
+        nextQuestionBtn.textContent = 'Next';
+      }
+    }
+
+    // Select an option for the current question
+    function selectOption(optionIndex) {
+      userAnswers[currentQuestionIndex] = optionIndex;
+      showQuestion(currentQuestionIndex); // Refresh to show selected state
+    }
+
+    // Show previous question
+    function showPreviousQuestion() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        showQuestion(currentQuestionIndex);
+      }
+    }
+
+    // Handle next question or finish quiz
+    function handleNextQuestion() {
+      // Check if an option is selected for the current question
+      if (userAnswers[currentQuestionIndex] === null) {
+        showNotification('Please select an answer before continuing.');
+        return;
+      }
+
+      if (currentQuestionIndex < quizQuestions.length - 1) {
+        // Go to next question
+        currentQuestionIndex++;
+        showQuestion(currentQuestionIndex);
+      } else {
+        // Last question, finish the quiz
+        finishQuiz();
+      }
+    }
+
+    // Finish the quiz and calculate score
+    function finishQuiz() {
+      // Calculate score
+      quizScore = 0;
+      userAnswers.forEach((answer, index) => {
+        if (answer === quizQuestions[index].correctAnswer) {
+          quizScore++;
+        }
+      });
+
+      // Update score display
+      userScoreEl.textContent = quizScore;
+      totalQuestionsEl.textContent = quizQuestions.length;
+      const percentage = Math.round((quizScore / quizQuestions.length) * 100);
+      scorePercentageEl.textContent = `${percentage}% Correct`;
+
+      // Generate review content
+      generateQuizReview();
+
+      // Save quiz attempt to Firestore
+      saveQuizAttempt(quizScore, quizQuestions.length);
+
+      // Show results view
+      quizQuestions_el.style.display = 'none';
+      quizResults.style.display = 'block';
+    }
+
+    // Generate quiz review content
+    function generateQuizReview() {
+      answersReview.innerHTML = '';
+
+      quizQuestions.forEach((question, index) => {
+        const userAnswer = userAnswers[index];
+        const isCorrect = userAnswer === question.correctAnswer;
+
+        const reviewItem = document.createElement('div');
+        reviewItem.style.cssText = `
+        margin-bottom: 20px;
+        padding: 15px;
+        border-radius: 8px;
+        background-color: ${isCorrect ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)'};
+        border-left: 4px solid ${isCorrect ? '#4CAF50' : '#F44336'};
+      `;
+
+        // Question text
+        const questionText = document.createElement('p');
+        questionText.style.fontWeight = 'bold';
+        questionText.textContent = `${index + 1}. ${question.question}`;
+        reviewItem.appendChild(questionText);
+
+        // Options with correct and user answers highlighted
+        const letters = ['A', 'B', 'C', 'D'];
+        const optionsList = document.createElement('div');
+        optionsList.style.marginLeft = '20px';
+
+        question.options.forEach((option, optionIndex) => {
+          const optionItem = document.createElement('div');
+          optionItem.style.cssText = `
+          margin: 5px 0;
+          display: flex;
+          align-items: center;
+        `;
+
+          // Determine the style for this option
+          let style = '';
+          let prefix = '';
+
+          if (optionIndex === question.correctAnswer) {
+            // Correct answer
+            style = 'color: #4CAF50; font-weight: bold;';
+            prefix = '✓ ';
+          } else if (userAnswer === optionIndex) {
+            // Incorrect user answer
+            style = 'color: #F44336; text-decoration: line-through;';
+            prefix = '✗ ';
+          }
+
+          optionItem.innerHTML = `
+          <span style="display: inline-block; width: 25px; height: 25px; 
+          background-color: ${optionIndex === question.correctAnswer ? 'rgba(76, 175, 80, 0.2)' :
+              (optionIndex === userAnswer ? 'rgba(244, 67, 54, 0.2)' : 'rgba(255,255,255,0.1)')};
+          color: white; border-radius: 50%; text-align: center; margin-right: 10px; line-height: 25px;">
+            ${letters[optionIndex]}
+          </span>
+          <span style="${style}">${prefix}${option}</span>
+        `;
+
+          optionsList.appendChild(optionItem);
+        });
+        reviewItem.appendChild(optionsList);
+
+        // Explanation
+        const explanation = document.createElement('div');
+        explanation.style.cssText = `
+        margin-top: 10px;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+        font-style: italic;
+      `;
+        explanation.innerHTML = `<strong>Explanation:</strong> ${question.explanation}`;
+        reviewItem.appendChild(explanation);
+
+        answersReview.appendChild(reviewItem);
+      });
+    }
+
+    // Save quiz attempt to Firestore
+    function saveQuizAttempt(score, totalQuestions) {
+      if (!currentUserId || !currentVideoId) {
+        showNotification('Error: Cannot save quiz results.');
+        return;
+      }
+
+      // Mark this quiz as attempted
+      db.collection('quizAttempts')
+        .doc(`${currentUserId}_${currentVideoId}`)
+        .set({
+          userId: currentUserId,
+          videoId: currentVideoId,
+          videoTitle: currentVideoTitle,
+          score: score,
+          totalQuestions: totalQuestions,
+          attemptedAt: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then(() => {
+          debugLog('Quiz attempt saved successfully');
+
+          // Save the quiz data for review
+          return db.collection('quizData')
+            .doc(`${currentUserId}_${currentVideoId}`)
+            .set({
+              questions: quizQuestions,
+              userAnswers: userAnswers
+            });
+        })
+        .then(() => {
+          debugLog('Quiz data saved successfully');
+          quizAttempted = true;
+        })
+        .catch(error => {
+          debugError('Error saving quiz attempt:', error);
+          showNotification('Error saving your quiz results. Your progress might not be saved.');
+        });
+    }
+
+    // Initialize quiz system when the page loads
+    window.addEventListener('DOMContentLoaded', () => {
+      initQuizSystem();
+    });
+
+
+    // Analytics System Implementation
+
+    // Variables for analytics
+    let progressChart, masteryChart, timeChart;
+
+    // DOM Elements
+    const openAnalyticsBtn = document.getElementById('openAnalytics');
+    const analyticsModal = document.getElementById('analyticsModal');
+    const closeAnalyticsBtn = document.getElementById('closeAnalytics');
+    const analyticsTabs = document.querySelectorAll('.analyticsTab');
+    const analyticsTabContents = document.querySelectorAll('.analyticsTabContent');
+
+    // Initialize analytics system
+    function initAnalyticsSystem() {
+      debugLog('Initializing analytics system...');
+
+      // Open analytics modal event
+      openAnalyticsBtn.addEventListener('click', () => {
+        analyticsModal.style.display = 'block';
+        loadAnalyticsData();
+      });
+
+      // Close analytics modal event
+      closeAnalyticsBtn.addEventListener('click', () => {
+        analyticsModal.style.display = 'none';
+      });
+
+      // Tab switching
+      analyticsTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const tabId = tab.getAttribute('data-tab');
+          switchTab(tabId);
+        });
+      });
+
+      debugLog('Analytics system initialized');
+    }
+
+    // Switch between analytics tabs
+    function switchTab(tabId) {
+      analyticsTabs.forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.getAttribute('data-tab') === tabId) {
+          tab.classList.add('active');
+        }
+      });
+
+      analyticsTabContents.forEach(content => {
+        content.classList.remove('active');
+        if (content.id === `${tabId}Tab`) {
+          content.classList.add('active');
+        }
+      });
+    }
+
+    // Load analytics data from Firestore
+    async function loadAnalyticsData() {
+      if (!currentUserId) {
+        showNotification('Please sign in to view analytics.');
+        return;
+      }
+
+      try {
+        // 1. Get progress data (quiz scores over time)
+        const progressData = await getProgressData();
+        renderProgressChart(progressData);
+
+        // 2. Get topic mastery data
+        const masteryData = await getMasteryData();
+        renderMasteryChart(masteryData);
+
+        // 3. Get time spent data
+        const timeData = await getTimeSpentData();
+        renderTimeChart(timeData);
+
+      } catch (error) {
+        debugError('Error loading analytics data:', error);
+        showNotification('Error loading analytics. Please try again.');
+      }
+    }
+
+    // Get progress data (quiz scores over time)
+    async function getProgressData() {
+      const snapshot = await db.collection('quizAttempts')
+        .where('userId', '==', currentUserId)
+        .orderBy('attemptedAt')
+        .get();
+
+      const progressData = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        progressData.push({
+          videoTitle: data.videoTitle,
+          date: data.attemptedAt.toDate().toLocaleDateString(),
+          score: data.score,
+          total: data.totalQuestions,
+          percentage: Math.round((data.score / data.totalQuestions) * 100)
+        });
+      });
+
+      return progressData;
+    }
+
+    // Get topic mastery data
+    async function getMasteryData() {
+      // This would be more sophisticated in a real app
+      // For now, we'll just use quiz data to estimate mastery
+      const snapshot = await db.collection('quizData')
+        .where('userId', '==', currentUserId)
+        .get();
+
+      const topicMastery = {};
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        data.questions.forEach((question, index) => {
+          // Extract topic from question (simple approach)
+          const topic = extractTopicFromQuestion(question.question);
+          const isCorrect = data.userAnswers[index] === question.correctAnswer;
+
+          if (!topicMastery[topic]) {
+            topicMastery[topic] = { correct: 0, total: 0 };
+          }
+
+          topicMastery[topic].total++;
+          if (isCorrect) {
+            topicMastery[topic].correct++;
+          }
+        });
+      });
+
+      // Convert to array format for chart
+      const masteryData = [];
+      for (const [topic, stats] of Object.entries(topicMastery)) {
+        masteryData.push({
+          topic: topic,
+          mastery: Math.round((stats.correct / stats.total) * 100)
+        });
+      }
+
+      return masteryData;
+    }
+
+    // Simple function to extract topic from question
+    function extractTopicFromQuestion(question) {
+      // This is a simplified approach - you'd want to improve this
+      const topics = ['Array', 'Linked List', 'Stack', 'Queue', 'Tree', 'Graph',
+        'Sorting', 'Searching', 'Recursion', 'Dynamic Programming'];
+
+      for (const topic of topics) {
+        if (question.includes(topic)) {
+          return topic;
+        }
+      }
+      return 'Other';
+    }
+
+    // Get time spent data
+    async function getTimeSpentData() {
+      const snapshot = await db.collection('videoWatches')
+        .where('userId', '==', currentUserId)
+        .get();
+
+      const timeData = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        timeData.push({
+          videoTitle: data.videoTitle,
+          timeSpent: data.timeSpent, // in minutes
+          lastWatched: data.lastWatched.toDate().toLocaleDateString()
+        });
+      });
+
+      return timeData;
+    }
+
+    // Render progress chart
+    function renderProgressChart(data) {
+      const ctx = document.getElementById('progressChart').getContext('2d');
+
+      // Destroy previous chart if it exists
+      if (progressChart) {
+        progressChart.destroy();
+      }
+
+      const labels = data.map(item => item.date || item.videoTitle);
+      const percentages = data.map(item => item.percentage);
+
+      progressChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Quiz Score (%)',
+            data: percentages,
+            backgroundColor: 'rgba(66, 133, 244, 0.2)',
+            borderColor: 'rgba(66, 133, 244, 1)',
+            borderWidth: 2,
+            tension: 0.1,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                color: '#fff'
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  const index = context.dataIndex;
+                  return [
+                    `Score: ${data[index].score}/${data[index].total}`,
+                    `Video: ${data[index].videoTitle}`
+                  ];
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              ticks: {
+                color: '#aaa'
+              },
+              grid: {
+                color: 'rgba(255,255,255,0.1)'
+              }
+            },
+            x: {
+              ticks: {
+                color: '#aaa'
+              },
+              grid: {
+                color: 'rgba(255,255,255,0.1)'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Render mastery chart
+    function renderMasteryChart(data) {
+      const ctx = document.getElementById('masteryChart').getContext('2d');
+
+      if (masteryChart) {
+        masteryChart.destroy();
+      }
+
+      const labels = data.map(item => item.topic);
+      const mastery = data.map(item => item.mastery);
+
+      masteryChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Mastery (%)',
+            data: mastery,
+            backgroundColor: mastery.map(value => {
+              // Color based on mastery level
+              if (value >= 80) return 'rgba(76, 175, 80, 0.7)'; // Green
+              if (value >= 50) return 'rgba(255, 193, 7, 0.7)'; // Yellow
+              return 'rgba(244, 67, 54, 0.7)'; // Red
+            }),
+            borderColor: mastery.map(value => {
+              if (value >= 80) return 'rgba(76, 175, 80, 1)';
+              if (value >= 50) return 'rgba(255, 193, 7, 1)';
+              return 'rgba(244, 67, 54, 1)';
+            }),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false,
+              labels: {
+                color: '#fff'
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  return `${context.parsed.y}% mastery`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              ticks: {
+                color: '#aaa'
+              },
+              grid: {
+                color: 'rgba(255,255,255,0.1)'
+              }
+            },
+            x: {
+              ticks: {
+                color: '#aaa'
+              },
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Render time spent chart
+    function renderTimeChart(data) {
+      const ctx = document.getElementById('timeChart').getContext('2d');
+
+      if (timeChart) {
+        timeChart.destroy();
+      }
+
+      const labels = data.map(item => item.videoTitle.length > 20 ?
+        item.videoTitle.substring(0, 20) + '...' : item.videoTitle);
+      const times = data.map(item => item.timeSpent);
+
+      timeChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Time Spent (minutes)',
+            data: times,
+            backgroundColor: 'rgba(156, 39, 176, 0.7)',
+            borderColor: 'rgba(156, 39, 176, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              labels: {
+                color: '#fff'
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  const index = context.dataIndex;
+                  return [
+                    `Time: ${data[index].timeSpent} minutes`,
+                    `Last watched: ${data[index].lastWatched}`
+                  ];
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                color: '#aaa'
+              },
+              grid: {
+                color: 'rgba(255,255,255,0.1)'
+              }
+            },
+            x: {
+              ticks: {
+                color: '#aaa'
+              },
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Track video watch time (add this to your loadVideo function)
+    function trackVideoWatchTime() {
+      if (!currentUserId || !currentVideoId) return;
+
+      const startTime = Date.now();
+
+      // When video changes or page closes, save the time
+      window.addEventListener('beforeunload', saveWatchTime);
+      videoPlayer.addEventListener('ended', saveWatchTime);
+
+      function saveWatchTime() {
+        const endTime = Date.now();
+        const timeSpent = Math.round((endTime - startTime) / 60000); // in minutes
+
+        db.collection('videoWatches')
+          .doc(`${currentUserId}_${currentVideoId}`)
+          .set({
+            userId: currentUserId,
+            videoId: currentVideoId,
+            videoTitle: currentVideoTitle,
+            timeSpent: firebase.firestore.FieldValue.increment(timeSpent),
+            lastWatched: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true })
+          .catch(error => {
+            debugError('Error saving watch time:', error);
+          });
+
+        // Remove event listeners
+        window.removeEventListener('beforeunload', saveWatchTime);
+        videoPlayer.removeEventListener('ended', saveWatchTime);
+      }
+    }
+
+    // Initialize analytics system when the page loads
+    window.addEventListener('DOMContentLoaded', () => {
+      initAnalyticsSystem();
+    });
+    // Code Editor System Implementation
+
+
+
+    // Code Editor System Implementation
+    // Code Editor System Implementation
+    // Code Editor System Implementation
+    let editor = null;
+    let isEditorOpen = false;
+
+    // Initialize code editor system
+    function initCodeEditorSystem() {
+      debugLog('Initializing code editor system...');
+
+      // Open editor button
+      document.getElementById('openCodeEditor').addEventListener('click', toggleCodeEditor);
+
+      // Run code button
+      document.getElementById('runCodeBtn').addEventListener('click', runCode);
+
+      // Save code button
+      document.getElementById('saveCodeBtn').addEventListener('click', saveCode);
+
+      // Make editor popup draggable
+      makeDraggable(document.getElementById('codeEditorPopup'));
+
+      debugLog('Code editor system initialized');
+    }
+
+    // Toggle code editor visibility
+    function toggleCodeEditor() {
+      const editorPopup = document.getElementById('codeEditorPopup');
+
+      if (isEditorOpen) {
+        editorPopup.style.display = 'none';
+        isEditorOpen = false;
+      } else {
+        editorPopup.style.display = 'block';
+        isEditorOpen = true;
+
+        // Initialize Monaco Editor if not already done
+        if (!editor) {
+          initializeMonacoEditor();
+        }
+
+        // Load saved code for this video
+        loadCode();
+      }
+    }
+
+    // Close code editor
+    function closeCodeEditor() {
+      document.getElementById('codeEditorPopup').style.display = 'none';
+      isEditorOpen = false;
+    }
+
+    // Initialize Monaco Editor
+    function initializeMonacoEditor() {
+      // Check if Monaco is already loaded
+      if (typeof monaco === 'undefined') {
+        // Load Monaco Editor
+        const loaderScript = document.createElement('script');
+        loaderScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.47.0/min/vs/loader.min.js';
+        loaderScript.onload = () => {
+          require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.47.0/min/vs' } });
+          require(['vs/editor/editor.main'], () => {
+            createEditor();
+          });
+        };
+        document.body.appendChild(loaderScript);
+      } else {
+        createEditor();
+      }
+    }
+
+    // Create the editor instance
+    function createEditor() {
+      editor = monaco.editor.create(document.getElementById('editorContainer'), {
+        value: [
+          '// C++ code example',
+          '#include <iostream>',
+          '',
+          'int main() {',
+          '    std::cout << "Hello, DSA Learner!" << std::endl;',
+          '    return 0;',
+          '}'
+        ].join('\n'),
+        language: 'cpp',
+        theme: 'vs-dark',
+        automaticLayout: true,
+        minimap: { enabled: true },
+        fontSize: 14,
+        scrollBeyondLastLine: false
+      });
+
+      // Resize handler
+      window.addEventListener('resize', () => {
+        if (editor) {
+          editor.layout();
+        }
+      });
+    }
+
+    // Run code in the editor
+    function runCode() {
+      // Get the output container and make sure it's visible
+      const outputContainer = document.getElementById('outputContainer');
+      outputContainer.style.display = 'block';
+
+      // Adjust editor container height to make room for output
+      const editorPopup = document.getElementById('codeEditorPopup');
+      const editorContainer = document.getElementById('editorContainer');
+      editorContainer.style.height = 'calc(100% - 140px)';  // Make room for output
+
+      // Show "compiling" message
+      outputContainer.innerHTML = '<div style="color: #aaa;">Compiling and running C++ code...</div>';
+
+      try {
+        // Get the code from the editor
+        const code = editor.getValue();
+
+        // Simulate output for testing if no server is available
+        const isMockMode = true; // Set to false when your server is ready
+
+        if (isMockMode) {
+          // Smart mock implementation that processes the code
+          setTimeout(() => {
+            // Parse the C++ code to extract expected output
+            let mockOutput = "";
+            let hasError = false;
+            let errorMessage = "";
+
+            try {
+              // Basic parsing of cout statements
+              const coutRegex = /std::cout\s*<<\s*"([^"]*)"/g;
+              const coutMatches = [...code.matchAll(coutRegex)];
+
+              if (coutMatches.length > 0) {
+                // Combine all cout outputs
+                mockOutput = coutMatches.map(match => match[1]).join('');
+
+                // Add newlines if endl is present
+                if (code.includes("endl")) {
+                  mockOutput += "\n";
+                }
+              } else {
+                // Check if there's any output at all
+                mockOutput = "No output detected. Make sure to use std::cout.";
+              }
+
+              // Check for common syntax errors
+              if (!code.includes("main()") && !code.includes("main(")) {
+                throw new Error("No main function found");
+              }
+
+              if ((code.match(/{/g) || []).length !== (code.match(/}/g) || []).length) {
+                throw new Error("Mismatched braces");
+              }
+
+              if (!code.includes("#include <iostream>") && code.includes("std::cout")) {
+                mockOutput = "Warning: iostream header is missing, but continuing execution...\n" + mockOutput;
+              }
+
+              // Additional C++ specific checks could be added here
+
+            } catch (parseError) {
+              hasError = true;
+              errorMessage = parseError.message;
+            }
+
+            if (hasError) {
+              outputContainer.innerHTML = `
+            <div style="color: #F44336;">✗ Error compiling code</div>
+            <div style="margin-top: 10px; color: #fff;">Error:</div>
+            <pre style="background: #1e1e1e; padding: 10px; border-radius: 5px; margin-top: 5px; color: #F44336;">${errorMessage}</pre>
+          `;
+            } else {
+              outputContainer.innerHTML = `
+            <div style="color: #4CAF50;">✓ Code executed successfully</div>
+            <div style="margin-top: 10px; color: #fff;">Output:</div>
+            <pre style="background: #1e1e1e; padding: 10px; border-radius: 5px; margin-top: 5px;">${mockOutput}</pre>
+          `;
+            }
+          }, 1000);
+        } else {
+          // Real implementation with server
+          fetch('/api/run-cpp', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ code: code })
+          })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                outputContainer.innerHTML = `
+            <div style="color: #4CAF50;">✓ Code executed successfully</div>
+            <div style="margin-top: 10px; color: #fff;">Output:</div>
+            <pre style="background: #1e1e1e; padding: 10px; border-radius: 5px; margin-top: 5px;">${data.output}</pre>
+          `;
+              } else {
+                outputContainer.innerHTML = `
+            <div style="color: #F44336;">✗ Error executing code</div>
+            <div style="margin-top: 10px; color: #fff;">Error:</div>
+            <pre style="background: #1e1e1e; padding: 10px; border-radius: 5px; margin-top: 5px; color: #F44336;">${data.error}</pre>
+          `;
+              }
+            })
+            .catch(error => {
+              outputContainer.innerHTML = `
+          <div style="color: #F44336;">✗ Error connecting to the server</div>
+          <div style="margin-top: 10px; color: #fff;">Error:</div>
+          <pre style="background: #1e1e1e; padding: 10px; border-radius: 5px; margin-top: 5px; color: #F44336;">${error.toString()}</pre>
+        `;
+            });
+        }
+      } catch (error) {
+        outputContainer.innerHTML = `
+      <div style="color: #F44336;">✗ Error processing code</div>
+      <div style="margin-top: 10px; color: #fff;">Error:</div>
+      <pre style="background: #1e1e1e; padding: 10px; border-radius: 5px; margin-top: 5px; color: #F44336;">${error.toString()}</pre>
+    `;
+      }
+    }
+
+    // Save code to Firestore
+    function saveCode() {
+      if (!currentUserId || !currentVideoId) {
+        showNotification('Error: Cannot save code. Please sign in.');
+        return;
+      }
+
+      const code = editor.getValue();
+      const codeDocId = `${currentUserId}_${currentVideoId}`;
+
+      db.collection('userCode').doc(codeDocId).set({
+        userId: currentUserId,
+        videoId: currentVideoId,
+        videoTitle: currentVideoTitle,
+        language: 'cpp',
+        code: code,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      })
+        .then(() => {
+          showNotification('Code saved successfully!');
+        })
+        .catch(error => {
+          debugError('Error saving code:', error);
+          showNotification('Error saving code. Please try again.');
+        });
+    }
+
+    // Load code from Firestore
+    function loadCode() {
+      if (!currentUserId || !currentVideoId || !editor) {
+        return;
+      }
+
+      const codeDocId = `${currentUserId}_${currentVideoId}`;
+
+      db.collection('userCode').doc(codeDocId).get()
+        .then(doc => {
+          if (doc.exists) {
+            editor.setValue(doc.data().code);
+          }
+        })
+        .catch(error => {
+          debugError('Error loading code:', error);
+        });
+    }
+
+    // Initialize code editor system when the page loads
+    window.addEventListener('DOMContentLoaded', () => {
+      initCodeEditorSystem();
+    });
+
+  </script>
+  <script>
+    // Advanced multi-layer obfuscation with anti-tampering
+    document.addEventListener('DOMContentLoaded', function () {
+      const scripts = document.getElementsByTagName('script');
+      const selfScript = document.currentScript;
+
+      // Configuration for what to obfuscate
+      const targets = [
+        {
+          keywords: ['firebaseConfig', 'initializeFirebase', 'init()'],
+          name: 'firebase'
+        },
+        {
+          keywords: ['youtubeApiKeys', 'geminiApiKey', 'fetchPlaylist'],
+          name: 'tutor'
+        },
+        {
+          keywords: ['DEBUG_MODE', 'debugLog', 'debugError'],
+          name: 'debug'
+        }
+      ];
+
+      // Skip this obfuscation script
+      for (let i = 0; i < scripts.length; i++) {
+        if (scripts[i] === selfScript) continue;
+
+        const scriptContent = scripts[i].textContent;
+        let shouldObfuscate = false;
+        let scriptType = '';
+
+        // Check if this script matches any target patterns
+        for (const target of targets) {
+          if (target.keywords.some(keyword => scriptContent.includes(keyword))) {
+            shouldObfuscate = true;
+            scriptType = target.name;
+            break;
+          }
+        }
+
+        if (shouldObfuscate) {
+          debugLog(`Obfuscating ${scriptType} script...`);
+          scripts[i].textContent = advancedObfuscate(scriptContent, scriptType);
+        }
+      }
+
+      // Multi-layer obfuscation with anti-debugging
+      function advancedObfuscate(code, type) {
+        // Layer 1: String obfuscation with random encoding
+        const layer1 = stringObfuscation(code);
+
+        // Layer 2: Code structure transformation
+        const layer2 = structureTransform(layer1);
+
+        // Layer 3: Anti-debugging and anti-tampering
+        const layer3 = addProtection(layer2, type);
+
+        return layer3;
+      }
+
+      function stringObfuscation(code) {
+        // Convert to hex with random junk insertion
+        const hexArray = [];
+        const junkChars = ['%', '$', '!', '*'];
+
+        for (let i = 0; i < code.length; i++) {
+          // Insert random junk every 5-10 characters
+          if (i > 0 && Math.random() < 0.15) {
+            const junk = junkChars[Math.floor(Math.random() * junkChars.length)];
+            hexArray.push(junk.charCodeAt(0).toString(16));
+          }
+          hexArray.push(code.charCodeAt(i).toString(16).padStart(2, '0'));
+        }
+
+        const hexString = hexArray.join('');
+
+        // Create a decoder function with random variable names
+        const var1 = randomString(4);
+        const var2 = randomString(4);
+        const var3 = randomString(4);
+
+        return `(function(){ 
+              var ${var1}='${hexString}';
+              var ${var2}=${var1}.replace(/[${junkChars.join('')}]/g,'');
+              var ${var3}=${var2}.replace(/../g,function($0){return'%'+$0});
+              return unescape(${var3});
+          })()`;
+      }
+
+      function structureTransform(code) {
+        // Split code into chunks and rearrange with control flow
+        const chunks = [];
+        const chunkSize = 50 + Math.floor(Math.random() * 50);
+
+        for (let i = 0; i < code.length; i += chunkSize) {
+          chunks.push(code.substr(i, chunkSize));
+        }
+
+        // Shuffle chunks but remember original order
+        const shuffled = [...chunks];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+
+        // Create reconstruction logic
+        const var4 = randomString(4);
+        const var5 = randomString(4);
+        const var6 = randomString(4);
+
+        let reconstructor = `var ${var4}=[${shuffled.map(c => JSON.stringify(c)).join(',')}];`;
+        reconstructor += `var ${var5}=[${chunks.map((_, i) => i).join(',')}];`;
+        reconstructor += `var ${var6}='';`;
+        reconstructor += `for(var i=0;i<${var5}.length;i++){${var6}+=${var4}[${var5}[i]];}`;
+        reconstructor += `return ${var6};`;
+
+        return `(function(){${reconstructor}})()`;
+      }
+
+      function addProtection(code, type) {
+        // Add anti-debugging and tamper detection
+        const protection = `
+          if(typeof window !== 'undefined'){
+              // Anti-debugging
+              function ${randomString(8)}(){
+                  var start = Date.now();
+                  debugger;
+                  if(Date.now() - start > 100){
+                      document.body.innerHTML = '<h1 style="color:red">Debugger detected!</h1>';
+                      while(1){}
+                  }
+              }
+              
+              // Tamper detection
+              var ${randomString(8)} = '${randomString(16)}';
+              Object.defineProperty(window, '${randomString(8)}', {
+                  get: function() {
+                      document.body.innerHTML = '<h1 style="color:red">Tampering detected!</h1>';
+                      return false;
+                  },
+                  configurable: false
+              });
+              
+              // Type-specific protection
+              ${type === 'firebase' ? firebaseProtection() : ''}
+              ${type === 'tutor' ? tutorProtection() : ''}
+          }
+          `;
+
+        return `try{${protection}${code}}catch(e){console.error('Obfuscation error:',e)}`;
+      }
+
+      function firebaseProtection() {
+        return `
+          // Firebase-specific protection
+          if(typeof firebase === 'undefined'){
+              setTimeout(function(){
+                  if(typeof firebase === 'undefined'){
+                      document.body.innerHTML = '<h1 style="color:red">Firebase blocked!</h1>';
+                  }
+              }, 2000);
+          }
+          `;
+      }
+
+      function tutorProtection() {
+        return `
+          // Tutor-specific protection
+          if(typeof document.getElementById('videoPlayer') === 'undefined'){
+              document.body.innerHTML = '<h1 style="color:red">Required elements missing!</h1>';
+          }
+          `;
+      }
+
+      function randomString(length) {
+        return 'x' + Math.random().toString(36).substr(2, length);
+      }
+
+      function debugLog(msg) {
+        if (typeof console !== 'undefined' && console.log) {
+          console.log('[Obfuscator]', msg);
+        }
+      }
+    });
+  </script>
+  <script>
+    document.addEventListener("contextmenu", function (e) {
+      e.preventDefault();
+    });
+  </script>
+
+
+  </script>
+</body>
+
+</html>

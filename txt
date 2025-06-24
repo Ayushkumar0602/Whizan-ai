@@ -1,0 +1,570 @@
+AIzaSyCoBeOf90UzMby6rZmIFInhS2DHhbAzbS4
+AIzaSyDvdyjYPX0MTlDPEwWIiCW1MdtQ6K9ri6Y
+AIzaSyACa-hDsfwmTJ4lQHx-EThm8s4-i5fJbnA
+AIzaSyDvdyjYPX0MTlDPEwWIiCW1MdtQ6K9ri6Y
+
+
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+  
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+      
+    match /notes/{noteId} {
+      // Allow read if the user ID in the document matches the authenticated user
+      // or if the document ID starts with the user's ID
+      allow read: if request.auth != null && 
+                  (resource.data.userId == request.auth.uid || 
+                   noteId.matches(request.auth.uid + '_.*'));
+      
+      // Allow create if the user is authenticated and setting their own user ID
+      allow create: if request.auth != null && 
+                    request.resource.data.userId == request.auth.uid &&
+                    noteId.matches(request.auth.uid + '_.*');
+      
+      // Allow update if the user is authenticated and not changing the user ID or videoId
+      allow update: if request.auth != null && 
+                    resource.data.userId == request.auth.uid &&
+                    request.resource.data.userId == request.auth.uid &&
+                    resource.data.videoId == request.resource.data.videoId;
+      
+      // Allow delete only for the user's own notes
+      allow delete: if request.auth != null && 
+                    resource.data.userId == request.auth.uid;
+    }
+    
+    // Helper function to check if user is signed in
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    // Match quizAttempts collection - stores the score and attempt status
+    match /quizAttempts/{docId} {
+      // Allow read if the user is signed in and the document belongs to them
+      // Document ID format: {userId}_{videoId}
+      allow read: if isSignedIn() && docId.split('_')[0] == request.auth.uid;
+      
+      // Allow create only if:
+      // 1. User is signed in
+      // 2. Document ID starts with their user ID
+      // 3. The user ID in the data matches their auth ID
+      allow create: if request.auth != null && 
+                    docId.split('_')[0] == request.auth.uid &&
+                    request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Match quizData collection - stores questions and user answers
+    match /quizData/{docId} {
+      // Allow read if the user is signed in and the document belongs to them
+      allow read: if request.auth != null && docId.split('_')[0] == request.auth.uid;
+      
+      // Allow create only for the user's own data
+      allow create: if request.auth != null && 
+                    docId.split('_')[0] == request.auth.uid &&
+                    request.resource.data.userId == request.auth.uid;
+                    
+                    
+                    
+    }
+  }
+}
+
+
+
+edd42894e4msh613e5fe61ffb32bp134978jsn391befcfa024
+
+
+
+
+
+
+
+
+
+{
+  "rules": {
+    "course_chats": {
+      "$courseId": {
+        // Allow read access to course messages if the user is authenticated
+        ".read": "auth !== null",
+        
+        "messages": {
+          ".read": "auth !== null",
+          ".write": "auth !== null",
+          "$messageId": {
+            // Validate that messages contain required fields
+            ".validate": "newData.hasChildren(['text', 'senderId', 'timestamp'])",
+            
+            // Ensure user can only delete their own messages
+            ".write": "auth !== null && (auth.uid === data.child('senderId').val() || !data.exists())"
+          }
+        },
+        
+        "typing": {
+          ".read": "auth !== null",
+          "$userId": {
+            // Users can only update their own typing status
+            ".write": "auth !== null && auth.uid === $userId"
+          }
+        },
+        
+        "online": {
+          ".read": "auth !== null",
+          "$userId": {
+            // Users can only update their own online status
+            ".write": "auth !== null && auth.uid === $userId"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+//firestore rules - 
+
+    rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isUserData(userId) {
+      return isSignedIn() && userId == request.auth.uid;
+    }
+    
+    function isValidNote() {
+      return request.resource.data.keys().hasAll(['userId', 'videoId', 'content']) &&
+             request.resource.data.userId == request.auth.uid &&
+             request.resource.data.videoId is string &&
+             request.resource.data.content is string;
+    }
+    
+    function isValidQuizAttempt() {
+      return request.resource.data.keys().hasAll(['userId', 'videoId', 'score', 'totalQuestions']) &&
+             request.resource.data.userId == request.auth.uid &&
+             request.resource.data.score is number &&
+             request.resource.data.totalQuestions is number;
+    }
+    
+    function isValidVideoWatch() {
+      return request.resource.data.keys().hasAll(['userId', 'videoId', 'timeSpent']) &&
+             request.resource.data.userId == request.auth.uid &&
+             request.resource.data.timeSpent is number &&
+             request.resource.data.timeSpent > 0;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read, write: if isUserData(userId);
+    }
+      
+    // Notes collection
+    match /notes/{noteId} {
+      allow read: if isUserData(resource.data.userId) || 
+                   isUserData(noteId.split('_')[0]);
+      
+      allow create: if isUserData(request.resource.data.userId) &&
+                    noteId.matches(request.auth.uid + '_.*') &&
+                    isValidNote();
+      
+      allow update: if isUserData(resource.data.userId) &&
+                    resource.data.userId == request.resource.data.userId &&
+                    resource.data.videoId == request.resource.data.videoId &&
+                    isValidNote();
+      
+      allow delete: if isUserData(resource.data.userId);
+    }
+    
+    // QuizAttempts collection (single definition)
+    match /quizAttempts/{docId} {
+      allow read: if isUserData(resource.data.userId) || 
+                   isUserData(docId.split('_')[0]);
+      
+      allow create: if isUserData(request.resource.data.userId) &&
+                    docId.matches(request.auth.uid + '_.*') &&
+                    isValidQuizAttempt();
+      
+      // Prevent updates/deletes to maintain history integrity
+      allow update, delete: if false;
+    }
+    
+    // QuizData collection
+    match /quizData/{docId} {
+      allow read: if isUserData(resource.data.userId) || 
+                   isUserData(docId.split('_')[0]);
+      
+      allow create: if isUserData(request.resource.data.userId) &&
+                    docId.matches(request.auth.uid + '_.*') &&
+                    request.resource.data.keys().hasAll(['questions', 'userAnswers']);
+      
+      allow update, delete: if false;
+    }
+    
+    // VideoWatches collection
+    match /videoWatches/{docId} {
+      allow read: if isUserData(resource.data.userId) || 
+                   isUserData(docId.split('_')[0]);
+      
+      allow create, update: if isUserData(request.resource.data.userId) &&
+                           docId.matches(request.auth.uid + '_.*') &&
+                           isValidVideoWatch();
+      
+      allow delete: if false;
+    }
+    
+    // Analytics collection
+    match /analytics/{userId} {
+      allow read: if isUserData(userId);
+      
+      // Allow writes only from server (via Firebase Admin SDK)
+      allow write: if request.auth != null && 
+                   request.auth.token.firebase.sign_in_provider == 'custom' &&
+                   userId == request.resource.data.userId;
+                   
+    }
+    
+     match /goals/{goalId} {
+      allow read, write: if isUserData(request.auth.uid);
+    }
+
+match /users/{userId} {
+  allow read: if request.auth != null && request.auth.uid == userId;
+  allow write: if request.auth != null && request.auth.uid == userId;
+}
+
+  // Helper functions (keep your existing ones)
+   
+    
+    // Add this new helper function
+    function isValidEnrollment() {
+      return request.resource.data.keys().hasAll(['userId', 'courseId', 'playlistId']) &&
+             request.resource.data.userId == request.auth.uid &&
+             request.resource.data.courseId is string &&
+             request.resource.data.playlistId is string;
+    }
+
+    // Updated enrolledCourses rules
+    match /enrolledCourses/{enrollment} {
+      // Allow users to read their own enrollments
+      allow read: if isUserData(resource.data.userId);
+      
+      // Allow creation of new enrollments with validation
+      allow create: if isSignedIn() && 
+                    isValidEnrollment() &&
+                    request.resource.data.userId == request.auth.uid;
+      
+      // Allow updates only to specific fields
+      allow update: if isUserData(resource.data.userId) &&
+                   request.resource.data.userId == resource.data.userId &&
+                   request.resource.data.courseId == resource.data.courseId &&
+                   request.resource.data.playlistId == resource.data.playlistId &&
+                   request.resource.data.keys().hasOnly(['progress', 'lastAccessed']);
+      
+      // Optionally allow delete if needed
+      allow delete: if isUserData(resource.data.userId);
+    }
+    
+    
+   match /userCode/{docId} {
+      // Users can read, create, update and delete only their own code snippets
+      allow read, write: if request.auth != null && 
+                          request.auth.uid == resource.data.userId || 
+                          request.auth.uid == request.resource.data.userId;
+    }
+
+////streak rules - 
+
+
+  }
+}
+
+
+
+
+
+
+
+
+
+    rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isUserData(userId) {
+      return isSignedIn() && userId == request.auth.uid;
+    }
+    
+    function isValidNote() {
+      return request.resource.data.keys().hasAll(['userId', 'videoId', 'content']) &&
+             request.resource.data.userId == request.auth.uid &&
+             request.resource.data.videoId is string &&
+             request.resource.data.content is string;
+    }
+    
+    function isValidQuizAttempt() {
+      return request.resource.data.keys().hasAll(['userId', 'videoId', 'score', 'totalQuestions']) &&
+             request.resource.data.userId == request.auth.uid &&
+             request.resource.data.score is number &&
+             request.resource.data.totalQuestions is number;
+    }
+    
+    function isValidVideoWatch() {
+      return request.resource.data.keys().hasAll(['userId', 'videoId', 'timeSpent']) &&
+             request.resource.data.userId == request.auth.uid &&
+             request.resource.data.timeSpent is number &&
+             request.resource.data.timeSpent > 0;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read, write: if isUserData(userId);
+    }
+      
+    // Notes collection
+    match /notes/{noteId} {
+      allow read: if isUserData(resource.data.userId) || 
+                   isUserData(noteId.split('_')[0]);
+      
+      allow create: if isUserData(request.resource.data.userId) &&
+                    noteId.matches(request.auth.uid + '_.*') &&
+                    isValidNote();
+      
+      allow update: if isUserData(resource.data.userId) &&
+                    resource.data.userId == request.resource.data.userId &&
+                    resource.data.videoId == request.resource.data.videoId &&
+                    isValidNote();
+      
+      allow delete: if isUserData(resource.data.userId);
+    }
+    
+    // QuizAttempts collection (single definition)
+    match /quizAttempts/{docId} {
+      allow read: if isUserData(resource.data.userId) || 
+                   isUserData(docId.split('_')[0]);
+      
+      allow create: if isUserData(request.resource.data.userId) &&
+                    docId.matches(request.auth.uid + '_.*') &&
+                    isValidQuizAttempt();
+      
+      // Prevent updates/deletes to maintain history integrity
+      allow update, delete: if false;
+    }
+    
+    // QuizData collection
+    match /quizData/{docId} {
+      allow read: if isUserData(resource.data.userId) || 
+                   isUserData(docId.split('_')[0]);
+      
+      allow create: if isUserData(request.resource.data.userId) &&
+                    docId.matches(request.auth.uid + '_.*') &&
+                    request.resource.data.keys().hasAll(['questions', 'userAnswers']);
+      
+      allow update, delete: if false;
+    }
+    
+    // VideoWatches collection
+    match /videoWatches/{docId} {
+      allow read: if isUserData(resource.data.userId) || 
+                   isUserData(docId.split('_')[0]);
+      
+      allow create, update: if isUserData(request.resource.data.userId) &&
+                           docId.matches(request.auth.uid + '_.*') &&
+                           isValidVideoWatch();
+      
+      allow delete: if false;
+    }
+    
+    // Analytics collection
+    match /analytics/{userId} {
+      allow read: if isUserData(userId);
+      
+      // Allow writes only from server (via Firebase Admin SDK)
+      allow write: if request.auth != null && 
+                   request.auth.token.firebase.sign_in_provider == 'custom' &&
+                   userId == request.resource.data.userId;
+                   
+    }
+    
+     match /goals/{goalId} {
+      allow read, write: if isUserData(request.auth.uid);
+    }
+
+match /users/{userId} {
+  allow read: if request.auth != null && request.auth.uid == userId;
+  allow write: if request.auth != null && request.auth.uid == userId;
+}
+
+  // Helper functions (keep your existing ones)
+   
+    
+    // Add this new helper function
+    function isValidEnrollment() {
+      return request.resource.data.keys().hasAll(['userId', 'courseId', 'playlistId']) &&
+             request.resource.data.userId == request.auth.uid &&
+             request.resource.data.courseId is string &&
+             request.resource.data.playlistId is string;
+    }
+
+    // Updated enrolledCourses rules
+    match /enrolledCourses/{enrollment} {
+      // Allow users to read their own enrollments
+      allow read: if isUserData(resource.data.userId);
+      
+      // Allow creation of new enrollments with validation
+      allow create: if isSignedIn() && 
+                    isValidEnrollmaent() &&
+                    request.resource.data.userId == request.auth.uid;
+      
+      // Allow updates only to specific fields
+      allow update: if isUserData(resource.data.userId) &&
+                   request.resource.data.userId == resource.data.userId &&
+                   request.resource.data.courseId == resource.data.courseId &&
+                   request.resource.data.playlistId == resource.data.playlistId &&
+                   request.resource.data.keys().hasOnly(['progress', 'lastAccessed']);
+      
+      // Optionally allow delete if needed
+      allow delete: if isUserData(resource.data.userId);
+    }
+    
+    
+   match /userCode/{docId} {
+      // Users can read, create, update and delete only their own code snippets
+      allow read, write: if request.auth != null && 
+                          request.auth.uid == resource.data.userId || 
+                          request.auth.uid == request.resource.data.userId;
+    }
+
+////streak rules - 
+   match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      allow update: if 
+        // User owns this document
+        request.auth.uid == userId &&
+        // Only credits field can be updated
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['credits']) &&
+        // Credits can only increase
+        request.resource.data.credits >= resource.data.credits &&
+        // Max 100 credits per update (prevent exploits)
+        request.resource.data.credits <= (resource.data.credits + 100);
+    }
+
+  }
+}
+
+
+
+
+
+{
+  "rules": {
+    "course_chats": {
+      "$courseId": {
+        ".read": "auth !== null",
+        
+        "messages": {
+          ".read": "auth !== null",
+          ".write": "auth !== null",
+          "$messageId": {
+            ".validate": "newData.hasChildren(['text', 'senderId', 'timestamp'])",
+            ".write": "auth !== null && (auth.uid === data.child('senderId').val() || !data.exists())",
+            
+            "text": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length < 1000"
+            },
+            "senderId": {
+              ".validate": "newData.isString() && newData.val() === auth.uid"
+            },
+            "timestamp": {
+              ".validate": "newData.isNumber() && newData.val() <= now"
+            },
+            "pinned": {
+              ".validate": "newData.isBoolean()"
+            },
+            "urls": {
+              ".validate": "newData.isString() || (newData.hasChildren() && newData.val().length <= 3)"
+            },
+            "reactions": {
+              "$userId": {
+                ".write": "auth !== null && auth.uid === $userId",
+                ".validate": "newData.isString() && newData.val().length <= 2"
+              }
+            },
+            "views": {
+              "$userId": {
+                ".write": "auth !== null && auth.uid === $userId",
+                ".validate": "newData.isBoolean()"
+              }
+            }
+          }
+        },
+        
+        "typing": {
+          ".read": "auth !== null",
+          "$userId": {
+            ".write": "auth !== null && auth.uid === $userId",
+            ".validate": "newData.isBoolean()"
+          }
+        },
+        
+        "online": {
+          ".read": "auth !== null",
+          "$userId": {
+            ".write": "auth !== null && auth.uid === $userId",
+            ".validate": "newData.isBoolean()"
+          }
+        },
+        
+        "last_read": {
+          "$userId": {
+            ".write": "auth !== null && auth.uid === $userId",
+            ".validate": "newData.isNumber() && newData.val() <= now"
+          }
+        }
+      }
+    },
+    
+    "indexes": {
+      "course_chats": {
+        "$courseId": {
+          "messages": {
+            "pinned": {
+              ".indexOn": ".value"
+            },
+            "timestamp": {
+              ".indexOn": ".value"
+            }
+          }
+        }
+      }
+    },
+    
+    "resumes": {
+      "$userId": {
+        ".read": "auth != null && auth.uid === $userId",
+        ".write": "auth != null && auth.uid === $userId"
+      }
+    }
+  }
+}
+
+
+
+
+AIzaSyCfF0iZYvUiF_rB6DSKHAKwW0XYF5D3umQ
+1XLtQOlNje--RsMNpnG0fp4D2W_1Ek2Kl

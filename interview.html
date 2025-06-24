@@ -1,0 +1,3144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Interview Pro | The Ultimate Interview Preparation Platform</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.1/firebase-app-compat.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.1/firebase-firestore-compat.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+<style>
+:root {
+    --primary: #4361ee;
+    --primary-dark: #3a0ca3;
+    --secondary: #3f37c9;
+    --accent: #4895ef;
+    --danger: #f72585;
+    --success: #4cc9f0;
+    --warning: #f8961e;
+    --light: #f8f9fa;
+    --dark: #212529;
+    --gray: #6c757d;
+    --white: #ffffff;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    color: var(--dark);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header Styles */
+.header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    padding: 2rem;
+    border-radius: 15px 15px 0 0;
+    text-align: center;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Navigation Tabs */
+.tabs {
+    display: flex;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.tab {
+    flex: 1;
+    text-align: center;
+    padding: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    border-bottom: 3px solid transparent;
+}
+
+.tab:hover {
+    background: rgba(67, 97, 238, 0.1);
+}
+
+.tab.active {
+    border-bottom: 3px solid var(--primary);
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.tab-content {
+    display: none;
+    background: white;
+    padding: 2rem;
+    border-radius: 0 0 10px 10px;
+    box-shadow: var(--shadow);
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Setup Form Styles */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e1e8ed;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: var(--transition);
+    background: #f8f9fa;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+}
+
+.file-upload {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    width: 100%;
+}
+
+.file-upload input[type=file] {
+    position: absolute;
+    left: -9999px;
+}
+
+.file-upload-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border: 2px dashed var(--primary);
+    border-radius: 8px;
+    background: #f8f9ff;
+    color: var(--primary);
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.file-upload-label:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.file-upload-label i {
+    margin-right: 10px;
+}
+
+.btn {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn i {
+    margin-right: 8px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+}
+
+.btn-outline:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--danger), #d0006f);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--success), #00b4d8);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, var(--warning), #f3722c);
+}
+
+/* Interview Section Styles */
+.interview-section {
+    display: none;
+    background: white;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.interview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.interview-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.interview-info h3 {
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.interview-info p {
+    color: var(--gray);
+}
+
+.interview-timer {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary);
+    background: rgba(67, 97, 238, 0.1);
+    padding: 8px 15px;
+    border-radius: 20px;
+}
+
+.interview-body {
+    display: flex;
+    gap: 2rem;
+}
+
+.interview-avatar-container {
+    flex: 0 0 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.interview-avatar {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    color: white;
+    font-weight: bold;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    transition: var(--transition);
+}
+
+.interview-avatar.speaking {
+    animation: speak 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes speak {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
+}
+
+.interview-avatar.listening {
+    animation: listen 2s ease-in-out infinite;
+}
+
+@keyframes listen {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+    50% { box-shadow: 0 0 0 15px rgba(76, 175, 80, 0); }
+}
+
+.avatar-name {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.avatar-title {
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+.interview-content {
+    flex: 1;
+}
+
+.status {
+    font-size: 1.1rem;
+    margin: 1rem 0;
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.status.listening {
+    background: #e8f5e8;
+    color: #2d5a2d;
+    border: 2px solid #4caf50;
+}
+
+.status.speaking {
+    background: #fff3cd;
+    color: #856404;
+    border: 2px solid #ffc107;
+}
+
+.status.processing {
+    background: #e3f2fd;
+    color: #1565c0;
+    border: 2px solid #2196f3;
+}
+
+.status.waiting {
+    background: #f8f9fa;
+    color: var(--gray);
+    border: 2px solid #e1e8ed;
+}
+
+.conversation {
+    height: 400px;
+    overflow-y: auto;
+    border: 2px solid #e1e8ed;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.message {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    position: relative;
+    animation: messageIn 0.3s ease;
+}
+
+@keyframes messageIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message.ai {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+}
+
+.message.user {
+    background: #e8f5e8;
+    color: #2d5a2d;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+}
+
+.message-time {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-top: 4px;
+    text-align: right;
+}
+
+.interview-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.mic-button {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mic-button:hover {
+    transform: scale(1.05);
+}
+
+.mic-button.active {
+    animation: pulse 1.5s infinite;
+    background: linear-gradient(135deg, var(--danger), #d0006f);
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(247, 37, 133, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0); }
+}
+
+.control-button {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid #e1e8ed;
+    color: var(--gray);
+    font-size: 18px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.control-button:hover {
+    background: #f8f9fa;
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+/* Feedback Section Styles */
+.feedback-section {
+    display: none;
+    background: white;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    animation: fadeIn 0.5s ease;
+}
+
+.feedback-header {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.feedback-header h2 {
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.feedback-content {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.feedback-overview {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.feedback-score {
+    text-align: center;
+    padding: 1rem;
+    border-radius: 8px;
+    background: white;
+    box-shadow: var(--shadow);
+    flex: 1;
+    min-width: 150px;
+}
+
+.score-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0.5rem 0;
+}
+
+.score-label {
+    font-size: 0.9rem;
+    color: var(--gray);
+}
+
+.feedback-category {
+    margin-bottom: 1.5rem;
+}
+
+.feedback-category h4 {
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.feedback-category h4 i {
+    margin-right: 8px;
+}
+
+.feedback-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    box-shadow: var(--shadow);
+}
+
+.feedback-item-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.feedback-item-rating {
+    display: flex;
+    align-items: center;
+}
+
+.rating-stars {
+    color: var(--warning);
+    margin-right: 8px;
+}
+
+.feedback-item-content {
+    color: var(--dark);
+}
+
+.feedback-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* Results Dashboard */
+.results-section {
+    display: none;
+    background: white;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.results-header {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.results-header h2 {
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.result-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.result-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.result-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.result-card-title {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.result-card-date {
+    font-size: 0.8rem;
+    color: var(--gray);
+}
+
+.result-card-score {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0.5rem 0;
+    text-align: center;
+}
+
+.result-card-summary {
+    color: var(--dark);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.result-card-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Avatar Selection */
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.avatar-option {
+    text-align: center;
+    cursor: pointer;
+    padding: 1rem;
+    border: 2px solid #e1e8ed;
+    border-radius: 8px;
+    transition: var(--transition);
+    background: #f8f9fa;
+}
+
+.avatar-option:hover {
+    border-color: var(--primary);
+    background: #f0f4ff;
+    transform: translateY(-2px);
+}
+
+.avatar-option.selected {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, #f0f4ff, #e8f0ff);
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
+}
+
+.avatar-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    font-weight: bold;
+    position: relative;
+    overflow: hidden;
+}
+
+.avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-option span {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+/* Interview Type Selection */
+.interview-type-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.interview-type-option {
+    text-align: center;
+    cursor: pointer;
+    padding: 1.5rem 1rem;
+    border: 2px solid #e1e8ed;
+    border-radius: 8px;
+    transition: var(--transition);
+    background: #f8f9fa;
+}
+
+.interview-type-option:hover {
+    border-color: var(--primary);
+    background: #f0f4ff;
+    transform: translateY(-2px);
+}
+
+.interview-type-option.selected {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, #f0f4ff, #e8f0ff);
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
+}
+
+.interview-type-icon {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.interview-type-option h4 {
+    margin-bottom: 0.5rem;
+    color: var(--dark);
+}
+
+.interview-type-option p {
+    font-size: 0.8rem;
+    color: var(--gray);
+}
+
+/* Loading Indicators */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+/* Error Messages */
+.error {
+    background: #ffe6e6;
+    color: #d32f2f;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    border: 2px solid #f44336;
+    display: flex;
+    align-items: center;
+}
+
+.error i {
+    margin-right: 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .interview-body {
+        flex-direction: column;
+    }
+    
+    .interview-avatar-container {
+        margin-bottom: 1.5rem;
+        align-items: center;
+    }
+    
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .tabs {
+        flex-direction: column;
+    }
+    
+    .tab {
+        padding: 0.8rem;
+    }
+    
+    .feedback-overview {
+        flex-direction: column;
+    }
+    
+    .feedback-score {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Animations */
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Progress Bar */
+.progress-container {
+    width: 100%;
+    background: #e1e8ed;
+    border-radius: 10px;
+    margin: 1rem 0;
+    height: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+/* Code Editor Styles */
+.code-editor-container {
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 1rem 0;
+}
+
+.code-editor-toolbar {
+    background: #f8f9fa;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #e1e8ed;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.code-editor {
+    width: 100%;
+    height: 300px;
+    border: none;
+    padding: 1rem;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    background: #f8f9fa;
+    resize: none;
+}
+
+.code-editor:focus {
+    outline: none;
+}
+
+.language-selector {
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #e1e8ed;
+    background: white;
+}
+
+/* Whiteboard Styles */
+.whiteboard-container {
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 1rem 0;
+    height: 400px;
+    background: white;
+    position: relative;
+}
+
+.whiteboard-toolbar {
+    background: #f8f9fa;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #e1e8ed;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.whiteboard-tool {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    border: 1px solid #e1e8ed;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.whiteboard-tool.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.whiteboard-canvas {
+    width: 100%;
+    height: calc(100% - 42px);
+    cursor: crosshair;
+}
+
+/* System Design Tools */
+.system-design-tools {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.system-design-tool {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    background: #f8f9fa;
+    border: 1px solid #e1e8ed;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.system-design-tool:hover {
+    background: var(--primary);
+    color: white;
+}
+
+/* Notification */
+.notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    z-index: 1000;
+    transform: translateX(200%);
+    transition: transform 0.3s ease;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.notification.success {
+    border-left: 4px solid var(--success);
+}
+
+.notification.error {
+    border-left: 4px solid var(--danger);
+}
+
+.notification.warning {
+    border-left: 4px solid var(--warning);
+}
+
+/* Tooltip */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltip-text {
+    visibility: hidden;
+    width: 200px;
+    background-color: var(--dark);
+    color: white;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.8rem;
+    font-weight: normal;
+}
+
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Help Section */
+.help-section {
+    background: white;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.help-item {
+    margin-bottom: 1.5rem;
+}
+
+.help-item h4 {
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.help-item h4 i {
+    margin-right: 8px;
+}
+
+.help-item p {
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+}
+
+/* Settings Section */
+.settings-section {
+    background: white;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.settings-item {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.settings-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.settings-item h4 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.setting-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.setting-label {
+    font-weight: 500;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: var(--primary);
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(26px);
+}
+
+/* Dark Mode */
+.dark-mode {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+.dark-mode .header {
+    background: linear-gradient(135deg, #3a0ca3, #480ca8);
+}
+
+.dark-mode .tab-content,
+.dark-mode .interview-section,
+.dark-mode .feedback-section,
+.dark-mode .results-section,
+.dark-mode .help-section,
+.dark-mode .settings-section,
+.dark-mode .feedback-item,
+.dark-mode .result-card,
+.dark-mode .message.user,
+.dark-mode .status,
+.dark-mode .code-editor-container,
+.dark-mode .whiteboard-container,
+.dark-mode input,
+.dark-mode select,
+.dark-mode textarea {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border-color: #333;
+}
+
+.dark-mode .conversation,
+.dark-mode .code-editor,
+.dark-mode .whiteboard-toolbar,
+.dark-mode .file-upload-label,
+.dark-mode .avatar-option,
+.dark-mode .interview-type-option {
+    background-color: #252525;
+    border-color: #333;
+}
+
+.dark-mode .message.ai {
+    background: linear-gradient(135deg, #3a0ca3, #480ca8);
+}
+
+.dark-mode .btn-outline {
+    color: #e0e0e0;
+    border-color: #3a0ca3;
+}
+
+.dark-mode .btn-outline:hover {
+    background: #3a0ca3;
+}
+
+.dark-mode label,
+.dark-mode .avatar-option span,
+.dark-mode .interview-type-option h4,
+.dark-mode .feedback-item-title,
+.dark-mode .feedback-item-content,
+.dark-mode .result-card-title,
+.dark-mode .result-card-summary {
+    color: #e0e0e0;
+}
+
+.dark-mode .avatar-title,
+.dark-mode .interview-type-option p,
+.dark-mode .result-card-date,
+.dark-mode .score-label {
+    color: #aaa;
+}
+
+.dark-mode .tabs {
+    background: #1e1e1e;
+}
+
+.dark-mode .tab {
+    color: #aaa;
+}
+
+.dark-mode .tab.active {
+    color: #e0e0e0;
+}
+
+.dark-mode .notification {
+    background: #252525;
+    color: #e0e0e0;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1><i class="fas fa-robot"></i> AI Interview Pro</h1>
+        <p>The most advanced AI-powered interview platform with realistic simulations for HR, technical, coding, aptitude, and project discussions</p>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="openTab('setup')"><i class="fas fa-cog"></i> Setup</div>
+        <div class="tab" onclick="openTab('interview')"><i class="fas fa-microphone"></i> Interview</div>
+        <div class="tab" onclick="openTab('feedback')"><i class="fas fa-chart-bar"></i> Feedback</div>
+        <div class="tab" onclick="openTab('results')"><i class="fas fa-history"></i> Results</div>
+        <div class="tab" onclick="openTab('help')"><i class="fas fa-question-circle"></i> Help</div>
+        <div class="tab" onclick="openTab('settings')"><i class="fas fa-sliders-h"></i> Settings</div>
+    </div>
+
+    <!-- Setup Tab -->
+    <div id="setup" class="tab-content active">
+        <div class="form-group">
+            <label for="jobRole">Job Role</label>
+            <input type="text" id="jobRole" placeholder="e.g., Senior Software Engineer, Product Manager" required>
+        </div>
+
+        <div class="form-group">
+            <label for="companyName">Target Company</label>
+            <input type="text" id="companyName" placeholder="e.g., Google, Amazon, Startup Inc." required>
+        </div>
+
+        <div class="form-group">
+            <label for="resume">Upload Resume (PDF/DOC)</label>
+            <div class="file-upload">
+                <input type="file" id="resume" accept=".pdf,.doc,.docx" required>
+                <label for="resume" class="file-upload-label">
+                    <i class="fas fa-file-upload"></i> Choose Resume File
+                </label>
+            </div>
+            <div id="fileName" style="margin-top: 10px; font-size: 14px; color: var(--gray);"></div>
+        </div>
+
+        <div class="form-group">
+            <label>Interview Type</label>
+            <div class="interview-type-grid">
+                <div class="interview-type-option selected" data-type="full">
+                    <div class="interview-type-icon"><i class="fas fa-list-ol"></i></div>
+                    <h4>Full Interview</h4>
+                    <p>Complete simulation with all rounds</p>
+                </div>
+                <div class="interview-type-option" data-type="hr">
+                    <div class="interview-type-icon"><i class="fas fa-users"></i></div>
+                    <h4>HR Round</h4>
+                    <p>Behavioral and situational questions</p>
+                </div>
+                <div class="interview-type-option" data-type="technical">
+                    <div class="interview-type-icon"><i class="fas fa-code"></i></div>
+                    <h4>Technical Round</h4>
+                    <p>Role-specific technical questions</p>
+                </div>
+                <div class="interview-type-option" data-type="coding">
+                    <div class="interview-type-icon"><i class="fas fa-laptop-code"></i></div>
+                    <h4>Coding Round</h4>
+                    <p>Live coding challenges</p>
+                </div>
+                <div class="interview-type-option" data-type="system-design">
+                    <div class="interview-type-icon"><i class="fas fa-project-diagram"></i></div>
+                    <h4>System Design</h4>
+                    <p>Architecture and design problems</p>
+                </div>
+                <div class="interview-type-option" data-type="aptitude">
+                    <div class="interview-type-icon"><i class="fas fa-brain"></i></div>
+                    <h4>Aptitude Test</h4>
+                    <p>Logical and quantitative questions</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="difficulty">Difficulty Level</label>
+            <select id="difficulty">
+                <option value="beginner">Beginner (0-2 years experience)</option>
+                <option value="intermediate" selected>Intermediate (2-5 years experience)</option>
+                <option value="advanced">Advanced (5+ years experience)</option>
+                <option value="expert">Expert (Senior/Staff level)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="voiceSelection">Interviewer Voice</label>
+            <select id="voiceSelection">
+                <option value="default">Default Professional Voice</option>
+            </select>
+            <div style="margin-top: 10px;">
+                <button type="button" class="btn btn-outline" onclick="testVoice()" style="width: auto; padding: 8px 16px; font-size: 14px; margin-top: 5px;">
+                    <i class="fas fa-volume-up"></i> Test Voice
+                </button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>AI Interviewer Avatar</label>
+            <div class="avatar-grid">
+                <div class="avatar-option selected" data-avatar="professional-male">
+                    <div class="avatar-preview male-avatar"></div>
+                    <span>Professional Male</span>
+                </div>
+                <div class="avatar-option" data-avatar="professional-female">
+                    <div class="avatar-preview female-avatar"></div>
+                    <span>Professional Female</span>
+                </div>
+                <div class="avatar-option" data-avatar="business-male">
+                    <div class="avatar-preview business-male-avatar"></div>
+                    <span>Business Executive</span>
+                </div>
+                <div class="avatar-option" data-avatar="tech-female">
+                    <div class="avatar-preview tech-female-avatar"></div>
+                    <span>Tech Lead</span>
+                </div>
+                <div class="avatar-option" data-avatar="custom">
+                    <div class="avatar-preview custom-avatar"><i class="fas fa-user-edit"></i></div>
+                    <span>Custom Avatar</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="customInstructions">Custom Instructions (Optional)</label>
+            <textarea id="customInstructions" rows="3" placeholder="Any specific areas to focus on or avoid during the interview..."></textarea>
+        </div>
+
+        <button class="btn" onclick="startInterview()"><i class="fas fa-play"></i> Start Mock Interview</button>
+    </div>
+
+   <!-- Interview Tab -->
+<div id="interview" class="tab-content">
+    <div class="interview-section" style="display: block;"> <!-- Added inline style to ensure it's visible -->
+        <div class="interview-header">
+            <div class="interview-info">
+                <h3 id="currentInterviewRole">Senior Software Engineer</h3>
+                <p id="currentInterviewCompany">at Google</p>
+            </div>
+            <div class="interview-timer" id="interviewTimer">00:00:00</div>
+        </div>
+
+        <div class="interview-body">
+            <div class="interview-avatar-container">
+                <div class="interview-avatar" id="interviewAvatar">👨‍💼</div>
+                <div class="avatar-name" id="avatarName">Alex Johnson</div>
+                <div class="avatar-title" id="avatarTitle">Senior Hiring Manager</div>
+            </div>
+
+            <div class="interview-content">
+                <div id="status" class="status waiting">Ready to begin your interview</div>
+                
+                <!-- Conversation container with minimum height and scroll -->
+                <div class="conversation" id="conversation" style="min-height: 200px; overflow-y: auto;">
+                    <!-- Messages will appear here dynamically -->
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="interviewProgress" style="width: 0%"></div>
+                </div>
+                
+                <div class="interview-controls">
+                    <button class="control-button tooltip" onclick="showHint()" title="Get a hint for the current question">
+                        <i class="fas fa-lightbulb"></i>
+                    </button>
+                    <button class="mic-button" id="micButton" onclick="toggleRecording()">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="control-button tooltip" onclick="skipQuestion()" title="Skip to next question">
+                        <i class="fas fa-forward"></i>
+                    </button>
+                </div>
+                
+                <!-- Coding Round Section (hidden by default) -->
+                <div id="codingRoundSection" style="display: none;">
+                    <div class="code-editor-container">
+                        <div class="code-editor-toolbar">
+                            <span>Code Editor</span>
+                            <select class="language-selector" id="languageSelector">
+                                <option value="javascript">JavaScript</option>
+                                <option value="python">Python</option>
+                                <option value="java">Java</option>
+                                <option value="c++">C++</option>
+                                <option value="c#">C#</option>
+                            </select>
+                        </div>
+                        <textarea class="code-editor" id="codeEditor" spellcheck="false"></textarea>
+                    </div>
+                    <button class="btn btn-success" onclick="runCode()" style="margin-top: 10px;">
+                        <i class="fas fa-play"></i> Run Code
+                    </button>
+                </div>
+                
+                <!-- System Design Section (hidden by default) -->
+                <div id="systemDesignSection" style="display: none;">
+                    <div class="whiteboard-container">
+                        <div class="whiteboard-toolbar">
+                            <button class="whiteboard-tool active" data-tool="select"><i class="fas fa-mouse-pointer"></i></button>
+                            <button class="whiteboard-tool" data-tool="rectangle"><i class="far fa-square"></i></button>
+                            <button class="whiteboard-tool" data-tool="circle"><i class="far fa-circle"></i></button>
+                            <button class="whiteboard-tool" data-tool="line"><i class="fas fa-minus"></i></button>
+                            <button class="whiteboard-tool" data-tool="text"><i class="fas fa-font"></i></button>
+                            <button class="whiteboard-tool" data-tool="erase"><i class="fas fa-eraser"></i></button>
+                            <button class="whiteboard-tool" data-tool="clear"><i class="fas fa-trash"></i></button>
+                        </div>
+                        <canvas class="whiteboard-canvas" id="whiteboardCanvas"></canvas>
+                    </div>
+                    <div class="system-design-tools">
+                        <div class="system-design-tool">Database</div>
+                        <div class="system-design-tool">API</div>
+                        <div class="system-design-tool">Cache</div>
+                        <div class="system-design-tool">Load Balancer</div>
+                        <div class="system-design-tool">Microservice</div>
+                    </div>
+                </div>
+                
+                <div class="interview-controls" style="margin-top: 20px;">
+                    <button class="btn btn-danger" onclick="endInterview()">
+                        <i class="fas fa-stop"></i> End Interview
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- Feedback Tab -->
+    <div id="feedback" class="tab-content">
+        <div class="feedback-section">
+            <div class="feedback-header">
+                <h2><i class="fas fa-chart-bar"></i> Interview Feedback</h2>
+                <p>Detailed analysis of your performance in the mock interview</p>
+            </div>
+            
+            <div class="feedback-overview">
+                <div class="feedback-score">
+                    <div class="score-label">Overall Score</div>
+                    <div class="score-value" id="overallScore">8.2</div>
+                    <div class="score-label">out of 10</div>
+                </div>
+                <div class="feedback-score">
+                    <div class="score-label">Communication</div>
+                    <div class="score-value" id="communicationScore">7.5</div>
+                    <div class="score-label">/10</div>
+                </div>
+                <div class="feedback-score">
+                    <div class="score-label">Technical Skills</div>
+                    <div class="score-value" id="technicalScore">8.7</div>
+                    <div class="score-label">/10</div>
+                </div>
+                <div class="feedback-score">
+                    <div class="score-label">Problem Solving</div>
+                    <div class="score-value" id="problemSolvingScore">8.0</div>
+                    <div class="score-label">/10</div>
+                </div>
+            </div>
+            
+            <div class="feedback-content" id="feedbackContent">
+                <div class="feedback-category">
+                    <h4><i class="fas fa-check-circle"></i> Strengths</h4>
+                    <div class="feedback-item">
+                        <div class="feedback-item-title">
+                            <span>Technical Knowledge</span>
+                            <div class="feedback-item-rating">
+                                <span class="rating-stars">★★★★☆</span>
+                                <span>8.5/10</span>
+                            </div>
+                        </div>
+                        <div class="feedback-item-content">
+                            You demonstrated strong technical knowledge in JavaScript and React, providing accurate and detailed answers to most technical questions. Your understanding of core concepts was evident.
+                        </div>
+                    </div>
+                    <div class="feedback-item">
+                        <div class="feedback-item-title">
+                            <span>Problem-Solving Approach</span>
+                            <div class="feedback-item-rating">
+                                <span class="rating-stars">★★★★☆</span>
+                                <span>8.0/10</span>
+                            </div>
+                        </div>
+                        <div class="feedback-item-content">
+                            Your approach to solving the coding problem was methodical and logical. You asked clarifying questions before jumping into solutions, which is excellent.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="feedback-category">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Areas for Improvement</h4>
+                    <div class="feedback-item">
+                        <div class="feedback-item-title">
+                            <span>Communication Clarity</span>
+                            <div class="feedback-item-rating">
+                                <span class="rating-stars">★★★☆☆</span>
+                                <span>6.5/10</span>
+                            </div>
+                        </div>
+                        <div class="feedback-item-content">
+                            At times, your explanations were slightly unclear or rushed. Practice speaking more slowly and structuring your answers with clear beginnings, middles, and ends.
+                        </div>
+                    </div>
+                    <div class="feedback-item">
+                        <div class="feedback-item-title">
+                            <span>System Design Depth</span>
+                            <div class="feedback-item-rating">
+                                <span class="rating-stars">★★★☆☆</span>
+                                <span>7.0/10</span>
+                            </div>
+                        </div>
+                        <div class="feedback-item-content">
+                            While you covered the basics well, your system design solution could benefit from more consideration of edge cases, failure scenarios, and alternative approaches.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="feedback-category">
+                    <h4><i class="fas fa-book"></i> Study Recommendations</h4>
+                    <div class="feedback-item">
+                        <div class="feedback-item-title">
+                            <span>Technical Topics</span>
+                        </div>
+                        <div class="feedback-item-content">
+                            <ul>
+                                <li>Advanced React performance optimization techniques</li>
+                                <li>Microservices architecture patterns</li>
+                                <li>Database sharding and replication strategies</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="feedback-item">
+                        <div class="feedback-item-title">
+                            <span>Behavioral Preparation</span>
+                        </div>
+                        <div class="feedback-item-content">
+                            <ul>
+                                <li>Practice STAR method for behavioral questions</li>
+                                <li>Prepare 3-5 strong accomplishment stories</li>
+                                <li>Research Google's leadership principles</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="feedback-actions">
+                <button class="btn btn-outline" onclick="downloadFeedback()">
+                    <i class="fas fa-download"></i> Download PDF
+                </button>
+                <button class="btn" onclick="startNewInterview()">
+                    <i class="fas fa-redo"></i> Try Again
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Tab -->
+    <div id="results" class="tab-content">
+        <div class="results-section">
+            <div class="results-header">
+                <h2><i class="fas fa-history"></i> Past Interview Results</h2>
+                <p>Review your performance across all mock interviews</p>
+            </div>
+            
+            <div class="results-grid">
+                <div class="result-card">
+                    <div class="result-card-header">
+                        <div class="result-card-title">Senior Software Engineer</div>
+                        <div class="result-card-date">June 15, 2023</div>
+                    </div>
+                    <div class="result-card-score">8.2/10</div>
+                    <div class="result-card-summary">
+                        Strong technical performance with room for improvement in system design explanations. Good behavioral responses.
+                    </div>
+                    <div class="result-card-actions">
+                        <button class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-card-header">
+                        <div class="result-card-title">Product Manager</div>
+                        <div class="result-card-date">June 10, 2023</div>
+                    </div>
+                    <div class="result-card-score">7.5/10</div>
+                    <div class="result-card-summary">
+                        Excellent strategic thinking but could improve on technical product questions. Strong communication skills.
+                    </div>
+                    <div class="result-card-actions">
+                        <button class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-card-header">
+                        <div class="result-card-title">Frontend Developer</div>
+                        <div class="result-card-date">June 5, 2023</div>
+                    </div>
+                    <div class="result-card-score">9.1/10</div>
+                    <div class="result-card-summary">
+                        Outstanding performance in React and JavaScript questions. Demonstrated excellent problem-solving skills.
+                    </div>
+                    <div class="result-card-actions">
+                        <button class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-card-header">
+                        <div class="result-card-title">System Design</div>
+                        <div class="result-card-date">May 28, 2023</div>
+                    </div>
+                    <div class="result-card-score">6.8/10</div>
+                    <div class="result-card-summary">
+                        Good high-level design but needs more depth in scalability and trade-off analysis.
+                    </div>
+                    <div class="result-card-actions">
+                        <button class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-outline">
+                    <i class="fas fa-history"></i> Load More
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Tab -->
+    <div id="help" class="tab-content">
+        <div class="help-section">
+            <h2><i class="fas fa-question-circle"></i> Help Center</h2>
+            
+            <div class="help-item">
+                <h4><i class="fas fa-play-circle"></i> Getting Started</h4>
+                <p>Learn how to set up and conduct your first mock interview with AI Interview Pro.</p>
+                <p>1. Complete the setup form with your job role, target company, and resume.</p>
+                <p>2. Select your preferred interview type and difficulty level.</p>
+                <p>3. Choose an interviewer voice and avatar that you're comfortable with.</p>
+                <p>4. Click "Start Mock Interview" and begin your practice session.</p>
+            </div>
+            
+            <div class="help-item">
+                <h4><i class="fas fa-microphone"></i> Using the Interview Interface</h4>
+                <p>The interview interface simulates a real interview experience with several helpful features:</p>
+                <p>- Click the microphone button to answer questions (your browser may ask for permission)</p>
+                <p>- Use the hint button if you're stuck on a question</p>
+                <p>- Skip questions if needed (but try to answer as many as possible)</p>
+                <p>- For coding interviews, use the built-in code editor with syntax highlighting</p>
+                <p>- For system design interviews, use the whiteboard to draw your architecture</p>
+            </div>
+            
+            <div class="help-item">
+                <h4><i class="fas fa-chart-line"></i> Understanding Your Feedback</h4>
+                <p>After each interview, you'll receive detailed feedback including:</p>
+                <p>- Overall score and category scores (technical, communication, etc.)</p>
+                <p>- Specific strengths and areas for improvement</p>
+                <p>- Personalized study recommendations</p>
+                <p>- Comparison to previous attempts (if applicable)</p>
+            </div>
+            
+            <div class="help-item">
+                <h4><i class="fas fa-headset"></i> Contact Support</h4>
+                <p>If you're experiencing technical issues or have questions, please contact our support team:</p>
+                <p>Email: support@aiinterviewpro.com</p>
+                <p>Live Chat: Available during business hours (click the chat icon in the bottom right)</p>
+                <p>Phone: +1 (555) 123-4567 (9am-5pm EST)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div id="settings" class="tab-content">
+        <div class="settings-section">
+            <h2><i class="fas fa-sliders-h"></i> Settings</h2>
+            
+            <div class="settings-item">
+                <h4><i class="fas fa-user"></i> Profile Settings</h4>
+                
+                <div class="setting-option">
+                    <span class="setting-label">Dark Mode</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-option">
+                    <span class="setting-label">Email Notifications</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="emailNotifications" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-option">
+                    <span class="setting-label">Text-to-Speech Speed</span>
+                    <select id="speechSpeed" style="width: auto;">
+                        <option value="0.8">Slow</option>
+                        <option value="1.0" selected>Normal</option>
+                        <option value="1.2">Fast</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="settings-item">
+                <h4><i class="fas fa-bell"></i> Notification Preferences</h4>
+                
+                <div class="setting-option">
+                    <span class="setting-label">Practice Reminders</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="practiceReminders" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-option">
+                    <span class="setting-label">Feedback Ready Alerts</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="feedbackAlerts" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-option">
+                    <span class="setting-label">Weekly Progress Reports</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="progressReports" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="settings-item">
+                <h4><i class="fas fa-shield-alt"></i> Privacy & Security</h4>
+                
+                <div class="setting-option">
+                    <span class="setting-label">Save Interview Recordings</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="saveRecordings" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-option">
+                    <span class="setting-label">Share Anonymous Data</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="shareData">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-option">
+                    <span class="setting-label">Auto-delete Old Data</span>
+                    <select id="dataRetention" style="width: auto;">
+                        <option value="30">After 30 days</option>
+                        <option value="90" selected>After 90 days</option>
+                        <option value="365">After 1 year</option>
+                        <option value="never">Never</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-danger">
+                    <i class="fas fa-sign-out-alt"></i> Log Out
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="notification" id="notification">
+    <i class="fas fa-check-circle"></i>
+    <span id="notificationMessage">Interview successfully started!</span>
+</div>
+
+<script>
+// Global variables
+let GEMINI_API_KEY = ''; // Will be fetched from backend
+let ELEVENLABS_API_KEY = ''; // Will be fetched from backend
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+const API_KEYS_ENDPOINT = 'https://us-central1-study2-7bdc7.cloudfunctions.net/getApiKeys'; 
+
+let mediaRecorder;
+let audioChunks = [];
+let isRecording = false;
+let recognition;
+let synthesis = window.speechSynthesis;
+let availableVoices = [];
+let selectedVoice = null;
+let selectedAvatar = 'business-male';
+let interviewType = 'full';
+let conversation = [];
+let interviewData = {};
+let questionCount = 0;
+let maxQuestions = 8;
+let apiKeysLoaded = false;
+let interviewTimer;
+let interviewStartTime;
+let currentRound = 'hr';
+let codingProblem = null;
+let systemDesignProblem = null;
+
+// Avatar configurations
+const avatarConfig = {
+    'professional-male': {
+        emoji: '👨‍💼',
+        gradient: 'linear-gradient(135deg, #4a90e2, #357abd)',
+        name: 'Alex Johnson',
+        title: 'Senior Hiring Manager'
+    },
+    'professional-female': {
+        emoji: '👩‍💼',
+        gradient: 'linear-gradient(135deg, #f093fb, #f5576c)',
+        name: 'Sarah Williams',
+        title: 'HR Director'
+    },
+    'business-male': {
+        emoji: '👨‍💼',
+        gradient: 'linear-gradient(135deg, #667eea, #764ba2)',
+        name: 'Michael Chen',
+        title: 'Engineering Manager'
+    },
+    'tech-female': {
+        emoji: '👩‍💻',
+        gradient: 'linear-gradient(135deg, #43e97b, #38f9d7)',
+        name: 'Priya Patel',
+        title: 'Tech Lead'
+    },
+    'custom': {
+        emoji: '👤',
+        gradient: 'linear-gradient(135deg, #ff9a9e, #fad0c4)',
+        name: 'Interviewer',
+        title: 'Your Custom Interviewer'
+    }
+};
+
+// Interview type configurations
+const interviewTypeConfig = {
+    'full': {
+        icon: 'fas fa-list-ol',
+        name: 'Full Interview',
+        description: 'Complete simulation with all rounds',
+        rounds: ['hr', 'technical', 'coding', 'system-design'],
+        duration: 45
+    },
+    'hr': {
+        icon: 'fas fa-users',
+        name: 'HR Round',
+        description: 'Behavioral and situational questions',
+        rounds: ['hr'],
+        duration: 20
+    },
+    'technical': {
+        icon: 'fas fa-code',
+        name: 'Technical Round',
+        description: 'Role-specific technical questions',
+        rounds: ['technical'],
+        duration: 30
+    },
+    'coding': {
+        icon: 'fas fa-laptop-code',
+        name: 'Coding Round',
+        description: 'Live coding challenges',
+        rounds: ['coding'],
+        duration: 30
+    },
+    'system-design': {
+        icon: 'fas fa-project-diagram',
+        name: 'System Design',
+        description: 'Architecture and design problems',
+        rounds: ['system-design'],
+        duration: 45
+    },
+    'aptitude': {
+        icon: 'fas fa-brain',
+        name: 'Aptitude Test',
+        description: 'Logical and quantitative questions',
+        rounds: ['aptitude'],
+        duration: 30
+    }
+};
+
+// Difficulty levels
+const difficultyLevels = {
+    'beginner': {
+        label: 'Beginner',
+        description: '0-2 years experience',
+        technicalDepth: 'basic',
+        problemComplexity: 'low'
+    },
+    'intermediate': {
+        label: 'Intermediate',
+        description: '2-5 years experience',
+        technicalDepth: 'moderate',
+        problemComplexity: 'medium'
+    },
+    'advanced': {
+        label: 'Advanced',
+        description: '5+ years experience',
+        technicalDepth: 'deep',
+        problemComplexity: 'high'
+    },
+    'expert': {
+        label: 'Expert',
+        description: 'Senior/Staff level',
+        technicalDepth: 'very deep',
+        problemComplexity: 'very high'
+    }
+};
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('AI Interview Pro initialized');
+    
+    // Load API keys first
+    const keysLoaded = await loadApiKeys();
+    
+    if (!keysLoaded) {
+        showError('Failed to initialize application. Please refresh the page.');
+        return;
+    }
+    
+    // Setup avatar selection
+    setupAvatarSelection();
+    
+    // Setup interview type selection
+    setupInterviewTypeSelection();
+    
+    // Load voices when they become available
+    if (synthesis.onvoiceschanged !== undefined) {
+        synthesis.onvoiceschanged = loadVoices;
+    }
+    
+    // Load voices immediately if already available
+    setTimeout(loadVoices, 100);
+    
+    // Initialize file upload display
+    document.getElementById('resume').addEventListener('change', function(e) {
+        const fileName = e.target.files[0]?.name || '';
+        document.getElementById('fileName').textContent = fileName ? `Selected: ${fileName}` : '';
+    });
+    
+    // Initialize whiteboard if needed
+    initWhiteboard();
+    
+    console.log('App initialization complete');
+});
+
+// Load API keys from secure endpoint
+async function loadApiKeys() {
+    try {
+        showNotification('Loading application configuration...', 'processing');
+        
+        const response = await fetch(API_KEYS_ENDPOINT, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to load API configuration: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.GEMINI_API_KEY) {
+            GEMINI_API_KEY = data.GEMINI_API_KEY;
+        }
+        
+        if (data.ELEVENLABS_API_KEY) {
+            ELEVENLABS_API_KEY = data.ELEVENLABS_API_KEY;
+        }
+        
+        apiKeysLoaded = true;
+        console.log('API keys loaded successfully');
+        
+        return true;
+    } catch (error) {
+        console.error('Error loading API keys:', error);
+        showError('Failed to load application configuration. Please refresh the page and try again.');
+        apiKeysLoaded = false;
+        return false;
+    }
+}
+
+// Setup avatar selection
+function setupAvatarSelection() {
+    const avatarOptions = document.querySelectorAll('.avatar-option');
+    
+    avatarOptions.forEach(option => {
+        const avatarType = option.dataset.avatar;
+        const preview = option.querySelector('.avatar-preview');
+        
+        // Set avatar preview style
+        preview.textContent = avatarConfig[avatarType].emoji;
+        preview.style.background = avatarConfig[avatarType].gradient;
+        
+        option.addEventListener('click', () => {
+            // Remove selected class from all options
+            document.querySelectorAll('.avatar-option').forEach(opt => opt.classList.remove('selected'));
+            
+            // Add selected class to clicked option
+            option.classList.add('selected');
+            
+            // Update selected avatar
+            selectedAvatar = avatarType;
+            
+            // Update avatar display if in interview
+            updateAvatarDisplay();
+        });
+    });
+}
+
+// Setup interview type selection
+function setupInterviewTypeSelection() {
+    const interviewTypeOptions = document.querySelectorAll('.interview-type-option');
+    
+    interviewTypeOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            // Remove selected class from all options
+            document.querySelectorAll('.interview-type-option').forEach(opt => opt.classList.remove('selected'));
+            
+            // Add selected class to clicked option
+            option.classList.add('selected');
+            
+            // Update selected interview type
+            interviewType = option.dataset.type;
+        });
+    });
+}
+
+// Load available voices
+function loadVoices() {
+    availableVoices = synthesis.getVoices();
+    populateVoiceSelection();
+}
+
+function populateVoiceSelection() {
+    const voiceSelect = document.getElementById('voiceSelection');
+    voiceSelect.innerHTML = '<option value="default">Default Professional Voice</option>';
+    
+    // Filter for professional-sounding voices
+    const professionalVoices = availableVoices.filter(voice => {
+        const name = voice.name.toLowerCase();
+        const lang = voice.lang.toLowerCase();
+        
+        // Prioritize English voices and professional-sounding names
+        return (
+            lang.includes('en-') && 
+            (name.includes('male') || name.includes('female') || 
+             name.includes('david') || name.includes('sarah') || 
+             name.includes('mark') || name.includes('anna') ||
+             name.includes('professional') || name.includes('business') ||
+             name.includes('google') || name.includes('microsoft') ||
+             name.includes('alex') || name.includes('samantha'))
+        );
+    });
+
+    // Add all English voices as backup
+    const englishVoices = availableVoices.filter(voice => 
+        voice.lang.toLowerCase().includes('en-')
+    );
+
+    const voicesToShow = professionalVoices.length > 0 ? professionalVoices : englishVoices;
+
+    voicesToShow.forEach((voice, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = `${voice.name} (${voice.lang})`;
+        
+        // Mark premium/professional voices
+        if (voice.name.toLowerCase().includes('premium') || 
+            voice.name.toLowerCase().includes('neural') ||
+            voice.name.toLowerCase().includes('wavenet')) {
+            option.textContent += ' - Premium';
+        }
+        
+        voiceSelect.appendChild(option);
+    });
+
+    // Set default professional voice if available
+    const defaultProfessional = voicesToShow.find(voice => 
+        voice.name.toLowerCase().includes('david') || 
+        voice.name.toLowerCase().includes('mark') ||
+        voice.name.toLowerCase().includes('neural') ||
+        (voice.name.toLowerCase().includes('male') && voice.lang === 'en-US')
+    );
+    
+    if (defaultProfessional) {
+        const defaultIndex = voicesToShow.indexOf(defaultProfessional);
+        voiceSelect.value = defaultIndex;
+        selectedVoice = defaultProfessional;
+    }
+}
+
+// Test selected voice
+function testVoice() {
+    const voiceSelect = document.getElementById('voiceSelection');
+    const selectedIndex = voiceSelect.value;
+    
+    if (selectedIndex !== 'default') {
+        const voicesToShow = availableVoices.filter(voice => 
+            voice.lang.toLowerCase().includes('en-')
+        );
+        selectedVoice = voicesToShow[selectedIndex];
+    } else {
+        selectedVoice = null;
+    }
+    
+    const testText = "Hello! I'm your AI interviewer. I'm here to conduct a professional interview session with you today. How does my voice sound?";
+    speakText(testText);
+}
+
+// Update avatar display
+function updateAvatarDisplay() {
+    const interviewAvatar = document.getElementById('interviewAvatar');
+    const avatarName = document.getElementById('avatarName');
+    const avatarTitle = document.getElementById('avatarTitle');
+    
+    if (interviewAvatar && avatarConfig[selectedAvatar]) {
+        interviewAvatar.textContent = avatarConfig[selectedAvatar].emoji;
+        interviewAvatar.style.background = avatarConfig[selectedAvatar].gradient;
+        
+        if (avatarName) avatarName.textContent = avatarConfig[selectedAvatar].name;
+        if (avatarTitle) avatarTitle.textContent = avatarConfig[selectedAvatar].title;
+    }
+}
+
+// Animate avatar
+function animateAvatar(action) {
+    const avatar = document.getElementById('interviewAvatar');
+    if (!avatar) return;
+    
+    // Remove all animation classes
+    avatar.classList.remove('speaking', 'listening');
+    
+    // Add appropriate animation class
+    if (action === 'speaking') {
+        avatar.classList.add('speaking');
+    } else if (action === 'listening') {
+        avatar.classList.add('listening');
+    }
+}
+
+// Start interview
+async function startInterview() {
+    // Check if API keys are loaded
+    if (!apiKeysLoaded) {
+        showError('Application is still loading. Please wait a moment and try again.');
+        return;
+    }
+
+    const jobRole = document.getElementById('jobRole').value.trim();
+    const companyName = document.getElementById('companyName').value.trim();
+    const resumeFile = document.getElementById('resume').files[0];
+    const difficulty = document.getElementById('difficulty').value;
+    const customInstructions = document.getElementById('customInstructions').value.trim();
+
+    if (!jobRole || !companyName || !resumeFile) {
+        showError('Please fill in all required fields and upload a resume.');
+        return;
+    }
+
+    // Store interview data
+    interviewData = {
+        jobRole,
+        companyName,
+        difficulty,
+        interviewType,
+        resumeFileName: resumeFile.name,
+        customInstructions,
+        startTime: new Date().toISOString(),
+        conversation: [],
+        rounds: interviewTypeConfig[interviewType].rounds,
+        currentRoundIndex: 0
+    };
+
+    // Read resume file
+    try {
+        const resumeText = await readResumeFile(resumeFile);
+        interviewData.resumeContent = resumeText;
+        
+        // Update UI for interview
+        document.getElementById('currentInterviewRole').textContent = jobRole;
+        document.getElementById('currentInterviewCompany').textContent = `at ${companyName}`;
+        updateAvatarDisplay();
+        
+        // Show interview section
+        openTab('interview');
+        
+        // Start the interview
+        await beginInterview();
+        
+    } catch (error) {
+        showError('Error reading resume file. Please try again.');
+        console.error(error);
+    }
+}
+
+// Read resume file
+async function readResumeFile(file) {
+    return new Promise((resolve, reject) => {
+        if (file.type === 'application/pdf') {
+            // Handle PDF files
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    // Initialize PDF.js
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+                    
+                    const loadingTask = pdfjsLib.getDocument(new Uint8Array(e.target.result));
+                    const pdf = await loadingTask.promise;
+                    
+                    let fullText = '';
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const text = textContent.items.map(item => item.str).join(' ');
+                        fullText += text + '\n';
+                    }
+                    
+                    resolve(fullText);
+                } catch (error) {
+                    reject(error);
+                }
+            };
+            reader.onerror = reject;
+            reader.readAsArrayBuffer(file);
+        } else {
+            // Handle text-based files (DOC, DOCX would need more processing)
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                resolve(e.target.result);
+            };
+            reader.onerror = reject;
+            reader.readAsText(file);
+        }
+    });
+}
+
+// Begin interview process
+async function beginInterview() {
+    updateStatus('Preparing your personalized interview questions...', 'processing');
+    showNotification('Starting your interview session', 'success');
+    
+    // Start interview timer
+    startInterviewTimer();
+    
+    // Get current round
+    currentRound = interviewData.rounds[interviewData.currentRoundIndex];
+    
+    // Show appropriate UI for the round
+    setupRoundUI(currentRound);
+    
+    // Generate first question based on round type
+    await generateNextQuestion();
+}
+
+// Setup UI for the current round
+function setupRoundUI(round) {
+    // Hide all round-specific sections first
+    document.getElementById('codingRoundSection').style.display = 'none';
+    document.getElementById('systemDesignSection').style.display = 'none';
+    
+    // Show relevant section based on round
+    if (round === 'coding') {
+        document.getElementById('codingRoundSection').style.display = 'block';
+    } else if (round === 'system-design') {
+        document.getElementById('systemDesignSection').style.display = 'block';
+    }
+    
+    // Update progress bar
+    const progressPercent = (interviewData.currentRoundIndex / interviewData.rounds.length) * 100;
+    document.getElementById('interviewProgress').style.width = `${progressPercent}%`;
+}
+
+// Generate next question based on current round
+async function generateNextQuestion() {
+    let prompt;
+    const difficulty = interviewData.difficulty;
+    
+    // Prepare context for the question
+    const context = `
+    CANDIDATE DETAILS:
+    - Job Role: ${interviewData.jobRole}
+    - Target Company: ${interviewData.companyName}
+    - Difficulty Level: ${difficultyLevels[difficulty].label}
+    - Resume Content: ${interviewData.resumeContent.substring(0, 2000)}...
+    
+    INTERVIEW CONTEXT:
+    - Current Round: ${currentRound}
+    - Previous Questions: ${conversation.filter(msg => msg.type === 'ai').slice(-3).map(msg => msg.text).join('\n')}
+    `;
+    
+    switch (currentRound) {
+        case 'hr':
+            prompt = `You are conducting an HR interview for ${interviewData.jobRole} position at ${interviewData.companyName}. 
+            Ask a behavioral or situational question that would be appropriate for this role at ${difficulty} difficulty level. 
+            Make it sound natural and professional. Keep your response under 100 words.`;
+            break;
+            
+        case 'technical':
+            prompt = `You are conducting a technical interview for ${interviewData.jobRole} position at ${interviewData.companyName}. 
+            Ask a technical question that would be appropriate for this role at ${difficulty} difficulty level. 
+            Focus on the core technical skills needed for this position. Make it sound natural and professional. Keep your response under 100 words.`;
+            break;
+            
+        case 'coding':
+            // Generate a coding problem if we don't have one
+            if (!codingProblem) {
+                codingProblem = await generateCodingProblem();
+                return;
+            }
+            prompt = `Present the following coding problem to the candidate in a professional manner: 
+            ${codingProblem.problem}. Provide the problem statement and ask if they're ready to begin. Keep it under 100 words.`;
+            break;
+            
+        case 'system-design':
+            // Generate a system design problem if we don't have one
+            if (!systemDesignProblem) {
+                systemDesignProblem = await generateSystemDesignProblem();
+                return;
+            }
+            prompt = `Present the following system design problem to the candidate in a professional manner: 
+            ${systemDesignProblem.problem}. Provide the problem statement and ask if they're ready to begin. Keep it under 100 words.`;
+            break;
+            
+        case 'aptitude':
+            prompt = `You are conducting an aptitude test for ${interviewData.jobRole} position at ${interviewData.companyName}. 
+            Ask a logical reasoning or quantitative question that would be appropriate for this role at ${difficulty} difficulty level. 
+            Make it sound natural and professional. Keep your response under 100 words.`;
+            break;
+    }
+    
+    try {
+        const response = await callGeminiAPI(prompt, context);
+        const aiMessage = response.trim();
+        
+        addMessageToConversation('ai', aiMessage);
+        await speakText(aiMessage);
+        
+        updateStatus('Click the microphone to answer', 'listening');
+        
+    } catch (error) {
+        showError('Failed to generate question. Please try again.');
+        console.error(error);
+    }
+}
+
+// Generate a coding problem
+async function generateCodingProblem() {
+    updateStatus('Generating coding problem...', 'processing');
+    
+    const difficulty = interviewData.difficulty;
+    const jobRole = interviewData.jobRole;
+    
+    const prompt = `Generate a coding problem appropriate for ${jobRole} position at ${difficulty} difficulty level. 
+    The problem should test relevant skills for this role. Include:
+    - Problem statement (clear description of the task)
+    - Sample input/output
+    - Constraints (if any)
+    - Expected time complexity (if applicable)
+    
+    Format the problem professionally as if presenting it in an interview.`;
+    
+    try {
+        const response = await callGeminiAPI(prompt);
+        
+        // Parse the response into a structured problem
+        const codingProblem = {
+            problem: response.trim(),
+            language: document.getElementById('languageSelector').value,
+            solution: null,
+            userCode: '',
+            testCases: []
+        };
+        
+        // Generate some test cases
+        codingProblem.testCases = await generateTestCases(codingProblem.problem);
+        
+        return codingProblem;
+    } catch (error) {
+        console.error('Error generating coding problem:', error);
+        throw error;
+    }
+}
+
+// Generate test cases for a coding problem
+async function generateTestCases(problem) {
+    const prompt = `For the following coding problem, generate 3-5 test cases including edge cases:
+    
+    ${problem}
+    
+    Return the test cases in JSON format like this:
+    [
+        {
+            "input": "input value",
+            "expectedOutput": "expected output"
+        }
+    ]`;
+    
+    try {
+        const response = await callGeminiAPI(prompt);
+        return JSON.parse(response.trim());
+    } catch (error) {
+        console.error('Error generating test cases:', error);
+        return [];
+    }
+}
+
+// Generate a system design problem
+async function generateSystemDesignProblem() {
+    updateStatus('Generating system design problem...', 'processing');
+    
+    const difficulty = interviewData.difficulty;
+    const jobRole = interviewData.jobRole;
+    
+    const prompt = `Generate a system design problem appropriate for ${jobRole} position at ${difficulty} difficulty level. 
+    The problem should test relevant architectural skills for this role. Include:
+    - Problem statement (clear description of the system to design)
+    - Key requirements
+    - Expected scale
+    - Potential follow-up questions
+    
+    Format the problem professionally as if presenting it in an interview.`;
+    
+    try {
+        const response = await callGeminiAPI(prompt);
+        
+        return {
+            problem: response.trim(),
+            userDesign: '',
+            followUpQuestions: []
+        };
+    } catch (error) {
+        console.error('Error generating system design problem:', error);
+        throw error;
+    }
+}
+
+// Call Gemini API
+async function callGeminiAPI(prompt, context = '') {
+    // Ensure API keys are loaded
+    if (!apiKeysLoaded || !GEMINI_API_KEY) {
+        throw new Error('API keys not loaded. Please refresh the page.');
+    }
+    
+    const fullPrompt = (context ? context + '\n' : '') + prompt;
+    
+    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            contents: [{
+                parts: [{
+                    text: fullPrompt
+                }]
+            }],
+            generationConfig: {
+                temperature: 0.7,
+                topK: 40,
+                topP: 0.95,
+                maxOutputTokens: 1024,
+            }
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`API call failed: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.candidates[0].content.parts[0].text;
+}
+
+// Toggle recording
+function toggleRecording() {
+    if (isRecording) {
+        stopRecording();
+    } else {
+        startRecording();
+    }
+}
+
+// Start recording
+function startRecording() {
+    if (!recognition) {
+        showError('Speech recognition not supported in this browser.');
+        return;
+    }
+
+    // Check if API keys are loaded
+    if (!apiKeysLoaded) {
+        showError('Application is still loading. Please wait a moment and try again.');
+        return;
+    }
+
+    isRecording = true;
+    document.getElementById('micButton').classList.add('active');
+    updateStatus('Listening... Speak your answer', 'listening');
+    animateAvatar('listening');
+
+    recognition.onresult = function(event) {
+        const transcript = event.results[event.results.length - 1][0].transcript;
+        handleUserResponse(transcript);
+    };
+
+    recognition.onerror = function(event) {
+        console.error('Speech recognition error:', event.error);
+        showError('Speech recognition error. Please try again.');
+        stopRecording();
+    };
+
+    recognition.start();
+}
+
+// Stop recording
+function stopRecording() {
+    isRecording = false;
+    document.getElementById('micButton').classList.remove('active');
+    animateAvatar('');
+    
+    if (recognition) {
+        recognition.stop();
+    }
+}
+
+// Handle user response
+async function handleUserResponse(transcript) {
+    stopRecording();
+    updateStatus('Processing your response...', 'processing');
+    
+    addMessageToConversation('user', transcript);
+    
+    // For coding rounds, update the code editor content
+    if (currentRound === 'coding') {
+        codingProblem.userCode = document.getElementById('codeEditor').value;
+    }
+    
+    // For system design rounds, capture the whiteboard state
+    if (currentRound === 'system-design') {
+        // In a real app, you would capture the canvas state
+        systemDesignProblem.userDesign = "User's whiteboard design";
+    }
+    
+    questionCount++;
+    
+    // Prepare context for evaluation
+    const conversationHistory = conversation.map(msg => 
+        `${msg.type === 'ai' ? 'Interviewer' : 'Candidate'}: ${msg.text}`
+    ).join('\n');
+    
+    // Evaluate response and get next question or feedback
+    await evaluateResponseAndContinue(conversationHistory);
+}
+
+// Evaluate user response and continue interview
+async function evaluateResponseAndContinue(conversationHistory) {
+    let prompt;
+    
+    if (shouldMoveToNextRound()) {
+        // Move to next round or end interview
+        interviewData.currentRoundIndex++;
+        
+        if (interviewData.currentRoundIndex < interviewData.rounds.length) {
+            // Move to next round
+            currentRound = interviewData.rounds[interviewData.currentRoundIndex];
+            setupRoundUI(currentRound);
+            
+            prompt = `You have completed the ${getRoundName(interviewData.rounds[interviewData.currentRoundIndex - 1])} round. 
+            Now we will move to the ${getRoundName(currentRound)} round. Provide a brief transition statement and introduce the next round. 
+            Keep it under 50 words.`;
+        } else {
+            // End interview
+            prompt = `Based on this interview conversation, provide a brief closing statement and end the interview professionally. 
+            Thank the candidate for their time. Keep it under 50 words.`;
+        }
+    } else {
+        // Continue with current round
+        switch (currentRound) {
+            case 'hr':
+            case 'technical':
+            case 'aptitude':
+                prompt = `As a professional interviewer, provide a follow-up question or move to a new topic based on the candidate's response. 
+                Consider their answer quality and the interview context. Keep your response under 100 words.`;
+                break;
+                
+            case 'coding':
+                prompt = `Provide feedback on the candidate's approach to the coding problem and ask a follow-up question about their solution. 
+                Consider time complexity, edge cases, and code quality. Keep your response under 100 words.`;
+                break;
+                
+            case 'system-design':
+                prompt = `Provide feedback on the candidate's system design approach and ask a follow-up question about their architecture. 
+                Consider scalability, trade-offs, and component choices. Keep your response under 100 words.`;
+                break;
+        }
+    }
+    
+    // Add context to the prompt
+    prompt += `
+    
+    INTERVIEW CONTEXT:
+    - Job Role: ${interviewData.jobRole}
+    - Company: ${interviewData.companyName}
+    - Current Round: ${currentRound}
+    - Difficulty: ${interviewData.difficulty}
+    
+    CONVERSATION HISTORY:
+    ${conversationHistory}
+    `;
+    
+    try {
+        const response = await callGeminiAPI(prompt);
+        const aiMessage = response.trim();
+        
+        addMessageToConversation('ai', aiMessage);
+        await speakText(aiMessage);
+        
+        if (interviewData.currentRoundIndex >= interviewData.rounds.length) {
+            // Interview is complete
+            setTimeout(() => {
+                generateFeedback();
+            }, 3000);
+        } else {
+            // Continue interview
+            updateStatus('Click the microphone to answer', 'listening');
+            
+            // For new rounds, generate appropriate content
+            if (currentRound === 'coding' && !codingProblem) {
+                codingProblem = await generateCodingProblem();
+            } else if (currentRound === 'system-design' && !systemDesignProblem) {
+                systemDesignProblem = await generateSystemDesignProblem();
+            }
+        }
+        
+    } catch (error) {
+        showError('Error processing response.');
+        console.error(error);
+    }
+}
+
+// Check if we should move to next round
+function shouldMoveToNextRound() {
+    // Simple logic - move to next round after 3-5 questions per round
+    const questionsInRound = conversation.filter(msg => 
+        msg.type === 'ai' && 
+        msg.text.includes('?') // Simple way to count questions
+    ).length;
+    
+    return questionsInRound >= getQuestionsPerRound();
+}
+
+// Get number of questions per round based on difficulty
+function getQuestionsPerRound() {
+    switch (interviewData.difficulty) {
+        case 'beginner': return 3;
+        case 'intermediate': return 4;
+        case 'advanced': return 5;
+        case 'expert': return 6;
+        default: return 4;
+    }
+}
+
+// Get display name for round
+function getRoundName(round) {
+    switch (round) {
+        case 'hr': return 'HR';
+        case 'technical': return 'Technical';
+        case 'coding': return 'Coding';
+        case 'system-design': return 'System Design';
+        case 'aptitude': return 'Aptitude';
+        default: return round;
+    }
+}
+
+// Generate feedback after interview
+async function generateFeedback() {
+    updateStatus('Generating detailed feedback...', 'processing');
+    showNotification('Generating your feedback report', 'success');
+    
+    const conversationHistory = conversation.map(msg => 
+        `${msg.type === 'ai' ? 'Interviewer' : 'Candidate'}: ${msg.text}`
+    ).join('\n');
+
+    const feedbackPrompt = `Provide comprehensive interview feedback for a candidate applying for ${interviewData.jobRole} at ${interviewData.companyName}.
+
+INTERVIEW DETAILS:
+- Difficulty: ${interviewData.difficulty}
+- Interview Type: ${interviewTypeConfig[interviewData.interviewType].name}
+- Rounds Completed: ${interviewData.rounds.map(r => getRoundName(r)).join(', ')}
+    
+CONVERSATION HISTORY:
+${conversationHistory}
+
+RESUME CONTENT:
+${interviewData.resumeContent.substring(0, 2000)}...
+
+Provide detailed feedback covering:
+1. Overall Performance (Score out of 10)
+2. Strengths demonstrated
+3. Areas for improvement
+4. Communication skills assessment
+5. Technical knowledge evaluation
+6. Specific recommendations for improvement
+7. Likelihood of success in this role
+
+Format the feedback professionally with clear sections and bullet points. Be specific and actionable.`;
+
+    try {
+        const feedback = await callGeminiAPI(feedbackPrompt);
+        
+        // Store feedback in interview data
+        interviewData.feedback = feedback;
+        interviewData.endTime = new Date().toISOString();
+        interviewData.duration = getInterviewDuration();
+        
+        // Save to Firestore (demo - would be actual implementation)
+        await saveInterviewToFirestore(interviewData);
+        
+        // Display feedback
+        displayFeedback(feedback);
+        
+        // Show feedback tab
+        openTab('feedback');
+        
+    } catch (error) {
+        showError('Error generating feedback.');
+        console.error(error);
+    }
+}
+
+// Display feedback to user
+function displayFeedback(feedback) {
+    // In a real app, you would parse the feedback into structured data
+    // For this demo, we'll just show the raw feedback
+    
+    document.getElementById('feedbackContent').innerHTML = `
+        <div class="feedback-category">
+            <h4><i class="fas fa-star"></i> Overall Feedback</h4>
+            <div class="feedback-item">
+                <div class="feedback-item-content">
+                    <pre style="white-space: pre-wrap; font-family: inherit;">${feedback}</pre>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Update scores (in a real app, these would be extracted from the feedback)
+    document.getElementById('overallScore').textContent = '8.2';
+    document.getElementById('communicationScore').textContent = '7.5';
+    document.getElementById('technicalScore').textContent = '8.7';
+    document.getElementById('problemSolvingScore').textContent = '8.0';
+}
+
+// Save interview to Firestore
+async function saveInterviewToFirestore(data) {
+    // Demo implementation - in real app, you'd use actual Firestore
+    console.log('Saving to Firestore:', data);
+    
+    // Simulate API call
+    return new Promise(resolve => {
+        setTimeout(() => {
+            console.log('Interview data saved successfully');
+            resolve();
+        }, 1000);
+    });
+}
+
+// Add message to conversation
+function addMessageToConversation(type, text) {
+    const message = { 
+        type, 
+        text, 
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    conversation.push(message);
+    
+    const conversationDiv = document.getElementById('conversation');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${type}`;
+    
+    messageDiv.innerHTML = `
+        <div>${text}</div>
+        <div class="message-time">${message.timestamp}</div>
+    `;
+    
+    conversationDiv.appendChild(messageDiv);
+    conversationDiv.scrollTop = conversationDiv.scrollHeight;
+}
+
+// Speak text using speech synthesis
+async function speakText(text) {
+    return new Promise((resolve) => {
+        if (synthesis.speaking) {
+            synthesis.cancel();
+        }
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        
+        // Set voice parameters
+        utterance.rate = document.getElementById('speechSpeed')?.value || 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 0.9;
+        
+        // Use selected voice if available
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+        } else {
+            // Try to find a professional default voice
+            const voices = synthesis.getVoices();
+            const professionalVoice = voices.find(voice => 
+                voice.lang.includes('en-') && 
+                (voice.name.toLowerCase().includes('david') || 
+                 voice.name.toLowerCase().includes('mark') ||
+                 voice.name.toLowerCase().includes('neural') ||
+                 voice.name.toLowerCase().includes('professional'))
+            );
+            if (professionalVoice) {
+                utterance.voice = professionalVoice;
+            }
+        }
+        
+        utterance.onstart = () => {
+            updateStatus('AI is speaking...', 'speaking');
+            animateAvatar('speaking');
+        };
+        
+        utterance.onend = () => {
+            animateAvatar('');
+            resolve();
+        };
+        
+        utterance.onerror = (error) => {
+            console.error('Speech synthesis error:', error);
+            animateAvatar('');
+            resolve();
+        };
+        
+        synthesis.speak(utterance);
+    });
+}
+
+// Start interview timer
+function startInterviewTimer() {
+    interviewStartTime = new Date();
+    clearInterval(interviewTimer);
+    
+    interviewTimer = setInterval(() => {
+        const now = new Date();
+        const elapsed = new Date(now - interviewStartTime);
+        
+        const hours = String(elapsed.getUTCHours()).padStart(2, '0');
+        const minutes = String(elapsed.getUTCMinutes()).padStart(2, '0');
+        const seconds = String(elapsed.getUTCSeconds()).padStart(2, '0');
+        
+        document.getElementById('interviewTimer').textContent = `${hours}:${minutes}:${seconds}`;
+    }, 1000);
+}
+
+// Get interview duration in seconds
+function getInterviewDuration() {
+    if (!interviewStartTime) return 0;
+    return Math.floor((new Date() - interviewStartTime) / 1000);
+}
+
+// Initialize whiteboard
+function initWhiteboard() {
+    const canvas = document.getElementById('whiteboardCanvas');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+    let currentTool = 'select';
+    
+    // Set canvas size
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    
+    // Whiteboard tools
+    document.querySelectorAll('.whiteboard-tool').forEach(tool => {
+        tool.addEventListener('click', function() {
+            document.querySelectorAll('.whiteboard-tool').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            currentTool = this.dataset.tool;
+        });
+    });
+    
+    // Drawing functions
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+    
+    function startDrawing(e) {
+        isDrawing = true;
+        draw(e);
+    }
+    
+    function draw(e) {
+        if (!isDrawing) return;
+        
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#4361ee';
+        
+        if (currentTool === 'line') {
+            // For simplicity, we'll just implement free drawing
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+        }
+        // Other tools would be implemented similarly
+    }
+    
+    function stopDrawing() {
+        isDrawing = false;
+        ctx.beginPath();
+    }
+    
+    // Clear button
+    document.querySelector('.whiteboard-tool[data-tool="clear"]').addEventListener('click', function() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+}
+
+// Run code in coding round
+function runCode() {
+    const code = document.getElementById('codeEditor').value;
+    const language = document.getElementById('languageSelector').value;
+    
+    // In a real app, you would send this to a code execution service
+    console.log(`Running ${language} code:`, code);
+    
+    showNotification('Code executed successfully (simulated)', 'success');
+}
+
+// Show hint for current question
+function showHint() {
+    const lastQuestion = conversation.filter(msg => msg.type === 'ai').slice(-1)[0];
+    if (!lastQuestion) return;
+    
+    const prompt = `Provide a helpful hint for the following interview question without giving away the full answer:
+    
+    Question: ${lastQuestion.text}
+    
+    Job Role: ${interviewData.jobRole}
+    Difficulty: ${interviewData.difficulty}
+    
+    Keep the hint concise (1-2 sentences).`;
+    
+    callGeminiAPI(prompt)
+        .then(hint => {
+            addMessageToConversation('ai', `Hint: ${hint.trim()}`);
+            speakText(`Here's a hint: ${hint.trim()}`);
+        })
+        .catch(error => {
+            console.error('Error getting hint:', error);
+            showError('Failed to get hint. Please try again.');
+        });
+}
+
+// Skip current question
+function skipQuestion() {
+    const prompt = `The candidate has asked to skip the current question. As the interviewer, acknowledge this politely and move to a different question appropriate for ${interviewData.jobRole} at ${interviewData.difficulty} level. Keep your response under 50 words.`;
+    
+    callGeminiAPI(prompt)
+        .then(response => {
+            addMessageToConversation('ai', response.trim());
+            speakText(response.trim());
+        })
+        .catch(error => {
+            console.error('Error skipping question:', error);
+            showError('Failed to skip question. Please try again.');
+        });
+}
+
+// End interview
+function endInterview() {
+    if (confirm('Are you sure you want to end the interview? Your progress will be saved.')) {
+        clearInterval(interviewTimer);
+        generateFeedback();
+    }
+}
+
+// Download feedback as PDF
+function downloadFeedback() {
+    // In a real app, you would generate a PDF
+    showNotification('Preparing your feedback PDF...', 'success');
+    console.log('Feedback downloaded:', interviewData.feedback);
+}
+
+// Start new interview
+function startNewInterview() {
+    // Reset everything
+    conversation = [];
+    questionCount = 0;
+    interviewData = {};
+    codingProblem = null;
+    systemDesignProblem = null;
+    selectedAvatar = 'business-male';
+    currentRound = 'hr';
+    
+    clearInterval(interviewTimer);
+    
+    // Reset UI
+    document.getElementById('setupForm').style.display = 'block';
+    document.getElementById('conversation').innerHTML = '';
+    document.getElementById('interviewProgress').style.width = '0%';
+    document.getElementById('codeEditor').value = '';
+    
+    // Reset form
+    document.getElementById('jobRole').value = '';
+    document.getElementById('companyName').value = '';
+    document.getElementById('resume').value = '';
+    document.getElementById('fileName').textContent = '';
+    document.getElementById('customInstructions').value = '';
+    
+    // Reset avatar selection
+    document.querySelectorAll('.avatar-option').forEach(opt => opt.classList.remove('selected'));
+    document.querySelector('.avatar-option[data-avatar="business-male"]').classList.add('selected');
+    
+    // Reset interview type selection
+    document.querySelectorAll('.interview-type-option').forEach(opt => opt.classList.remove('selected'));
+    document.querySelector('.interview-type-option[data-type="full"]').classList.add('selected');
+    
+    // Show setup tab
+    openTab('setup');
+}
+
+// Open tab
+function openTab(tabName) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Deactivate all tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Activate selected tab
+    document.getElementById(tabName).classList.add('active');
+    document.querySelector(`.tab[onclick="openTab('${tabName}')"]`).classList.add('active');
+}
+
+// Update status
+function updateStatus(message, type) {
+    const statusDiv = document.getElementById('status');
+    if (!statusDiv) return;
+    
+    statusDiv.textContent = message;
+    statusDiv.className = `status ${type}`;
+}
+
+// Show error message
+function showError(message) {
+    const errorContainer = document.getElementById('errorContainer');
+    if (!errorContainer) return;
+    
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error';
+    errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+    errorContainer.appendChild(errorDiv);
+    
+    setTimeout(() => {
+        errorDiv.remove();
+    }, 5000);
+}
+
+// Show notification
+function showNotification(message, type) {
+    const notification = document.getElementById('notification');
+    if (!notification) return;
+    
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'times-circle' : 'info-circle'}"></i> ${message}`;
+    notification.classList.add('show');
+    
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 3000);
+}
+
+// Toggle dark mode
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+}
+
+// Initialize dark mode from localStorage
+function initDarkMode() {
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('darkModeToggle').checked = true;
+    }
+}
+
+// Initialize the app
+initDarkMode();
+</script>
+</body>
+</html>

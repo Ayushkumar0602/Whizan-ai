@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whizan.ai</title>
+    <link rel="icon" type="image/png" href="Smart Study.jpeg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <style>
+        :root {
+            --purple-dark: #6a0dad;
+            --purple-light: #9d4edd;
+            --purple-bright: #c77dff;
+            --purple-vibrant: #e0aaff;
+            --accent-pink: #ff006e;
+            --accent-cyan: #00d9ff;
+            --black-deep: #0d0d0d;
+            --black-light: #1a1a1a;
+            --white-soft: #f8f9fa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--black-deep) 0%, var(--black-light) 50%, var(--purple-dark) 100%);
+            color: var(--white-soft);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .color-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.2;
+        }
+        
+        .color {
+            position: absolute;
+            filter: blur(120px);
+            border-radius: 50%;
+            animation: floatColors 20s infinite ease-in-out;
+        }
+        
+        .color:nth-child(1) {
+            background: radial-gradient(circle, var(--purple-bright), var(--purple-light));
+            width: 500px;
+            height: 500px;
+            top: -100px;
+            left: -150px;
+            animation-delay: 0s;
+        }
+        
+        .color:nth-child(2) {
+            background: radial-gradient(circle, var(--accent-pink), var(--purple-vibrant));
+            width: 400px;
+            height: 400px;
+            bottom: -100px;
+            right: -100px;
+            animation-delay: -7s;
+        }
+        
+        .color:nth-child(3) {
+            background: radial-gradient(circle, var(--accent-cyan), var(--purple-bright));
+            width: 350px;
+            height: 350px;
+            top: 30%;
+            right: -50px;
+            animation-delay: -14s;
+        }
+        
+        .color:nth-child(4) {
+            background: radial-gradient(circle, var(--purple-vibrant), var(--purple-light));
+            width: 300px;
+            height: 300px;
+            bottom: 20%;
+            left: 10%;
+            animation-delay: -3s;
+        }
+        
+        .color:nth-child(5) {
+            background: radial-gradient(circle, var(--accent-pink), var(--accent-cyan));
+            width: 250px;
+            height: 250px;
+            top: 60%;
+            left: -80px;
+            animation-delay: -10s;
+        }
+        
+        @keyframes floatColors {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg) scale(1);
+            }
+            20% {
+                transform: translate(100px, -80px) rotate(72deg) scale(1.1);
+            }
+            40% {
+                transform: translate(-50px, 120px) rotate(144deg) scale(0.9);
+            }
+            60% {
+                transform: translate(150px, 50px) rotate(216deg) scale(1.2);
+            }
+            80% {
+                transform: translate(-80px, -100px) rotate(288deg) scale(0.8);
+            }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            backdrop-filter: blur(10px);
+            background: rgba(26, 26, 26, 0.3);
+            padding: 1rem 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(157, 78, 221, 0.2);
+        }
+        
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--purple-bright), var(--accent-pink), var(--accent-cyan), var(--purple-vibrant));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 400% 400%;
+            animation: gradientShift 6s ease infinite;
+            text-shadow: 0 0 30px rgba(157, 78, 221, 0.5);
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--purple-bright), var(--accent-pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(157, 78, 221, 0.4);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .logout-btn {
+            background: rgba(157, 78, 221, 0.2);
+            border: 1px solid var(--purple-bright);
+            color: var(--white-soft);
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .logout-btn:hover {
+            background: var(--purple-bright);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(157, 78, 221, 0.3);
+        }
+        
+        .welcome-message {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            backdrop-filter: blur(15px);
+            background: rgba(26, 26, 26, 0.2);
+            border-radius: 20px;
+            border: 1px solid rgba(157, 78, 221, 0.1);
+        }
+        
+        .welcome-message h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--purple-light), var(--purple-vibrant));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 20px rgba(157, 78, 221, 0.3); }
+            to { text-shadow: 0 0 30px rgba(157, 78, 221, 0.6); }
+        }
+        
+        .welcome-message p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .tabs-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .tab {
+            padding: 1.5rem;
+            background: rgba(26, 26, 26, 0.4);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(157, 78, 221, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tab::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(157, 78, 221, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+            opacity: 0;
+        }
+        
+        .tab:hover::before {
+            animation: shimmer 1.5s ease-in-out;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); opacity: 0; }
+        }
+        
+        .tab:hover {
+            background: rgba(157, 78, 221, 0.1);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(157, 78, 221, 0.2);
+            border-color: var(--purple-bright);
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, var(--purple-dark), var(--purple-light));
+            box-shadow: 0 20px 40px rgba(157, 78, 221, 0.3);
+            transform: translateY(-5px);
+            border-color: var(--purple-bright);
+        }
+        
+        .tab i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+            background: linear-gradient(45deg, var(--purple-bright), var(--accent-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .tab h3 {
+            margin-bottom: 0.8rem;
+            font-size: 1.3rem;
+            color: var(--white-soft);
+        }
+        
+        .tab p {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+        
+        .content {
+            background: rgba(26, 26, 26, 0.3);
+            border-radius: 20px;
+            padding: 2.5rem;
+            backdrop-filter: blur(15px);
+            min-height: 350px;
+            display: none;
+            border: 1px solid rgba(157, 78, 221, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(157, 78, 221, 0.05), transparent);
+            transition: left 0.8s;
+        }
+        
+        .content.active::before {
+            left: 100%;
+        }
+        
+        .content.active {
+            display: block;
+            animation: contentSlideIn 0.6s ease;
+        }
+        
+        @keyframes contentSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .content h2 {
+            margin-bottom: 1.5rem;
+            color: var(--purple-bright);
+            font-size: 2rem;
+            position: relative;
+        }
+        
+        .content h2::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(45deg, var(--purple-bright), var(--accent-pink));
+            border-radius: 2px;
+        }
+        
+        .content p {
+            line-height: 1.7;
+            margin-bottom: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .content ul {
+            margin: 1.5rem 0;
+            padding-left: 1.5rem;
+        }
+        
+        .content li {
+            margin-bottom: 0.8rem;
+            line-height: 1.6;
+            position: relative;
+        }
+        
+        .content li::marker {
+            color: var(--purple-bright);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, var(--purple-dark), var(--purple-bright));
+            color: var(--white-soft);
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(157, 78, 221, 0.2);
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--accent-pink), var(--accent-cyan));
+            transition: left 0.4s;
+            z-index: -1;
+        }
+        
+        .btn:hover::before {
+            left: 0;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(157, 78, 221, 0.4);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            opacity: 0.7;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+            background: rgba(26, 26, 26, 0.2);
+            border-radius: 15px;
+            border: 1px solid rgba(157, 78, 221, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .tabs-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .welcome-message h1 {
+                font-size: 2.2rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="color-bg">
+        <div class="color"></div>
+        <div class="color"></div>
+        <div class="color"></div>
+        <div class="color"></div>
+        <div class="color"></div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">Whizan.Ai</div>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+        </header>
+        
+        <!-- <div class="welcome-message">
+            <h1>College Study Portal</h1>
+            <p>Access all the tools you need to excel in your studies. Generate assignments, solve quizzes, study materials, practice viva sessions, and access past papers - all in one place.</p>
+        </div> -->
+        
+        <div class="tabs-container">
+            <div class="tab active" data-tab="genius-assistant">
+                <i class="fas fa-magic"></i>
+                <h3>Assignment Generator</h3>
+                <p>AI-powered help for all your assignments</p>
+            </div>
+            <div class="tab" data-tab="quiz-master">
+                <i class="fas fa-question-circle"></i>
+                <h3>Quiz Master</h3>
+                <p>Get accurate solutions to any quiz</p>
+            </div>
+            <div class="tab" data-tab="viva-practice">
+                <i class="fas fa-microphone-alt"></i>
+                <h3>Viva Practice</h3>
+                <p>Interactive viva preparation sessions</p>
+            </div>
+            <div class="tab" data-tab="knowledge-hub">
+                <i class="fas fa-book-open"></i>
+                <h3>Knowledge Hub</h3>
+                <p>Comprehensive study materials</p>
+            </div>
+            <div class="tab" data-tab="archive">
+                <i class="fas fa-archive"></i>
+                <h3>Archive</h3>
+                <p>Past papers and exam resources</p>
+            </div>
+        </div>
+        
+        <div class="content active" id="genius-assistant-content">
+            <h2>Assignment Generator</h2>
+            <p>Our AI-powered assistant helps you generate high-quality assignments tailored to your requirements. Just provide the topic and requirements, and we'll create a customized assignment for you.</p>
+            <p>Features:</p>
+            <ul>
+                <li>Generate assignments in various formats</li>
+                <li>Include citations and references</li>
+                <li>Customize length and complexity</li>
+                <li>Support for multiple subjects</li>
+            </ul>
+            <button class="btn" onclick="window.location.href='assignment.html'">Try Assignment Generator</button>
+        </div>
+        
+        <div class="content" id="quiz-master-content">
+            <h2>Quiz Master</h2>
+            <p>Struggling with a quiz? Our 100% accurate quiz solver can help you find the correct answers instantly. Upload your quiz or enter the questions, and get precise solutions.</p>
+            <p>Features:</p>
+            <ul>
+                <li>Supports multiple question types</li>
+                <li>Step-by-step explanations</li>
+                <li>Works with images and text</li>
+                <li>Instant results</li>
+            </ul>
+            <button class="btn" onclick="window.location.href='quiz.html'">Access Quiz Master</button>
+        </div>
+        
+        <div class="content" id="viva-practice-content">
+            <h2>Viva Practice</h2>
+            <p>Prepare for your viva voce examinations with our interactive AI-powered practice sessions. Get real-time feedback and improve your presentation skills.</p>
+            <p>Features:</p>
+            <ul>
+                <li>Subject-specific viva questions</li>
+                <li>Real-time AI feedback and scoring</li>
+                <li>Practice with voice or text responses</li>
+                <li>Performance analytics and improvement tips</li>
+                <li>Mock viva sessions with time limits</li>
+                <li>Expert-curated question banks</li>
+            </ul>
+            <button class="btn" onclick="window.location.href='viva.html'">Start Viva Practice</button>
+        </div>
+        
+        <div class="content" id="knowledge-hub-content">
+            <h2>Knowledge Hub</h2>
+            <p>Access a vast collection of study materials curated by experts. Find textbooks, lecture notes, summaries, and more for all your courses.</p>
+            <p>Features:</p>
+            <ul>
+                <li>Organized by subject and topic</li>
+                <li>Searchable database</li>
+                <li>Downloadable resources</li>
+                <li>User-contributed content</li>
+            </ul>
+            <button class="btn" onclick="window.location.href='material.html'">Explore Knowledge Hub</button>
+        </div>
+        
+        <div class="content" id="archive-content">
+            <h2>Archive</h2>
+            <p>Prepare for your exams with our collection of past papers and exam resources. Find papers from previous years with solutions to help you practice.</p>
+            <p>Features:</p>
+            <ul>
+                <li>Past papers from multiple institutions</li>
+                <li>Model answers and solutions</li>
+                <li>Organized by year and subject</li>
+                <li>Exam preparation tips</li>
+            </ul>
+            <button class="btn" onclick="window.location.href='studymaterial.html'">Browse Archive</button>
+        </div>
+        
+        <footer>
+            <p>© 2023 Whizan.Ai Study Portal. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        let currentUser = null;
+    
+        async function initializeApp() {
+            try {
+                // 1. Get Firebase config from backend
+                const configResponse = await fetch('https://us-central1-study2-7bdc7.cloudfunctions.net/getConfig');
+                if (!configResponse.ok) throw new Error('Failed to get Firebase config');
+                
+                const config = await configResponse.json();
+                firebase.initializeApp(config.firebase);
+                
+                // 2. Set up auth state listener
+                firebase.auth().onAuthStateChanged(async (user) => {
+                    try {
+                        if (user) {
+                            currentUser = user;
+                            const displayName = user.displayName || user.email.split('@')[0];
+                            const userAvatar = document.getElementById('userAvatar');
+                            
+                            if (userAvatar) {
+                                userAvatar.textContent = displayName.charAt(0).toUpperCase();
+                                userAvatar.title = displayName; // Add tooltip
+                            }
+                            
+                            setupTabs();
+                            setupLogout();
+                            checkUserProfile(user);
+                        } else {
+                            redirectToLogin();
+                        }
+                    } catch (error) {
+                        console.error('Auth state error:', error);
+                        redirectToLogin();
+                    }
+                });
+                
+                // 3. Set up service worker for PWA (if needed)
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(registration => {
+                            console.log('ServiceWorker registration successful');
+                        })
+                        .catch(err => {
+                            console.log('ServiceWorker registration failed: ', err);
+                        });
+                }
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showError('Failed to initialize application. Please refresh.');
+            }
+        }
+    
+        function setupTabs() {
+            try {
+                const tabs = document.querySelectorAll('.tab');
+                const contents = document.querySelectorAll('.content');
+                
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        // Remove active classes
+                        tabs.forEach(t => t.classList.remove('active'));
+                        contents.forEach(c => c.classList.remove('active'));
+                        
+                        // Add active class to clicked tab
+                        tab.classList.add('active');
+                        
+                        // Show corresponding content
+                        const tabId = tab.getAttribute('data-tab');
+                        const contentElement = document.getElementById(`${tabId}-content`);
+                        
+                        if (contentElement) {
+                            contentElement.classList.add('active');
+                            
+                            // Lazy load tab content if needed
+                            if (contentElement.dataset.loaded !== 'true') {
+                                loadTabContent(tabId);
+                                contentElement.dataset.loaded = 'true';
+                            }
+                        }
+                    });
+                });
+                
+                // Activate first tab by default
+                if (tabs.length > 0) tabs[0].click();
+            } catch (error) {
+                console.error('Tab setup error:', error);
+            }
+        }
+    
+        function setupLogout() {
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async () => {
+                    try {
+                        // Optional: Call backend logout endpoint
+                        const idToken = await currentUser?.getIdToken();
+                        if (idToken) {
+                            await fetch('https://us-central1-study2-7bdc7.cloudfunctions.net/logoutUser', {
+                                method: 'POST',
+                                headers: {
+                                    'Authorization': `Bearer ${idToken}`
+                                }
+                            });
+                        }
+                        
+                        // Perform client-side logout
+                        await firebase.auth().signOut();
+                        redirectToLogin();
+                    } catch (error) {
+                        console.error('Logout error:', error);
+                        showError('Logout failed. Please try again.');
+                    }
+                });
+            }
+        }
+    
+        function checkUserProfile(user) {
+            // Check if user needs to complete profile
+            // if (!user.displayName || !user.photoURL) {
+            //     const profileComplete = confirm('Would you like to complete your profile now?');
+            //     if (profileComplete) {
+            //         window.location.href = 'profile.html';
+            //     }
+            // }
+        }
+    
+        // function redirectToLogin() {
+        //     // Store current path for post-login redirect
+        //     sessionStorage.setItem('redirectPath', window.location.pathname);
+        //     window.location.href = 'auth.html';
+        // }
+    
+        function showError(message) {
+            const errorElement = document.getElementById('error-message') || createErrorElement();
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 5000);
+        }
+    
+        function createErrorElement() {
+            const errorElement = document.createElement('div');
+            errorElement.id = 'error-message';
+            errorElement.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 15px;
+                background: #ff4444;
+                color: white;
+                border-radius: 5px;
+                z-index: 1000;
+                display: none;
+            `;
+            document.body.appendChild(errorElement);
+            return errorElement;
+        }
+    
+        function loadTabContent(tabId) {
+            // Placeholder for lazy loading content
+            console.log(`Loading content for ${tabId}`);
+        }
+    
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>

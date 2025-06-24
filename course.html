@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Courses-Whizan</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="Smart Study.jpeg">
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      color: #2d3748;
+      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+
+    /* Spinner styles */
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(6, 206, 49, 0.3);
+      border-radius: 50%;
+      border-top-color: #10df28;
+      animation: spin 1s ease-in-out infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .button-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes gradientBG {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    h1 {
+      color: white;
+      margin-bottom: 30px;
+      text-align: center;
+      font-size: 2.8rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      animation: pulse 3s ease infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.03);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .courses-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      backdrop-filter: blur(10px);
+      background-color: rgba(255, 255, 255, 0.85);
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    }
+
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 25px;
+    }
+
+    .course-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      padding: 24px;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+      border: none;
+    }
+
+    .course-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(to bottom right,
+          rgba(255, 255, 255, 0.3) 0%,
+          rgba(255, 255, 255, 0) 60%);
+      transform: rotate(30deg);
+      transition: all 0.5s ease;
+    }
+
+    .course-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .course-card:hover::before {
+      animation: shine 1.5s ease;
+    }
+
+    @keyframes shine {
+      0% {
+        transform: rotate(30deg) translate(-10%, -10%);
+      }
+
+      100% {
+        transform: rotate(30deg) translate(10%, 10%);
+      }
+    }
+
+    .course-header h3 {
+      font-size: 1.5rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #1a237e;
+      font-weight: 700;
+      position: relative;
+      z-index: 2;
+    }
+
+    .enrolled-badge {
+      background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+      color: white;
+      border-radius: 12px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      margin-left: 10px;
+      font-weight: 600;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      animation: pulse 2s ease infinite;
+    }
+
+    .course-difficulty {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      margin-top: 12px;
+      font-weight: 600;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .beginner {
+      background: linear-gradient(135deg, #81C784 0%, #4CAF50 100%);
+      color: white;
+    }
+
+    .intermediate {
+      background: linear-gradient(135deg, #FFD54F 0%, #FFB300 100%);
+      color: white;
+    }
+
+    .advanced {
+      background: linear-gradient(135deg, #E57373 0%, #F44336 100%);
+      color: white;
+    }
+
+    .course-description {
+      color: #424242;
+      margin: 18px 0;
+      line-height: 1.6;
+      font-size: 0.95rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .course-meta {
+      font-size: 0.9rem;
+      color: #616161;
+      margin-top: 8px;
+      display: flex;
+      gap: 15px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .course-meta i {
+      color: #1a237e;
+    }
+
+    .course-footer {
+      display: flex;
+      justify-content: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .enroll-btn,
+    .visit-btn,
+    .test-btn,
+    .chat-btn,
+    .request-btn {
+      border: none;
+      padding: 10px 18px;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .enroll-btn {
+      background: linear-gradient(135deg, #4285F4 0%, #34a853 100%);
+      color: white;
+    }
+
+    .enroll-btn:hover {
+      background: linear-gradient(135deg, #3367d6 0%, #2d9246 100%);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .visit-btn {
+      background: linear-gradient(135deg, #34a853 0%, #4285F4 100%);
+      color: white;
+    }
+
+    .visit-btn:hover {
+      background: linear-gradient(135deg, #2d9246 0%, #3367d6 100%);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .test-btn {
+      background: linear-gradient(135deg, #FBBC05 0%, #FF9800 100%);
+      color: white;
+    }
+
+    .test-btn:hover {
+      background: linear-gradient(135deg, #E6A800 0%, #F57C00 100%);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .chat-btn {
+      background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%);
+      color: white;
+    }
+
+    .chat-btn:hover {
+      background: linear-gradient(135deg, #7B1FA2 0%, #5E35B1 100%);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .request-btn {
+      background: linear-gradient(135deg, #FF5722 0%, #FF9800 100%);
+      color: white;
+      padding: 12px 24px;
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+
+    .request-btn:hover {
+      background: linear-gradient(135deg, #E64A19 0%, #F57C00 100%);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .test-btn:disabled {
+      background: #e0e0e0;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Notification styling */
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+      color: white;
+      padding: 14px 28px;
+      border-radius: 12px;
+      z-index: 1000;
+      animation: fadeInOut 3s ease;
+      font-weight: 600;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+    }
+
+    .notification.error {
+      background: linear-gradient(135deg, #F44336 0%, #E57373 100%);
+    }
+
+    @keyframes fadeInOut {
+      0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+      }
+
+      10% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      90% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+      }
+    }
+
+    /* Floating chat button */
+    .floating-chat-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%);
+      color: white;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 999;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+
+      100% {
+        transform: translateY(0px);
+      }
+    }
+
+    .floating-chat-btn:hover {
+      background: linear-gradient(135deg, #7B1FA2 0%, #5E35B1 100%);
+      transform: translateY(-5px) scale(1.1);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+      animation: none;
+    }
+
+    .floating-chat-btn i {
+      font-size: 28px;
+    }
+
+    /* Button ripple effect */
+    .enroll-btn:after,
+    .visit-btn:after,
+    .test-btn:after,
+    .chat-btn:after,
+    .floating-chat-btn:after,
+    .request-btn:after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 5px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.5);
+      opacity: 0;
+      border-radius: 100%;
+      transform: scale(1, 1) translate(-50%);
+      transform-origin: 50% 50%;
+    }
+
+    .enroll-btn:focus:not(:active)::after,
+    .visit-btn:focus:not(:active)::after,
+    .test-btn:focus:not(:active)::after,
+    .chat-btn:focus:not(:active)::after,
+    .floating-chat-btn:focus:not(:active)::after,
+    .request-btn:focus:not(:active)::after {
+      animation: ripple 1s ease-out;
+    }
+
+    @keyframes ripple {
+      0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+      }
+
+      100% {
+        transform: scale(20, 20);
+        opacity: 0;
+      }
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.98) 100%);
+      margin: 10% auto;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      max-width: 500px;
+      width: 90%;
+      position: relative;
+      animation: modalFadeIn 0.3s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      color: #666;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .close-modal:hover {
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus {
+      border-color: #673AB7;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(103, 58, 183, 0.2);
+    }
+
+    .submit-request-btn {
+      background: linear-gradient(135deg, #673AB7 0%, #9C27B0 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      justify-content: center;
+    }
+
+    .submit-request-btn:hover {
+      background: linear-gradient(135deg, #5E35B1 0%, #7B1FA2 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    @media (max-width: 600px) {
+      .courses-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .course-footer {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .enroll-btn,
+      .visit-btn,
+      .test-btn,
+      .chat-btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .floating-chat-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+      }
+
+      .courses-container {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 2.2rem;
+      }
+
+      .modal-content {
+        margin: 20% auto;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="courses-container">
+    <h1>Available Courses</h1>
+    <button id="requestCourseBtn" class="request-btn">
+      <i class="material-icons">add_circle_outline</i> Request a Course
+    </button>
+    <div class="courses-grid" id="courses-grid">
+      <!-- Courses will load here -->
+    </div>
+  </div>
+
+  <!-- Floating chat button (hidden by default) -->
+  <div class="floating-chat-btn" id="floatingChatBtn" style="display: none;">
+    <i class="material-icons">chat</i>
+  </div>
+
+  <!-- Request Course Modal -->
+  <div id="requestCourseModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Request a New Course</h2>
+      <form id="requestCourseForm">
+        <div class="form-group">
+          <label for="coursePlaylist">YouTube Playlist URL/ID:</label>
+          <input type="text" id="coursePlaylist" required placeholder="e.g., PLfqMhTWNBTe0b2nM6JHVCnAkhQRGiZMSJ">
+        </div>
+        <div class="form-group">
+          <label for="courseTitle">Course Title:</label>
+          <input type="text" id="courseTitle" required placeholder="e.g., Advanced JavaScript Concepts">
+        </div>
+        <div class="form-group">
+          <label for="userEmail">Your Email:</label>
+          <input type="email" id="userEmail" required>
+        </div>
+        <button type="submit" class="submit-request-btn">
+          <i class="material-icons">send</i> Submit Request
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    let currentUser = null;
+    let hasEnrolledCourses = false;
+
+    async function init() {
+      // Initialize Firebase from backend config
+      const configResponse = await fetch('https://us-central1-study2-7bdc7.cloudfunctions.net/getConfig');
+      const config = await configResponse.json();
+      firebase.initializeApp(config.firebase);
+
+      const auth = firebase.auth();
+      const db = firebase.firestore();
+
+      auth.onAuthStateChanged(async user => {
+        if (user) {
+          currentUser = user;
+          try {
+            const idToken = await user.getIdToken();
+            await loadCourses(idToken);
+            setupRequestCourse(idToken);
+          } catch (error) {
+            console.error('Authentication error:', error);
+            window.location.href = "auth.html";
+          }
+        } else {
+          window.location.href = "auth.html";
+        }
+      });
+    }
+
+    function setupRequestCourse(idToken) {
+      const modal = document.getElementById('requestCourseModal');
+      const btn = document.getElementById('requestCourseBtn');
+      const closeBtn = document.querySelector('.close-modal');
+      const form = document.getElementById('requestCourseForm');
+
+      btn.addEventListener('click', () => {
+        document.getElementById('userEmail').value = currentUser?.email || '';
+        modal.style.display = 'block';
+      });
+
+      closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+      });
+
+      window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const playlist = document.getElementById('coursePlaylist').value.trim();
+        const title = document.getElementById('courseTitle').value.trim();
+        const email = document.getElementById('userEmail').value.trim();
+
+        try {
+          const submitBtn = form.querySelector('button[type="submit"]');
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<i class="material-icons">hourglass_top</i> Submitting...';
+
+          const response = await fetch('https://us-central1-study2-7bdc7.cloudfunctions.net/requestCourse', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify({ title, playlist, email })
+          });
+
+          if (!response.ok) {
+            throw new Error('Request failed');
+          }
+
+          modal.style.display = 'none';
+          form.reset();
+          showNotification('Course request submitted successfully!', 'success');
+        } catch (error) {
+          console.error('Error submitting course request:', error);
+          showNotification('Failed to submit request. Please try again.', 'error');
+        } finally {
+          const submitBtn = form.querySelector('button[type="submit"]');
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="material-icons">send</i> Submit Request';
+          }
+        }
+      });
+    }
+
+    async function loadCourses(idToken) {
+      const coursesGrid = document.getElementById('courses-grid');
+      coursesGrid.innerHTML = '<div class="spinner"></div>';
+
+      try {
+        const response = await fetch('https://us-central1-study2-7bdc7.cloudfunctions.net/getCourses', {
+          headers: {
+            'Authorization': `Bearer ${idToken}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to load courses');
+        }
+
+        const { courses, hasEnrolledCourses } = await response.json();
+
+        // Show/hide floating chat button based on enrollments
+        const floatingChatBtn = document.getElementById('floatingChatBtn');
+        floatingChatBtn.style.display = hasEnrolledCourses ? 'flex' : 'none';
+
+        coursesGrid.innerHTML = '';
+        courses.forEach(course => {
+          const card = document.createElement('div');
+          card.className = 'course-card';
+          card.innerHTML = `
+              <div class="course-header">
+                <h3>${course.title} ${course.isEnrolled ? '<span class="enrolled-badge">Enrolled</span>' : ''}</h3>
+                <span class="course-difficulty ${course.difficulty}">
+                  ${course.difficulty.charAt(0).toUpperCase() + course.difficulty.slice(1)}
+                </span>
+                <div class="course-meta">
+                  <span><i class="material-icons" style="font-size:16px; vertical-align:middle">schedule</i> ${course.duration}</span>
+                  <span><i class="material-icons" style="font-size:16px; vertical-align:middle">menu_book</i> ${course.lessons}</span>
+                </div>
+              </div>
+              <div class="course-description">${course.description}</div>
+              <div class="course-footer">
+                ${course.isEnrolled ? '' : `<button class="enroll-btn" data-course="${course.id}" data-playlist="${course.playlistId}">
+                  <i class="material-icons" style="font-size:18px">school</i> Enroll
+                </button>`}
+                <button class="visit-btn" data-playlist="${course.playlistId}">
+                  <i class="material-icons" style="font-size:18px">play_circle</i> ${course.isEnrolled ? 'Continue' : 'Preview'}
+                </button>
+                ${course.isEnrolled ? `<button class="test-btn" data-course="${course.id}">
+                  <i class="material-icons" style="font-size:18px">quiz</i> Test
+                </button>` : ''}
+                ${course.isEnrolled ? `<button class="chat-btn" data-course="${course.id}">
+                  <i class="material-icons" style="font-size:18px">forum</i> Chat
+                </button>` : ''}
+              </div>
+            `;
+          coursesGrid.appendChild(card);
+        });
+
+        document.querySelectorAll('.enroll-btn').forEach(btn =>
+          btn.addEventListener('click', (e) => enrollInCourse(e, idToken))
+        );
+        document.querySelectorAll('.visit-btn').forEach(btn =>
+          btn.addEventListener('click', visitCourse)
+        );
+        document.querySelectorAll('.test-btn').forEach(btn =>
+          btn.addEventListener('click', takeTest)
+        );
+        document.querySelectorAll('.chat-btn').forEach(btn =>
+          btn.addEventListener('click', openChat)
+        );
+      } catch (error) {
+        console.error("Error loading courses:", error);
+        showNotification('Failed to load courses. Please try again.', 'error');
+      }
+    }
+
+    async function enrollInCourse(e, idToken) {
+      const courseId = e.target.getAttribute('data-course');
+      const playlistId = e.target.getAttribute('data-playlist');
+
+      try {
+        e.target.disabled = true;
+        e.target.innerHTML = '<span class="button-spinner"></span> Enrolling...';
+
+        const response = await fetch('https://us-central1-study2-7bdc7.cloudfunctions.net/enrollInCourse', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+          },
+          body: JSON.stringify({ courseId, playlistId })
+        });
+
+        if (!response.ok) {
+          throw new Error('Enrollment failed');
+        }
+
+        // Reload courses to reflect new enrollment
+        await loadCourses(idToken);
+        showNotification('Successfully enrolled in course!', 'success');
+      } catch (error) {
+        console.error("Error enrolling in course:", error);
+        e.target.disabled = false;
+        e.target.innerHTML = '<i class="material-icons" style="font-size:18px">school</i> Enroll';
+        showNotification('Enrollment failed. Please try again.', 'error');
+      }
+    }
+
+    // Rest of your functions (visitCourse, takeTest, openChat, showNotification) remain the same
+    // ...
+    function visitCourse(e) {
+      const playlistId = e.target.getAttribute('data-playlist');
+      window.location.href = `dashboard.html?playlistId=${playlistId}`;
+    }
+
+    function takeTest(e) {
+      const courseId = e.target.getAttribute('data-course');
+      window.location.href = `test.html?courseId=${courseId}`;
+    }
+
+    function openChat() {
+      window.location.href = `chat.html`;
+    }
+
+    function showNotification(message, type) {
+      const notification = document.createElement('div');
+      notification.className = 'notification';
+      notification.style.backgroundColor = type === 'success' ? '#34a853' : '#ea4335';
+      notification.innerHTML = `<i class="material-icons" style="vertical-align:middle; margin-right:8px;">${type === 'success' ? 'check_circle' : 'error'}</i> ${message}`;
+      document.body.appendChild(notification);
+      setTimeout(() => notification.remove(), 3000);
+    }
+
+    init();
+  </script>
+
+  <script>
+    // Enhanced obfuscation script that handles the entire code
+    document.addEventListener('DOMContentLoaded', function () {
+      // First, find all script tags
+      const scripts = document.getElementsByTagName('script');
+
+      // Obfuscate the main script containing Firebase config and logic
+      for (let i = 0; i < scripts.length; i++) {
+        if (!scripts[i].src && scripts[i].textContent.trim().length > 0) {
+          const originalContent = scripts[i].textContent;
+
+          // Advanced obfuscation with multiple layers
+          const obfuscated = btoa(originalContent
+            .split('')
+            .map(c => String.fromCharCode(c.charCodeAt(0) + 1))
+            .join(''))
+            .split('').reverse().join('');
+
+          // Create a new script element with obfuscated content
+          const newScript = document.createElement('script');
+          newScript.textContent = `
+                  (function() {
+                      try {
+                          const decoded = atob('${obfuscated}'.split('').reverse().join(''))
+                              .split('')
+                              .map(c => String.fromCharCode(c.charCodeAt(0) - 1))
+                              .join('');
+                          (new Function(decoded))();
+                      } catch(e) {
+                          console.error('Execution error:', e);
+                      }
+                  })();
+              `;
+
+          // Replace the original script with the obfuscated version
+          scripts[i].parentNode.replaceChild(newScript, scripts[i]);
+          break; // We only want to obfuscate the first inline script
+        }
+      }
+
+      // Additional protection for Firebase config
+      const firebaseConfigProtection = document.createElement('script');
+      firebaseConfigProtection.textContent = `
+          // Firebase config is dynamically loaded and protected
+          const getFirebaseConfig = () => ({
+              apiKey: atob("${btoa("AIzaSyCVYdfql5aqHrChlA1v3nxRLkIbYyWMvUg")}"),
+              authDomain: atob("${btoa("study2-7bdc7.firebaseapp.com")}"),
+              databaseURL: atob("${btoa("https://study2-7bdc7-default-rtdb.firebaseio.com")}"),
+              projectId: atob("${btoa("study2-7bdc7")}"),
+              storageBucket: atob("${btoa("study2-7bdc7.firebasestorage.app")}"),
+              messagingSenderId: atob("${btoa("320617984870")}"),
+              appId: atob("${btoa("1:320617984870:web:04b61ea4ee88ae057e4ea7")}"),
+              measurementId: atob("${btoa("G-VRM14GRNWG")}")
+          });
+      `;
+      document.head.appendChild(firebaseConfigProtection);
+    });
+  </script>
+  <!-- <script>
+  document.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+  });
+</script> -->
+</body>
+
+</html>

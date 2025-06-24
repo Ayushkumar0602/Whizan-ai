@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Answer Comparison</title>
+    <link rel="icon" type="image/png" href="Smart Study.jpeg">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+    <style>
+       :root {
+            --primary: #6c5ce7;
+            --secondary: #00cec9;
+            --danger: #ff7675;
+            --warning: #fdcb6e;
+            --success: #55efc4;
+            --dark: #121212;
+            --darker: #0a0a0a;
+            --light: #f8f9fa;
+            --gray: #b2bec3;
+            --dark-gray: #2d3436;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated gradient background */
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(-45deg, 
+                #6c5ce7, 
+                #00cec9, 
+                #fd79a8, 
+                #fdcb6e,
+                #6c5ce7);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            opacity: 0.15;
+            filter: blur(80px);
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+        
+        header {
+            background-color: rgba(18, 18, 18, 0.8);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            padding: 15px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 20px;
+        }
+        
+        .auth-section {
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        button:hover::after {
+            opacity: 1;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button.secondary {
+            background: rgba(255,255,255,0.1);
+            box-shadow: none;
+        }
+        
+        button.danger {
+            background: linear-gradient(135deg, var(--danger), #e84393);
+            box-shadow: 0 4px 15px rgba(255, 118, 117, 0.3);
+        }
+
+        button.danger:hover {
+            box-shadow: 0 6px 20px rgba(255, 118, 117, 0.4);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        @media (min-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .question-section, .results-section {
+            background-color: rgba(18, 18, 18, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .question-section:hover, .results-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+        }
+        
+        h2 {
+            margin-bottom: 20px;
+            color: var(--light);
+            font-size: 22px;
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 15px;
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            min-height: 150px;
+            font-family: inherit;
+            font-size: 16px;
+            margin-bottom: 15px;
+            resize: vertical;
+            color: var(--light);
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+        }
+
+        textarea::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        
+        .ask-button {
+            width: 100%;
+            padding: 14px;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .loading-spinner {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .best-answer {
+            background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(0, 206, 201, 0.1));
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 0 8px 8px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .best-answer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .best-answer:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .best-answer-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .confidence {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+        }
+        
+        .answer-list {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .answer-card {
+            background-color: rgba(18, 18, 18, 0.7);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .answer-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border-color: rgba(255,255,255,0.1);
+        }
+        
+        .answer-card-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .model-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .model-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .history-section {
+            margin-top: 40px;
+        }
+        
+        .history-item {
+            background-color: rgba(18, 18, 18, 0.7);
+            padding: 18px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .history-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            transform: scaleY(0);
+            transform-origin: top;
+            transition: transform 0.3s ease;
+        }
+
+        .history-item:hover::before {
+            transform: scaleY(1);
+        }
+        
+        .history-item:hover {
+            transform: translateX(5px);
+            background-color: rgba(30, 30, 30, 0.7);
+        }
+        
+        .history-question {
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: var(--light);
+        }
+        
+        .history-date {
+            color: var(--gray);
+            font-size: 14px;
+        }
+        
+        .login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: rgba(18, 18, 18, 0.95);
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            transform: scale(0.95);
+            opacity: 0;
+            animation: modalEnter 0.3s ease forwards;
+        }
+
+        @keyframes modalEnter {
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            align-items: center;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--light);
+        }
+        
+        input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 20px;
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            font-size: 16px;
+            color: var(--light);
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+        }
+
+        input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        
+        .error-message {
+            color: var(--danger);
+            margin-bottom: 15px;
+            font-size: 14px;
+            padding: 10px;
+            background-color: rgba(255, 118, 117, 0.1);
+            border-radius: 6px;
+            border-left: 3px solid var(--danger);
+        }
+
+        /* Code block styling */
+        pre {
+            background-color: rgba(40, 44, 52, 0.8);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            margin: 15px 0;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        code {
+            font-family: 'Fira Code', 'Courier New', Courier, monospace;
+            color: #abb2bf;
+        }
+
+        .copy-code {
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            background: rgba(108, 92, 231, 0.2);
+            border: none;
+            color: var(--light);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .copy-code:hover {
+            background: rgba(108, 92, 231, 0.4);
+        }
+
+        /* Math formula styling */
+        .math-formula {
+            background-color: rgba(0, 206, 201, 0.1);
+            padding: 12px;
+            border-radius: 6px;
+            margin: 15px 0;
+            overflow-x: auto;
+            border: 1px solid rgba(0, 206, 201, 0.2);
+        }
+
+        /* Response content styling */
+        .response-content {
+            line-height: 1.7;
+        }
+
+        .response-content p {
+            margin-bottom: 15px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .response-content ul, 
+        .response-content ol {
+            margin-bottom: 20px;
+            padding-left: 30px;
+        }
+
+        .response-content li {
+            margin-bottom: 8px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .response-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        .response-content th, 
+        .response-content td {
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px;
+            text-align: left;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .response-content th {
+            background-color: rgba(108, 92, 231, 0.2);
+            color: white;
+        }
+
+        .response-content blockquote {
+            border-left: 4px solid var(--primary);
+            padding-left: 20px;
+            margin: 20px 0;
+            color: rgba(255,255,255,0.7);
+            font-style: italic;
+            background-color: rgba(108, 92, 231, 0.05);
+            padding: 15px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        /* Floating particles animation */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            opacity: 0.1;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.1;
+            }
+            50% {
+                opacity: 0.15;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0.1;
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--primary), var(--secondary));
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(var(--secondary), var(--primary));
+        }
+
+        /* Tooltip for model icons */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: rgba(0,0,0,0.8);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .auth-section {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .question-section, .results-section {
+                padding: 20px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">AI Answer Comparison</div>
+            <div class="auth-section">
+                <button id="loginBtn" class="secondary"></button>
+                <button id="logoutBtn" style="display: none;">Logout</button>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div id="appContent" style="display: none;">
+            <div class="main-content">
+                <section class="question-section">
+                    <h2>Ask a Question</h2>
+                    <textarea id="questionInput" placeholder="Type your question here..."></textarea>
+                    <button id="askButton" class="ask-button">Ask All AI Models</button>
+                </section>
+                
+                <section class="results-section">
+                    <h2>Results</h2>
+                    <div class="loading" id="loadingIndicator">
+                        <div class="loading-spinner"></div>
+                        <p>Querying AI models...</p>
+                    </div>
+                    <div id="resultsContainer">
+                        <!-- Results will be inserted here -->
+                        <div class="best-answer">
+                            <div class="best-answer-header">
+                                <h3>Best Answer (Example)</h3>
+                                <span class="confidence">95%</span>
+                            </div>
+                            <div class="response-content">
+                                <p>Here's a well-formatted example response with code and math:</p>
+                                
+                                <p>To calculate the area of a circle, use the formula:</p>
+                                
+                                <div class="math-formula">
+                                    \[ A = \pi r^2 \]
+                                </div>
+                                
+                                <p>Here's a Python function to calculate it:</p>
+                                
+                                <pre><code class="language-python">import math
+
+def calculate_circle_area(radius):
+    """Calculate the area of a circle given its radius"""
+    return math.pi * (radius ** 2)
+
+# Example usage
+print(calculate_circle_area(5))  # Output: 78.53981633974483</code><button class="copy-code">Copy</button></pre>
+                                
+                                <p>Key points about this implementation:</p>
+                                <ul>
+                                    <li>Uses Python's built-in <code>math</code> module for π</li>
+                                    <li>Follows PEP 8 style guidelines</li>
+                                    <li>Includes a docstring for documentation</li>
+                                </ul>
+                                
+                                <p>The time complexity is O(1) since it's a simple calculation.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+            <section class="history-section">
+                <h2>Your Question History</h2>
+                <div id="historyContainer">
+                    <!-- History items will be inserted here -->
+                    <div class="history-item">
+                        <div class="history-question">How to calculate the area of a circle?</div>
+                        <div class="history-date">June 10, 2023, 2:30 PM</div>
+                    </div>
+                    <div class="history-item">
+                        <div class="history-question">What's the difference between Python lists and tuples?</div>
+                        <div class="history-date">June 8, 2023, 10:15 AM</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <div id="loginPrompt" style="text-align: center; margin-top: 50px;">
+            <h2>Ensuring Secure Authentication</h2>
+            <button id="promptLoginBtn" class="ask-button">Please wait !!!</button>
+        </div>
+    </div>
+    
+    <!-- Login Modal -->
+    <div class="login-modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Login</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="error-message" id="loginError"></div>
+            <input type="email" id="loginEmail" placeholder="Email">
+            <input type="password" id="loginPassword" placeholder="Password">
+            <button id="modalLoginBtn">Login</button>
+            <p style="margin-top: 15px; text-align: center;">
+                Don't have an account? <a href="#" id="showRegister">Register</a>
+            </p>
+        </div>
+    </div>
+    
+    <!-- Register Modal -->
+    <div class="login-modal" id="registerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Register</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="error-message" id="registerError"></div>
+            <input type="email" id="registerEmail" placeholder="Email">
+            <input type="password" id="registerPassword" placeholder="Password (min 6 characters)">
+            <input type="password" id="registerConfirmPassword" placeholder="Confirm Password">
+            <button id="modalRegisterBtn">Register</button>
+            <p style="margin-top: 15px; text-align: center;">
+                Already have an account? <a href="#" id="showLogin">Login</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Firebase and app scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script>
+        // Initialize highlight.js for code syntax highlighting
+        hljs.highlightAll();
+        
+        // Add copy functionality to code blocks
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.copy-code').forEach(button => {
+                button.addEventListener('click', function() {
+                    const codeBlock = this.previousElementSibling;
+                    const range = document.createRange();
+                    range.selectNode(codeBlock);
+                    window.getSelection().removeAllRanges();
+                    window.getSelection().addRange(range);
+                    document.execCommand('copy');
+                    window.getSelection().removeAllRanges();
+                    
+                    const originalText = this.textContent;
+                    this.textContent = 'Copied!';
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                    }, 2000);
+                });
+            });
+        });
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVYdfql5aqHrChlA1v3nxRLkIbYyWMvUg",
+            authDomain: "study2-7bdc7.firebaseapp.com",
+            databaseURL: "https://study2-7bdc7-default-rtdb.firebaseio.com",
+            projectId: "study2-7bdc7",
+            storageBucket: "study2-7bdc7.appspot.com",
+            messagingSenderId: "320617984870",
+            appId: "1:320617984870:web:04b61ea4ee88ae057e4ea7",
+            measurementId: "G-VRM14GRNWG"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // DOM elements
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const promptLoginBtn = document.getElementById('promptLoginBtn');
+        const appContent = document.getElementById('appContent');
+        const loginPrompt = document.getElementById('loginPrompt');
+        const questionInput = document.getElementById('questionInput');
+        const askButton = document.getElementById('askButton');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const historyContainer = document.getElementById('historyContainer');
+        const loginModal = document.getElementById('loginModal');
+        const registerModal = document.getElementById('registerModal');
+        const closeModalBtns = document.querySelectorAll('.close-modal');
+        const showRegister = document.getElementById('showRegister');
+        const showLogin = document.getElementById('showLogin');
+        const modalLoginBtn = document.getElementById('modalLoginBtn');
+        const modalRegisterBtn = document.getElementById('modalRegisterBtn');
+        const loginError = document.getElementById('loginError');
+        const registerError = document.getElementById('registerError');
+
+        // Replace with your Glitch backend URL
+        const BACKEND_URL = 'https://cors089282.glitch.me';
+
+        // Model information for icons and colors
+        const MODEL_INFO = {
+            gemini: { name: 'Gemini', color: '#4285F4', icon: 'G' },
+            deepseek: { name: 'DeepSeek', color: '#5C6BC0', icon: 'D' },
+            openai: { name: 'OpenAI', color: '#10A37F', icon: 'O' },
+            huggingface: { name: 'Hugging Face', color: '#FFD21E', icon: 'H' },
+            claude: { name: 'Claude', color: '#F4A261', icon: 'C' }
+        };
+
+        // Auth state listener
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // User is signed in
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'block';
+                appContent.style.display = 'block';
+                loginPrompt.style.display = 'none';
+                
+                // Load user's question history
+                loadHistory(user.uid);
+            } else {
+                // User is signed out
+                loginBtn.style.display = 'block';
+                logoutBtn.style.display = 'none';
+                appContent.style.display = 'none';
+                loginPrompt.style.display = 'block';
+            }
+        });
+
+        // Event listeners
+        loginBtn.addEventListener('click', () => loginModal.style.display = 'flex');
+        promptLoginBtn.addEventListener('click', () => loginModal.style.display = 'flex');
+        logoutBtn.addEventListener('click', () => auth.signOut());
+        
+        askButton.addEventListener('click', async () => {
+            const question = questionInput.value.trim();
+            if (!question) return;
+            
+            try {
+                loadingIndicator.style.display = 'block';
+                resultsContainer.innerHTML = '';
+                
+                const user = auth.currentUser;
+                if (!user) throw new Error('User not authenticated');
+                
+                const idToken = await user.getIdToken();
+                
+                const response = await fetch(`${BACKEND_URL}/ai-agent`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${idToken}`
+                    },
+                    body: JSON.stringify({ query: question })
+                });
+                
+                // Add more detailed error handling
+                if (!response.ok) {
+                    const errorText = await response.text().catch(() => 'No error details available');
+                    throw new Error(`Server responded with status ${response.status}: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                displayResults(data);
+                
+                // Reload history to include the new question
+                loadHistory(user.uid);
+            } catch (error) {
+                console.error('Error:', error);
+                resultsContainer.innerHTML = `
+                    <div class="error-message">
+                        Error: ${error.message}
+                    </div>
+                `;
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        });
+
+        // Modal handling
+        closeModalBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                loginModal.style.display = 'none';
+                registerModal.style.display = 'none';
+                loginError.textContent = '';
+                registerError.textContent = '';
+            });
+        });
+        
+        showRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginModal.style.display = 'none';
+            registerModal.style.display = 'flex';
+        });
+        
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerModal.style.display = 'none';
+            loginModal.style.display = 'flex';
+        });
+        
+        modalLoginBtn.addEventListener('click', async () => {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                loginModal.style.display = 'none';
+                loginError.textContent = '';
+            } catch (error) {
+                loginError.textContent = error.message;
+            }
+        });
+        
+        modalRegisterBtn.addEventListener('click', async () => {
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                registerError.textContent = 'Passwords do not match';
+                return;
+            }
+            
+            try {
+                await auth.createUserWithEmailAndPassword(email, password);
+                registerModal.style.display = 'none';
+                registerError.textContent = '';
+            } catch (error) {
+                registerError.textContent = error.message;
+            }
+        });
+
+        // Display results from AI models
+        function displayResults(data) {
+            resultsContainer.innerHTML = '';
+            
+            if (data.bestAnswer) {
+                const bestAnswer = data.bestAnswer;
+                const modelInfo = MODEL_INFO[bestAnswer.agent] || { name: bestAnswer.agent, color: '#666', icon: '?' };
+                
+                // Process the answer to format code blocks and math
+                const formattedAnswer = formatResponseContent(bestAnswer.answer);
+                
+                resultsContainer.innerHTML += `
+                    <div class="best-answer">
+                        <div class="best-answer-header">
+                            <h3>Best Answer (${modelInfo.name})</h3>
+                            <span class="confidence">${bestAnswer.confidence}</span>
+                        </div>
+                        <div class="response-content">${formattedAnswer}</div>
+                    </div>
+                `;
+            }
+            
+            const answersList = document.createElement('div');
+            answersList.className = 'answer-list';
+            
+            data.allAnswers.forEach(answer => {
+                const modelInfo = MODEL_INFO[answer.agent] || { name: answer.agent, color: '#666', icon: '?' };
+                
+                // Process the answer to format code blocks and math
+                const formattedAnswer = formatResponseContent(answer.answer);
+                
+                const answerCard = document.createElement('div');
+                answerCard.className = 'answer-card';
+                answerCard.innerHTML = `
+                    <div class="answer-card-header">
+                        <div class="model-name">
+                            <div class="model-icon" style="background-color: ${modelInfo.color}">
+                                ${modelInfo.icon}
+                            </div>
+                            ${modelInfo.name}
+                        </div>
+                        <span class="confidence">${answer.confidence}</span>
+                    </div>
+                    <div class="response-content">${formattedAnswer}</div>
+                `;
+                
+                answersList.appendChild(answerCard);
+            });
+            
+            resultsContainer.appendChild(answersList);
+            
+            // Highlight any code blocks in the new content
+            document.querySelectorAll('pre code').forEach(block => {
+                hljs.highlightElement(block);
+            });
+            
+            // Add copy buttons to code blocks
+            document.querySelectorAll('pre').forEach(preBlock => {
+                if (!preBlock.querySelector('.copy-code')) {
+                    const copyButton = document.createElement('button');
+                    copyButton.className = 'copy-code';
+                    copyButton.textContent = 'Copy';
+                    copyButton.addEventListener('click', function() {
+                        const codeBlock = this.previousElementSibling;
+                        const range = document.createRange();
+                        range.selectNode(codeBlock);
+                        window.getSelection().removeAllRanges();
+                        window.getSelection().addRange(range);
+                        document.execCommand('copy');
+                        window.getSelection().removeAllRanges();
+                        
+                        const originalText = this.textContent;
+                        this.textContent = 'Copied!';
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                        }, 2000);
+                    });
+                    preBlock.appendChild(copyButton);
+                }
+            });
+            
+            // Render any math formulas
+            if (typeof MathJax !== 'undefined') {
+                MathJax.typeset();
+            }
+        }
+
+        // Format response content with proper code and math formatting
+        function formatResponseContent(content) {
+            if (!content) return '';
+            
+            // Convert markdown code blocks to HTML
+            let formatted = content.replace(/```(\w*)([\s\S]*?)```/g, function(match, language, code) {
+                language = language || 'plaintext';
+                return `<pre><code class="language-${language}">${code.trim()}</code><button class="copy-code">Copy</button></pre>`;
+            });
+            
+            // Convert inline code
+            formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
+            
+            // Convert math formulas (assuming LaTeX between $$)
+            formatted = formatted.replace(/\$\$([^$]+)\$\$/g, '<div class="math-formula">$$$1$$</div>');
+            formatted = formatted.replace(/\$([^$]+)\$/g, '<span class="math-formula">$1</span>');
+            
+            // Convert newlines to paragraphs
+            formatted = formatted.replace(/\n\n/g, '</p><p>');
+            
+            return `<p>${formatted}</p>`;
+        }
+
+        // Load user's question history
+        async function loadHistory(userId) {
+            historyContainer.innerHTML = '';
+            
+            try {
+                const q = firebase.firestore.Query(
+                    firebase.firestore.CollectionReference(db, 'userQuestions'), 
+                    firebase.firestore.WhereFilter('userId', '==', userId)
+                );
+                
+                const querySnapshot = await firebase.firestore.getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    historyContainer.innerHTML = '<p>No questions asked yet.</p>';
+                    return;
+                }
+                
+                querySnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.innerHTML = `
+                        <div class="history-question">${data.question}</div>
+                        <div class="history-date">
+                            ${new Date(data.timestamp?.toDate()).toLocaleString()}
+                        </div>
+                    `;
+                    
+                    // Click to reload the question
+                    historyItem.addEventListener('click', () => {
+                        questionInput.value = data.question;
+                        questionInput.focus();
+                    });
+                    
+                    historyContainer.appendChild(historyItem);
+                });
+            } catch (error) {
+                console.error('Error loading history:', error);
+                historyContainer.innerHTML = '<div class="error-message">Error loading history</div>';
+            }
+        }
+    </script>
+<script>
+    document.addEventListener("contextmenu", function (e) {
+      e.preventDefault();
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>college Studymaterial</title>
+    <link rel="icon" type="image/png" href="Smart Study.jpeg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .resource-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .resource-btn {
+            padding: 12px 8px;
+            border: 2px solid #e1e1e1;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .resource-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .resource-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .fetch-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .fetch-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .fetch-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Full-screen PDF Viewer Styles */
+        .pdf-viewer-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .pdf-viewer-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pdf-viewer-header {
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1001;
+        }
+
+        .pdf-viewer-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 70%;
+        }
+
+        .pdf-viewer-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .pdf-viewer-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .pdf-viewer-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .pdf-viewer-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Ask Gemini Floating Button */
+        .ask-gemini-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #4285F4, #34A853);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1002;
+            transition: all 0.3s ease;
+        }
+
+        .ask-gemini-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .ask-gemini-btn:active {
+            transform: translateY(1px);
+        }
+
+        .ask-gemini-btn .gemini-icon {
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Gemini Chat Modal */
+        .gemini-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1003;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .gemini-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .gemini-modal-header {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #4285F4, #34A853);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .gemini-modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .gemini-modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .gemini-modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .gemini-chat-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f9f9f9;
+        }
+
+        .gemini-messages {
+            min-height: 300px;
+            max-height: 50vh;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background: #4285F4;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot-message {
+            background: #f1f1f1;
+            color: #333;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+        }
+
+        .gemini-input-container {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            background: white;
+            border-top: 1px solid #e1e1e1;
+        }
+
+        .gemini-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .gemini-input:focus {
+            border-color: #4285F4;
+        }
+
+        .gemini-send-btn {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #4285F4, #34A853);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .gemini-send-btn:hover {
+            opacity: 0.9;
+        }
+
+        .gemini-send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading-dots {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 20px;
+        }
+
+        .loading-dots div {
+            position: absolute;
+            top: 10px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4285F4;
+            animation-timing-function: cubic-bezier(0, 1, 1, 0);
+        }
+
+        .loading-dots div:nth-child(1) {
+            left: 8px;
+            animation: loading-dots1 0.6s infinite;
+        }
+
+        .loading-dots div:nth-child(2) {
+            left: 8px;
+            animation: loading-dots2 0.6s infinite;
+        }
+
+        .loading-dots div:nth-child(3) {
+            left: 32px;
+            animation: loading-dots2 0.6s infinite;
+        }
+
+        .loading-dots div:nth-child(4) {
+            left: 56px;
+            animation: loading-dots3 0.6s infinite;
+        }
+
+        @keyframes loading-dots1 {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes loading-dots2 {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(24px, 0); }
+        }
+
+        @keyframes loading-dots3 {
+            0% { transform: scale(1); }
+            100% { transform: scale(0); }
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error message */
+        .error {
+            color: #e74c3c;
+            background: #fdf2f2;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            .resource-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .ask-gemini-btn {
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+
+            .gemini-modal-content {
+                width: 95%;
+                max-height: 90vh;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Academic File Fetcher</h1>
+        
+        <form id="fileForm">
+            <div class="form-group">
+                <label for="college">College Name:</label>
+                <input type="text" id="college" required placeholder="Enter your college name">
+            </div>
+            
+            <div class="form-group">
+                <label for="branch">Branch:</label>
+                <input type="text" id="branch" required placeholder="e.g., CSE, ECE, ME">
+            </div>
+            
+            <div class="form-group">
+                <label for="year">Year:</label>
+                <select id="year" required>
+                    <option value="">Select Year</option>
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                    <option value="4">4th Year</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="subject">Subject:</label>
+                <input type="text" id="subject" required placeholder="Enter subject name">
+            </div>
+            
+            <div class="form-group">
+                <label>Resource Type:</label>
+                <div class="resource-buttons">
+                    <div class="resource-btn" data-type="past">
+                        📝 Past Papers
+                    </div>
+                    <div class="resource-btn" data-type="notes">
+                        📖 Notes
+                    </div>
+                    <div class="resource-btn" data-type="assignment">
+                        📋 Assignment
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="fetch-btn" id="fetchBtn">
+                🔍 Fetch File
+            </button>
+        </form>
+    </div>
+
+    <!-- Full-screen PDF Viewer -->
+    <div class="pdf-viewer-overlay" id="pdfViewerOverlay">
+        <div class="pdf-viewer-container">
+            <div class="pdf-viewer-header">
+                <div class="pdf-viewer-title" id="pdfViewerTitle">PDF Viewer</div>
+                <button class="pdf-viewer-close" id="pdfViewerClose">&times;</button>
+            </div>
+            <div class="pdf-viewer-content" id="pdfViewerContent">
+                <!-- PDF viewer will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Ask Gemini Floating Button -->
+    <button class="ask-gemini-btn" id="askGeminiBtn" style="display: none;">
+        <div class="gemini-icon">G</div>
+        Ask Gemini
+    </button>
+
+    <!-- Gemini Chat Modal -->
+    <div class="gemini-modal" id="geminiModal">
+        <div class="gemini-modal-content">
+            <div class="gemini-modal-header">
+                <div class="gemini-modal-title">Ask About This Document</div>
+                <button class="gemini-modal-close" id="geminiModalClose">&times;</button>
+            </div>
+            <div class="gemini-chat-container">
+                <div class="gemini-messages" id="geminiMessages">
+                    <div class="message bot-message">
+                        Hi! I can help answer questions about the document you're viewing. What would you like to know?
+                    </div>
+                </div>
+                <div class="gemini-input-container">
+                    <input type="text" class="gemini-input" id="geminiInput" placeholder="Ask a question about the document...">
+                    <button class="gemini-send-btn" id="geminiSendBtn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVYdfql5aqHrChlA1v3nxRLkIbYyWMvUg",
+            authDomain: "study2-7bdc7.firebaseapp.com",
+            databaseURL: "https://study2-7bdc7-default-rtdb.firebaseio.com",
+            projectId: "study2-7bdc7",
+            storageBucket: "study2-7bdc7.appspot.com",
+            messagingSenderId: "320617984870",
+            appId: "1:320617984870:web:04b61ea4ee88ae057e4ea7",
+            measurementId: "G-VRM14GRNWG"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Check authentication state
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                // User is not logged in, redirect to auth page
+                window.location.href = 'auth.html';
+            }
+        });
+
+        const API_KEY = 'AIzaSyCfF0iZYvUiF_rB6DSKHAKwW0XYF5D3umQ';
+        const GEMINI_API_KEY = 'AIzaSyAM1p730RTRu40S1sHghd1KD4501K6iCsI';
+        let selectedResourceType = '';
+        let currentPdfUrl = '';
+        let currentPdfText = '';
+
+        // Handle resource type selection
+        document.querySelectorAll('.resource-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.resource-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                selectedResourceType = this.dataset.type;
+            });
+        });
+
+        // Handle form submission
+        document.getElementById('fileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!selectedResourceType) {
+                alert('Please select a resource type');
+                return;
+            }
+
+            const college = document.getElementById('college').value.trim();
+            const branch = document.getElementById('branch').value.trim();
+            const year = document.getElementById('year').value;
+            const subject = document.getElementById('subject').value.trim();
+
+            // Create filename based on the pattern: college.branch.year.subject.resourcetype.pdf
+            const filename = `${college}.${branch}.${year}.${subject}.${selectedResourceType}.pdf`;
+            
+            console.log('Searching for filename:', filename);
+            
+            showLoading();
+            await searchAndDisplayFile(filename);
+        });
+
+        // Show loading state
+        function showLoading() {
+            document.getElementById('pdfViewerOverlay').style.display = 'block';
+            document.getElementById('pdfViewerTitle').textContent = 'Loading...';
+            
+            // Clear any previous content
+            const contentDiv = document.getElementById('pdfViewerContent');
+            contentDiv.innerHTML = '';
+            
+            // Create a loading spinner
+            const loadingDiv = document.createElement('div');
+            loadingDiv.style.display = 'flex';
+            loadingDiv.style.justifyContent = 'center';
+            loadingDiv.style.alignItems = 'center';
+            loadingDiv.style.height = '100%';
+            loadingDiv.style.width = '100%';
+            loadingDiv.innerHTML = `
+                <div style="text-align: center;">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 20px; color: white; font-size: 1.2rem;">Searching for file...</p>
+                </div>
+            `;
+            
+            contentDiv.appendChild(loadingDiv);
+        }
+
+        // Close PDF viewer
+        document.getElementById('pdfViewerClose').addEventListener('click', function() {
+            document.getElementById('pdfViewerOverlay').style.display = 'none';
+            document.getElementById('askGeminiBtn').style.display = 'none';
+        });
+
+        document.getElementById('pdfViewerOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+                document.getElementById('askGeminiBtn').style.display = 'none';
+            }
+        });
+
+        // Search and display file
+        async function searchAndDisplayFile(filename) {
+            try {
+                // Folder ID extracted from your Google Drive link
+                const folderId = '1XLtQOlNje--RsMNpnG0fp4D2W_1Ek2Kl';
+                
+                // First try exact match
+                let searchUrl = `https://www.googleapis.com/drive/v3/files?q=name='${encodeURIComponent(filename)}' and '${folderId}' in parents&key=${API_KEY}`;
+                
+                let searchResponse = await fetch(searchUrl);
+                let searchData = await searchResponse.json();
+
+                // If exact match fails, try case-insensitive search
+                if (!searchData.files || searchData.files.length === 0) {
+                    console.log('Exact match failed, trying case-insensitive search');
+                    // Try searching with contains instead of exact match
+                    const baseFilename = filename.replace('.pdf', '').toLowerCase();
+                    searchUrl = `https://www.googleapis.com/drive/v3/files?q='${folderId}' in parents and name contains '${baseFilename}'&key=${API_KEY}`;
+                    
+                    searchResponse = await fetch(searchUrl);
+                    searchData = await searchResponse.json();
+                }
+
+                console.log('Search results:', searchData);
+
+                if (searchData.error) {
+                    throw new Error(searchData.error.message);
+                }
+
+                if (searchData.files && searchData.files.length > 0) {
+                    const file = searchData.files[0];
+                    await displayFile(file);
+                } else {
+                    showError(`No file found with the name: ${filename}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError(`Failed to fetch file: ${error.message}`);
+            }
+        }
+
+        // Display file in full-screen viewer
+        async function displayFile(file) {
+            try {
+                const contentDiv = document.getElementById('pdfViewerContent');
+                contentDiv.innerHTML = '';
+                
+                // Create the iframe for PDF viewing
+                const iframe = document.createElement('iframe');
+                iframe.className = 'pdf-viewer-frame';
+                iframe.id = 'pdfViewerFrame';
+                iframe.src = `https://drive.google.com/file/d/${file.id}/preview`;
+                
+                // Set the title
+                document.getElementById('pdfViewerTitle').textContent = file.name;
+                
+                // Append the iframe to the content div
+                contentDiv.appendChild(iframe);
+                
+                // Store the PDF URL for Gemini
+                currentPdfUrl = `https://drive.google.com/file/d/${file.id}/view`;
+                
+                // Show the Ask Gemini button
+                document.getElementById('askGeminiBtn').style.display = 'flex';
+                
+                // For demonstration, we'll use a placeholder for the PDF text
+                // In a real implementation, you would extract text from the PDF
+                currentPdfText = `Document: ${file.name}\n\nThis is a placeholder for the PDF content. In a real implementation, the actual text content of the PDF would be extracted and stored here for Gemini to analyze.`;
+                
+            } catch (error) {
+                console.error('Error displaying file:', error);
+                showError(`Could not display the file: ${error.message}`);
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            const contentDiv = document.getElementById('pdfViewerContent');
+            contentDiv.innerHTML = `
+                <div style="padding: 30px; text-align: center; color: white;">
+                    <h3 style="margin-bottom: 20px;">Error</h3>
+                    <p style="margin-bottom: 20px;">${message}</p>
+                    <p style="font-size: 0.9rem; margin-bottom: 20px;">
+                        Please check your inputs and try again.
+                    </p>
+                    <button id="closeErrorBtn" style="padding: 10px 20px; background: white; border: none; border-radius: 5px; cursor: pointer;">
+                        Close
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('closeErrorBtn').addEventListener('click', function() {
+                document.getElementById('pdfViewerOverlay').style.display = 'none';
+            });
+        }
+
+        // Gemini Chat functionality
+        document.getElementById('askGeminiBtn').addEventListener('click', function() {
+            document.getElementById('geminiModal').style.display = 'block';
+        });
+
+        document.getElementById('geminiModalClose').addEventListener('click', function() {
+            document.getElementById('geminiModal').style.display = 'none';
+        });
+
+        document.getElementById('geminiModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+
+        document.getElementById('geminiInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessageToGemini();
+            }
+        });
+
+        document.getElementById('geminiSendBtn').addEventListener('click', sendMessageToGemini);
+
+        async function sendMessageToGemini() {
+            const input = document.getElementById('geminiInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Show loading indicator
+            const loadingId = addLoadingIndicator();
+            
+            try {
+                // Prepare the prompt for Gemini
+                const prompt = `PDF Content: ${currentPdfText}\n\nQuestion: ${message}\n\nAnswer the question based on the PDF content above. `;
+                
+                // Call Gemini API
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}
+`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }]
+                    })
+                });
+                
+                const data = await response.json();
+                
+                // Remove loading indicator
+                document.getElementById(loadingId).remove();
+                
+                // Add Gemini's response to chat
+                if (data.candidates && data.candidates[0].content.parts[0].text) {
+                    addMessage(data.candidates[0].content.parts[0].text, 'bot');
+                } else {
+                    addMessage("Sorry, I couldn't process that request. Please try again.", 'bot');
+                }
+            } catch (error) {
+                console.error('Error calling Gemini API:', error);
+                // Remove loading indicator
+                document.getElementById(loadingId).remove();
+                addMessage("Sorry, there was an error processing your request. Please try again.", 'bot');
+            }
+        }
+
+        function addMessage(text, sender) {
+            const messagesContainer = document.getElementById('geminiMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.textContent = text;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function addLoadingIndicator() {
+            const messagesContainer = document.getElementById('geminiMessages');
+            const loadingDiv = document.createElement('div');
+            const loadingId = 'loading-' + Date.now();
+            loadingDiv.id = loadingId;
+            loadingDiv.className = 'message bot-message';
+            loadingDiv.innerHTML = `
+                <div class="loading-dots">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            `;
+            messagesContainer.appendChild(loadingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            return loadingId;
+        }
+
+        // Add some visual feedback for form validation
+        document.querySelectorAll('input, select').forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.value.trim() === '' && this.hasAttribute('required')) {
+                    this.style.borderColor = '#e74c3c';
+                } else {
+                    this.style.borderColor = '#e1e1e1';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

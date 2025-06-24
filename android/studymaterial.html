@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Materials - Whizan</title>
+    <link rel="icon" type="image/png" href="smart study.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #000, #1a1a1a, #333, #1a1a1a, #000);
+            background-size: 400% 400%;
+            animation: gradientMove 15s ease infinite;
+            z-index: -1;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 15px 20px;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            margin-right: 10px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .brand-name {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #fff, #ccc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Main container */
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .main-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 30px 25px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(45deg, #fff, #ccc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: #999;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-input::placeholder {
+            color: #666;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .resource-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .resource-btn {
+            padding: 16px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            color: #fff;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .resource-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
+        }
+
+        .resource-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .fetch-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, #333, #555);
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        .fetch-btn:hover {
+            background: linear-gradient(45deg, #555, #777);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(255, 255, 255, 0.1);
+        }
+
+        .fetch-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* PDF Viewer */
+        .pdf-viewer-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .pdf-viewer-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pdf-viewer-header {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pdf-viewer-title {
+            font-size: 16px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 70%;
+        }
+
+        .pdf-viewer-close {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .pdf-viewer-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .pdf-viewer-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .pdf-viewer-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        /* Gemini Button */
+        .ask-gemini-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(45deg, #4285F4, #34A853);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            padding: 16px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(66, 133, 244, 0.3);
+            display: none;
+            align-items: center;
+            gap: 8px;
+            z-index: 2001;
+            transition: all 0.3s ease;
+        }
+
+        .ask-gemini-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(66, 133, 244, 0.4);
+        }
+
+        .gemini-icon {
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            color: #4285F4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        /* Gemini Modal */
+        .gemini-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2002;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .gemini-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            max-width: 500px;
+            max-height: 85vh;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .gemini-modal-header {
+            padding: 20px;
+            background: linear-gradient(45deg, #4285F4, #34A853);
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .gemini-modal-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .gemini-modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: #fff;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .gemini-modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .gemini-chat-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .gemini-messages {
+            min-height: 250px;
+            max-height: 40vh;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 16px;
+            max-width: 85%;
+            word-wrap: break-word;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .user-message {
+            background: #4285F4;
+            color: #fff;
+            margin-left: auto;
+            border-bottom-right-radius: 6px;
+        }
+
+        .bot-message {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            margin-right: auto;
+            border-bottom-left-radius: 6px;
+        }
+
+        .gemini-input-container {
+            display: flex;
+            gap: 12px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .gemini-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .gemini-input::placeholder {
+            color: #999;
+        }
+
+        .gemini-send-btn {
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #4285F4, #34A853);
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .gemini-send-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Loading animations */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-dots {
+            display: inline-block;
+            position: relative;
+            width: 60px;
+            height: 16px;
+        }
+
+        .loading-dots div {
+            position: absolute;
+            top: 6px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4285F4;
+            animation-timing-function: cubic-bezier(0, 1, 1, 0);
+        }
+
+        .loading-dots div:nth-child(1) {
+            left: 6px;
+            animation: loading-dots1 0.6s infinite;
+        }
+
+        .loading-dots div:nth-child(2) {
+            left: 6px;
+            animation: loading-dots2 0.6s infinite;
+        }
+
+        .loading-dots div:nth-child(3) {
+            left: 24px;
+            animation: loading-dots2 0.6s infinite;
+        }
+
+        .loading-dots div:nth-child(4) {
+            left: 42px;
+            animation: loading-dots3 0.6s infinite;
+        }
+
+        @keyframes loading-dots1 {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes loading-dots2 {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(18px, 0); }
+        }
+
+        @keyframes loading-dots3 {
+            0% { transform: scale(1); }
+            100% { transform: scale(0); }
+        }
+
+        /* Error styling */
+        .error {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .main-card {
+                padding: 25px 20px;
+            }
+            
+            .page-title {
+                font-size: 24px;
+            }
+            
+            .resource-buttons {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .ask-gemini-btn {
+                bottom: 20px;
+                right: 20px;
+                padding: 14px 20px;
+                font-size: 13px;
+            }
+        }
+
+        /* Disable text selection */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .form-input, .form-select, .gemini-input {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background -->
+    <div class="animated-bg"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="brand">
+                <img src="smart study.png" alt="Whizan Logo" class="logo">
+                <div class="brand-name">Whizan</div>
+            </div>
+            <a href="index.html" class="back-btn">← Back</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="main-card">
+            <h1 class="page-title">📚 Study Materials</h1>
+            <p class="page-subtitle">Find academic files, notes, and past papers</p>
+            
+            <form id="fileForm">
+                <div class="form-group">
+                    <label for="college" class="form-label">College Name:</label>
+                    <input type="text" id="college" class="form-input" required placeholder="Enter your college name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="branch" class="form-label">Branch:</label>
+                    <input type="text" id="branch" class="form-input" required placeholder="e.g., CSE, ECE, ME">
+                </div>
+                
+                <div class="form-group">
+                    <label for="year" class="form-label">Year:</label>
+                    <select id="year" class="form-select" required>
+                        <option value="">Select Year</option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="subject" class="form-label">Subject:</label>
+                    <input type="text" id="subject" class="form-input" required placeholder="Enter subject name">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Resource Type:</label>
+                    <div class="resource-buttons">
+                        <div class="resource-btn" data-type="past">
+                            📝 Past Papers
+                        </div>
+                        <div class="resource-btn" data-type="notes">
+                            📖 Notes
+                        </div>
+                        <div class="resource-btn" data-type="assignment">
+                            📋 Assignment
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="fetch-btn" id="fetchBtn">
+                    🔍 Fetch File
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- PDF Viewer -->
+    <div class="pdf-viewer-overlay" id="pdfViewerOverlay">
+        <div class="pdf-viewer-container">
+            <div class="pdf-viewer-header">
+                <div class="pdf-viewer-title" id="pdfViewerTitle">PDF Viewer</div>
+                <button class="pdf-viewer-close" id="pdfViewerClose">&times;</button>
+            </div>
+            <div class="pdf-viewer-content" id="pdfViewerContent">
+                <!-- PDF viewer content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Ask Gemini Button -->
+    <button class="ask-gemini-btn" id="askGeminiBtn">
+        <div class="gemini-icon">G</div>
+        Ask Gemini
+    </button>
+
+    <!-- Gemini Modal -->
+    <div class="gemini-modal" id="geminiModal">
+        <div class="gemini-modal-content">
+            <div class="gemini-modal-header">
+                <div class="gemini-modal-title">Ask About Document</div>
+                <button class="gemini-modal-close" id="geminiModalClose">&times;</button>
+            </div>
+            <div class="gemini-chat-container">
+                <div class="gemini-messages" id="geminiMessages">
+                    <div class="message bot-message">
+                        Hi! I can help answer questions about the document you're viewing. What would you like to know?
+                    </div>
+                </div>
+                <div class="gemini-input-container">
+                    <input type="text" class="gemini-input" id="geminiInput" placeholder="Ask about the document...">
+                    <button class="gemini-send-btn" id="geminiSendBtn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVYdfql5aqHrChlA1v3nxRLkIbYyWMvUg",
+            authDomain: "study2-7bdc7.firebaseapp.com",
+            databaseURL: "https://study2-7bdc7-default-rtdb.firebaseio.com",
+            projectId: "study2-7bdc7",
+            storageBucket: "study2-7bdc7.appspot.com",
+            messagingSenderId: "320617984870",
+            appId: "1:320617984870:web:04b61ea4ee88ae057e4ea7",
+            measurementId: "G-VRM14GRNWG"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Check authentication state
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = 'auth.html';
+            }
+        });
+
+        const API_KEY = 'AIzaSyCfF0iZYvUiF_rB6DSKHAKwW0XYF5D3umQ';
+        const GEMINI_API_KEY = 'AIzaSyAM1p730RTRu40S1sHghd1KD4501K6iCsI';
+        let selectedResourceType = '';
+        let currentPdfUrl = '';
+        let currentPdfText = '';
+
+        // Resource type selection
+        document.querySelectorAll('.resource-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.resource-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                selectedResourceType = this.dataset.type;
+            });
+        });
+
+        // Form submission
+        document.getElementById('fileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!selectedResourceType) {
+                alert('Please select a resource type');
+                return;
+            }
+
+            const college = document.getElementById('college').value.trim();
+            const branch = document.getElementById('branch').value.trim();
+            const year = document.getElementById('year').value;
+            const subject = document.getElementById('subject').value.trim();
+
+            const filename = `${college}.${branch}.${year}.${subject}.${selectedResourceType}.pdf`;
+            
+            showLoading();
+            await searchAndDisplayFile(filename);
+        });
+
+        function showLoading() {
+            document.getElementById('pdfViewerOverlay').style.display = 'block';
+            document.getElementById('pdfViewerTitle').textContent = 'Loading...';
+            
+            const contentDiv = document.getElementById('pdfViewerContent');
+            contentDiv.innerHTML = `
+                <div style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; flex-direction: column;">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 20px; color: #fff; font-size: 16px;">Searching for file...</p>
+                </div>
+            `;
+        }
+
+        document.getElementById('pdfViewerClose').addEventListener('click', function() {
+            document.getElementById('pdfViewerOverlay').style.display = 'none';
+            document.getElementById('askGeminiBtn').style.display = 'none';
+        });
+
+        document.getElementById('pdfViewerOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+                document.getElementById('askGeminiBtn').style.display = 'none';
+            }
+        });
+
+        async function searchAndDisplayFile(filename) {
+            try {
+                const folderId = '1XLtQOlNje--RsMNpnG0fp4D2W_1Ek2Kl';
+                let searchUrl = `https://www.googleapis.com/drive/v3/files?q=name='${encodeURIComponent(filename)}' and '${folderId}' in parents&key=${API_KEY}`;
+                
+                let searchResponse = await fetch(searchUrl);
+                let searchData = await searchResponse.json();
+
+                if (!searchData.files || searchData.files.length === 0) {
+                    const baseFilename = filename.replace('.pdf', '').toLowerCase();
+                    searchUrl = `https://www.googleapis.com/drive/v3/files?q='${folderId}' in parents and name contains '${baseFilename}'&key=${API_KEY}`;
+                    
+                    searchResponse = await fetch(searchUrl);
+                    searchData = await searchResponse.json();
+                }
+
+                if (searchData.error) {
+                    throw new Error(searchData.error.message);
+                }
+
+                if (searchData.files && searchData.files.length > 0) {
+                    const file = searchData.files[0];
+                    await displayFile(file);
+                } else {
+                    showError(`No file found: ${filename}`);
+                }
+            } catch (error) {
+                showError(`Failed to fetch file: ${error.message}`);
+            }
+        }
+
+        async function displayFile(file) {
+            try {
+                const contentDiv = document.getElementById('pdfViewerContent');
+                contentDiv.innerHTML = '';
+                
+                const iframe = document.createElement('iframe');
+                iframe.className = 'pdf-viewer-frame';
+                iframe.src = `https://drive.google.com/file/d/${file.id}/preview`;
+                
+                document.getElementById('pdfViewerTitle').textContent = file.name;
+                contentDiv.appendChild(iframe);
+                
+                currentPdfUrl = `https://drive.google.com/file/d/${file.id}/view`;
+                document.getElementById('askGeminiBtn').style.display = 'flex';
+                
+                currentPdfText = `Document: ${file.name}\n\nThis document contains study materials related to the requested subject.`;
+                
+            } catch (error) {
+                showError(`Could not display the file: ${error.message}`);
+            }
+        }
+
+        function showError(message) {
+            const contentDiv = document.getElementById('pdfViewerContent');
+            contentDiv.innerHTML = `
+                <div style="padding: 30px; text-align: center; color: #fff;">
+                    <div class="error">
+                        <h3 style="margin-bottom: 15px; color: #ff6b6b;">File Not Found</h3>
+                        <p style="margin-bottom: 20px;">${message}</p>
+                        <p style="font-size: 14px; margin-bottom: 25px; color: #ccc;">
+                            Please check your inputs and try again.
+                        </p>
+                        <button onclick="document.getElementById('pdfViewerOverlay').style.display='none'" style="padding: 12px 24px; background: #ff6b6b; color: #fff; border: none; border-radius: 12px; cursor: pointer; font-weight: 600;">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Gemini functionality
+        document.getElementById('askGeminiBtn').addEventListener('click', function() {
+            document.getElementById('geminiModal').style.display = 'block';
+        });
+
+        document.getElementById('geminiModalClose').addEventListener('click', function() {
+            document.getElementById('geminiModal').style.display = 'none';
+        });
+
+        document.getElementById('geminiModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+
+        document.getElementById('geminiInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessageToGemini();
+            }
+        });
+
+        document.getElementById('geminiSendBtn').addEventListener('click', sendMessageToGemini);
+
+        async function sendMessageToGemini() {
+            const input = document.getElementById('geminiInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addMessage(message, 'user');
+            input.value = '';
+            
+            const loadingId = addLoadingIndicator();
+            
+            try {
+                const prompt = `PDF Content: ${currentPdfText}\n\nQuestion: ${message}\n\nAnswer the question based on the PDF content above.`;
+                
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }]
+                    })
+                });
+                
+                const data = await response.json();
+                document.getElementById(loadingId).remove();
+                
+                if (data.candidates && data.candidates[0].content.parts[0].text) {
+                    addMessage(data.candidates[0].content.parts[0].text, 'bot');
+                } else {
+                    addMessage("Sorry, I couldn't process that request. Please try again.", 'bot');
+                }
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                addMessage("Sorry, there was an error processing your request.", 'bot');
+            }
+        }
+
+        function addMessage(text, sender) {
+            const messagesContainer = document.getElementById('geminiMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.textContent = text;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function addLoadingIndicator() {
+            const messagesContainer = document.getElementById('geminiMessages');
+            const loadingDiv = document.createElement('div');
+            const loadingId = 'loading-' + Date.now();
+            loadingDiv.id = loadingId;
+            loadingDiv.className = 'message bot-message';
+            loadingDiv.innerHTML = `
+                <div class="loading-dots">
+                    <div></div><div></div><div></div><div></div>
+                </div>
+            `;
+            messagesContainer.appendChild(loadingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            return loadingId;
+        }
+
+        // Disable right-click
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Form validation feedback
+        document.querySelectorAll('.form-input, .form-select').forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.value.trim() === '' && this.hasAttribute('required')) {
+                    this.style.borderColor = '#ff6b6b';
+                } else {
+                    this.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

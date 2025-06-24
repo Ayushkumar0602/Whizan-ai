@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gemini Flash Text Humanizer</title>
+  <link rel="icon" type="image/png" href="Smart Study.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #8a2be2;
+      --primary-dark: #5a189a;
+      --secondary: #240046;
+      --dark: #10002b;
+      --light: #e0aaff;
+      --text: #f8f9fa;
+      --text-secondary: #adb5bd;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--dark);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 20px;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 20%);
+      animation: gradientPulse 15s ease infinite;
+    }
+    
+    @keyframes gradientPulse {
+      0% { background-position: 10% 20%, 90% 80%; }
+      50% { background-position: 15% 25%, 85% 75%; }
+      100% { background-position: 10% 20%, 90% 80%; }
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      background: rgba(36, 0, 70, 0.8);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(138, 43, 226, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(138, 43, 226, 0.4);
+    }
+    
+    h2 {
+      color: var(--light);
+      text-align: center;
+      margin-bottom: 25px;
+      font-weight: 600;
+      font-size: 28px;
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+    
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), transparent);
+      border-radius: 3px;
+      animation: underlineGrow 0.8s ease forwards;
+    }
+    
+    @keyframes underlineGrow {
+      from { width: 0; opacity: 0; }
+      to { width: 60px; opacity: 1; }
+    }
+    
+    .input-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text);
+      font-weight: 500;
+      font-size: 16px;
+    }
+    
+    select, button {
+      width: 100%;
+      padding: 12px 15px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      background-color: rgba(138, 43, 226, 0.2);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+      border: 1px solid rgba(138, 43, 226, 0.4);
+    }
+    
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e0aaff'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+      background-size: 20px;
+    }
+    
+    select:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.5);
+      background-color: rgba(138, 43, 226, 0.3);
+    }
+    
+    textarea {
+      width: 100%;
+      height: 180px;
+      padding: 15px;
+      margin-top: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(138, 43, 226, 0.4);
+      background-color: rgba(36, 0, 70, 0.6);
+      color: var(--text);
+      resize: vertical;
+      transition: all 0.3s ease;
+    }
+    
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.3);
+      background-color: rgba(36, 0, 70, 0.8);
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    button {
+      flex: 1;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    button:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    button::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: rgba(255, 255, 255, 0.1);
+      transform: rotate(45deg);
+      transition: all 0.6s ease;
+      pointer-events: none;
+    }
+    
+    button:hover::after {
+      left: 100%;
+    }
+    
+    .output-container {
+      margin-top: 30px;
+      position: relative;
+    }
+    
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .output-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .output-actions button {
+      padding: 8px 12px;
+      font-size: 14px;
+      background: rgba(138, 43, 226, 0.2);
+      border: 1px solid rgba(138, 43, 226, 0.4);
+    }
+    
+    .output-actions button:hover {
+      background: rgba(138, 43, 226, 0.4);
+    }
+    
+    .output {
+      padding: 20px;
+      background-color: rgba(36, 0, 70, 0.6);
+      border-radius: 8px;
+      white-space: pre-wrap;
+      min-height: 150px;
+      border: 1px solid rgba(138, 43, 226, 0.2);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .output:hover {
+      border-color: rgba(138, 43, 226, 0.4);
+      box-shadow: inset 0 0 10px rgba(138, 43, 226, 0.2);
+    }
+    
+    .output.empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+    
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(138, 43, 226, 0.2);
+      border-top: 4px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .feature {
+      background: rgba(138, 43, 226, 0.1);
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      border: 1px solid rgba(138, 43, 226, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .feature i {
+      color: var(--light);
+    }
+    
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    
+    footer a {
+      color: var(--light);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    
+    footer a:hover {
+      color: var(--primary);
+    }
+    
+    .floating {
+      animation: floating 3s ease-in-out infinite;
+    }
+    
+    @keyframes floating {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      h2 {
+        font-size: 24px;
+      }
+    }
+    
+    /* Tooltip styles */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 200px;
+      background-color: var(--secondary);
+      color: var(--text);
+      text-align: center;
+      border-radius: 6px;
+      padding: 10px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 14px;
+      border: 1px solid var(--primary);
+    }
+    
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container floating">
+    <h2>AI Text Humanizer <span style="color: var(--light);">Whizan.ai</span></h2>
+    <p style="text-align: center; margin-bottom: 20px; color: var(--text-secondary);">Transform robotic AI text into natural, human-like writing</p>
+    
+    <div class="input-group">
+      <label for="tone">Writing Tone:</label>
+      <select id="tone">
+        <option value="friendly">Friendly</option>
+        <option value="professional">Professional</option>
+        <option value="casual">Casual</option>
+        <option value="academic">Academic</option>
+        <option value="conversational">Conversational</option>
+      </select>
+    </div>
+    
+    <div class="input-group">
+      <label for="inputText">Your AI-generated Text:</label>
+      <textarea id="inputText" placeholder="Paste your formal/robotic text here..."></textarea>
+    </div>
+    
+    <div class="button-group">
+      <button onclick="humanize()">
+        <i class="fas fa-magic" style="margin-right: 8px;"></i> Humanize Text
+      </button>
+      <button onclick="clearText()">
+        <i class="fas fa-trash" style="margin-right: 8px;"></i> Clear
+      </button>
+    </div>
+    
+    <div class="features">
+      <div class="feature">
+        <i class="fas fa-check-circle"></i> Natural phrasing
+      </div>
+      <div class="feature">
+        <i class="fas fa-check-circle"></i> Adds imperfections
+      </div>
+      <div class="feature">
+        <i class="fas fa-check-circle"></i> Tone adjustment
+      </div>
+      <div class="feature">
+        <i class="fas fa-check-circle"></i> Conversational flow
+      </div>
+      <div class="feature tooltip">
+        <i class="fas fa-info-circle"></i> How it works
+        <span class="tooltiptext">Uses Gemini Flash AI to rewrite text with human-like qualities including contractions, varied sentence structure, and natural flow.</span>
+      </div>
+    </div>
+    
+    <div class="output-container">
+      <div class="output-header">
+        <label>Humanized Output:</label>
+        <div class="output-actions">
+          <button onclick="copyOutput()">
+            <i class="fas fa-copy"></i> Copy
+          </button>
+        </div>
+      </div>
+      <div class="output empty" id="outputText">
+        Your humanized text will appear here...
+      </div>
+    </div>
+  </div>
+  
+  <footer>
+    <p>Powered by Whizan.AI 
+  </footer>
+
+  <script>
+    const API_KEY = 'AIzaSyAM1p730RTRu40S1sHghd1KD4501K6iCsI'; // <-- Replace with your Gemini Flash API Key
+    const MODEL = 'models/gemini-1.5-flash-latest';
+    const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+    async function humanize() {
+      const input = document.getElementById('inputText').value.trim();
+      const tone = document.getElementById('tone').value;
+      const outputBox = document.getElementById('outputText');
+      
+      if (!input) {
+        showAlert('Please enter some text first.');
+        return;
+      }
+
+      // Show loading state
+      outputBox.innerHTML = `
+        <div class="loading">
+          <div class="spinner"></div>
+          <div>Rewriting your text in ${tone} tone...</div>
+        </div>
+      `;
+      outputBox.classList.remove('empty');
+
+      const prompt = `
+You are a human editor rewriting AI-generated content so that it no longer appears to be written by AI.
+
+1. Keep the original meaning.
+2. Add some mild imperfections, contractions, and varied sentence lengths.
+3. Use more natural phrasing, idioms, and human expressions.
+4. Avoid overly formal or robotic tones.
+5. Breaks rhythm: fragments, questions, dashes, pauses
+6. Uses contractions ("don't", "I'm")
+7. Makes mistakes or informal transitions ("Anyway..." / "You know what I mean?")
+8. May repeat an idea slightly
+9. Adds real-world references (e.g., "like how TikTok trends come and go")
+10. Write like a human actually would in a ${tone} tone.
+
+Original Text:
+"${input}"
+
+Now rewrite it.`;
+
+      try {
+        const response = await fetch(ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          })
+        });
+
+        const data = await response.json();
+        const output = data.candidates?.[0]?.content?.parts?.[0]?.text || '⚠️ No response generated.';
+        
+        // Typewriter effect
+        typeWriter(outputBox, output);
+
+      } catch (error) {
+        console.error(error);
+        outputBox.textContent = '❌ Error communicating with Gemini API. Please check your API key and try again.';
+        outputBox.classList.add('empty');
+      }
+    }
+    
+    function typeWriter(element, text, i = 0) {
+      if (i < text.length) {
+        element.textContent = text.substring(0, i + 1);
+        setTimeout(() => typeWriter(element, text, i + 1), 10 + Math.random() * 20);
+      }
+    }
+    
+    function clearText() {
+      document.getElementById('inputText').value = '';
+      const outputBox = document.getElementById('outputText');
+      outputBox.textContent = 'Your humanized text will appear here...';
+      outputBox.classList.add('empty');
+    }
+    
+    function copyOutput() {
+      const outputText = document.getElementById('outputText').textContent;
+      if (outputText && !document.getElementById('outputText').classList.contains('empty')) {
+        navigator.clipboard.writeText(outputText)
+          .then(() => showAlert('Text copied to clipboard!'))
+          .catch(err => showAlert('Failed to copy text: ' + err));
+      } else {
+        showAlert('No output text to copy');
+      }
+    }
+    
+    function showAlert(message) {
+      const alert = document.createElement('div');
+      alert.style.position = 'fixed';
+      alert.style.bottom = '20px';
+      alert.style.left = '50%';
+      alert.style.transform = 'translateX(-50%)';
+      alert.style.backgroundColor = 'var(--primary)';
+      alert.style.color = 'white';
+      alert.style.padding = '12px 24px';
+      alert.style.borderRadius = '8px';
+      alert.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+      alert.style.zIndex = '1000';
+      alert.style.animation = 'fadeIn 0.3s ease';
+      alert.textContent = message;
+      
+      document.body.appendChild(alert);
+      
+      setTimeout(() => {
+        alert.style.animation = 'fadeOut 0.3s ease';
+        setTimeout(() => document.body.removeChild(alert), 300);
+      }, 3000);
+    }
+    
+    function showApiInfo() {
+      const info = `
+        <div style="background: rgba(36,0,70,0.9); padding: 20px; border-radius: 10px; border: 1px solid var(--primary); max-width: 500px; margin: 20px auto;">
+          <h3 style="color: var(--light); margin-bottom: 15px;">API Information</h3>
+          <p>This tool uses the Gemini Flash API to humanize text.</p>
+          <p style="margin-top: 10px;"><strong>Current API Key:</strong> ${API_KEY ? '*****' + API_KEY.slice(-5) : 'Not set'}</p>
+          <p style="margin-top: 10px;">To use your own API key, replace the value in the script tag.</p>
+          <button onclick="this.parentElement.style.display='none'" style="margin-top: 15px; background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">Close</button>
+        </div>
+      `;
+      
+      const div = document.createElement('div');
+      div.style.position = 'fixed';
+      div.style.top = '0';
+      div.style.left = '0';
+      div.style.width = '100%';
+      div.style.height = '100%';
+      div.style.backgroundColor = 'rgba(0,0,0,0.7)';
+      div.style.display = 'flex';
+      div.style.alignItems = 'center';
+      div.style.justifyContent = 'center';
+      div.style.zIndex = '2000';
+      div.innerHTML = info;
+      
+      document.body.appendChild(div);
+    }
+  </script>
+
+</body>
+</html>

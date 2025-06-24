@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whizan AI - The Ultimate Student AI Toolkit | Coming July 29, 2025</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        :root {
+            --primary: #6e00ff;
+            --primary-dark: #4b00b0;
+            --secondary: #ff00e4;
+            --black: #0a0a0a;
+            --white: #ffffff;
+            --gray: #a0a0a0;
+            --purple-light: #b388ff;
+            --purple-lighter: #d1b3ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--black), #1a0033);
+            color: var(--white);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Particle Background */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        /* Floating Elements */
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.6;
+            z-index: -1;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .floating-element:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            background: var(--secondary);
+            top: 60%;
+            left: 70%;
+            animation-delay: 2s;
+        }
+
+        .floating-element:nth-child(3) {
+            width: 250px;
+            height: 250px;
+            background: var(--purple-light);
+            top: 30%;
+            left: 80%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) translateX(0);
+            }
+
+            50% {
+                transform: translateY(-50px) translateX(20px);
+            }
+        }
+
+        /* Header */
+        header {
+            padding: 2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 0.5rem;
+            font-size: 2.2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--purple-light);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 5rem 5%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--white), var(--purple-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        .rotating-headline {
+            min-height: 120px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .headline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+            font-size: 2.5rem;
+            font-weight: 600;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .headline.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: var(--white);
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(110, 0, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .cta-button:hover::before {
+            opacity: 1;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(110, 0, 255, 0.4);
+        }
+
+        /* Countdown Timer */
+        .countdown-container {
+            position: fixed;
+            top: 50%;
+            right: 3%;
+            transform: translateY(-50%);
+            background: rgba(26, 0, 51, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(110, 0, 255, 0.2);
+            z-index: 100;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(110, 0, 255, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(110, 0, 255, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(110, 0, 255, 0);
+            }
+        }
+
+        .countdown-title {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--purple-light);
+            text-align: center;
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .countdown-item {
+            text-align: center;
+        }
+
+        .countdown-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .countdown-label {
+            font-size: 0.7rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 5rem 5%;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            position: relative;
+            display: block;
+            /* Changed from inline-block */
+            width: 100%;
+            /* Added */
+            left: auto;
+            /* Remove these two lines */
+            transform: none;
+            /* Remove these two lines */
+        }
+
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, transparent, var(--primary), transparent);
+            border-radius: 3px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: rgba(26, 0, 51, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(110, 0, 255, 0.2);
+            z-index: 1;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(110, 0, 255, 0.1), rgba(255, 0, 228, 0.05));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(110, 0, 255, 0.2);
+            border-color: rgba(110, 0, 255, 0.4);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .feature-desc {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .priority-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: var(--white);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: 0 5px 15px rgba(110, 0, 255, 0.3);
+        }
+
+        .sub-features {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            padding-left: 1rem;
+        }
+
+        .feature-card:hover .sub-features {
+            max-height: 500px;
+        }
+
+        .sub-feature-item {
+            margin-bottom: 0.5rem;
+            color: var(--purple-lighter);
+            position: relative;
+            padding-left: 1.2rem;
+            font-size: 0.9rem;
+        }
+
+        .sub-feature-item::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+        }
+
+        /* Waitlist Section */
+        .waitlist {
+            padding: 5rem 5%;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(135deg, rgba(26, 0, 51, 0.7), rgba(70, 0, 130, 0.5));
+            margin: 5rem 0;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .waitlist::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(110, 0, 255, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .waitlist h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--white), var(--purple-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .waitlist p {
+            font-size: 1.1rem;
+            color: var(--gray);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        .waitlist-form {
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .email-input {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            color: var(--white);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .email-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(110, 0, 255, 0.2);
+        }
+
+        .email-input::placeholder {
+            color: var(--gray);
+        }
+
+        .submit-button {
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: var(--white);
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(110, 0, 255, 0.3);
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(110, 0, 255, 0.4);
+        }
+
+        .form-message {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            min-height: 20px;
+        }
+
+        .success-message {
+            color: #4caf50;
+        }
+
+        .error-message {
+            color: #f44336;
+        }
+
+        /* Platform Support */
+        .platforms {
+            padding: 3rem 5%;
+            text-align: center;
+        }
+
+        .platform-badges {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .platform-badge {
+            display: flex;
+            align-items: center;
+            background: rgba(26, 0, 51, 0.5);
+            backdrop-filter: blur(5px);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            border: 1px solid rgba(110, 0, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .platform-badge:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(110, 0, 255, 0.2);
+            border-color: rgba(110, 0, 255, 0.4);
+        }
+
+        .platform-badge i {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .platform-name {
+            font-weight: 500;
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 5%;
+            text-align: center;
+            background: rgba(10, 0, 20, 0.7);
+            margin-top: 5rem;
+            position: relative;
+        }
+
+        .footer-logo {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--gray);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--purple-light);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--gray);
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: var(--white);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Scroll Animations */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .logo-image {
+            height: 40px;
+            /* Adjust as needed */
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .headline {
+                font-size: 2rem;
+            }
+
+            .countdown-container {
+                position: static;
+                transform: none;
+                margin: 2rem auto;
+                max-width: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .nav-links {
+                gap: 1.5rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .headline {
+                font-size: 1.5rem;
+            }
+
+            .rotating-headline {
+                min-height: 90px;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .waitlist-form {
+                flex-direction: column;
+            }
+
+            .email-input,
+            .submit-button {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .headline {
+                font-size: 1.2rem;
+            }
+
+            .rotating-headline {
+                min-height: 70px;
+            }
+
+            .feature-card {
+                padding: 1.5rem;
+            }
+
+            .platform-badges {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Floating Background Elements -->
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+
+    <!-- Particle Background -->
+    <div id="particles-js"></div>
+
+    <!-- Header -->
+    <header class="animate-on-scroll">
+        <div class="logo">
+            <img src="Smart Study.jpeg" alt="Whizan AI Logo" class="logo-image">
+            <span>Whizan AI</span>
+        </div>
+        <nav class="nav-links">
+            <a href="preview/subject/contact.html">Contact</a>
+            <a href="preview/subject/privacy.html">Privacy Policy</a>
+            <a href="preview/subject/terms.html">Terms of Service</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="animate-on-scroll">The Ultimate AI Toolkit for Students</h1>
+            <div class="rotating-headline animate-on-scroll">
+                <div class="headline">Advanced Learning Platform with AI Assistance</div>
+                <div class="headline">Handwritten Assignment Generator</div>
+                <div class="headline">ATS-Friendly Resume Creator</div>
+                <div class="headline">Smart Goal Scheduler</div>
+                <div class="headline">Your Personal Study Companion</div>
+            </div>
+            <p class="animate-on-scroll">Assignments piling up? Mock tests around the corner? Resume still blank? Whizan
+                AI has got you covered with an all-in-one solution to study smarter, not harder.</p>
+            <a href="#waitlist" class="cta-button animate-on-scroll">Join Waitlist for Early Access</a>
+        </div>
+    </section>
+
+    <!-- Countdown Timer -->
+    <div class="countdown-container animate-on-scroll">
+        <div class="countdown-title">Launching In</div>
+        <div class="countdown">
+            <div class="countdown-item">
+                <div class="countdown-number" id="days">00</div>
+                <div class="countdown-label">Days</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-number" id="hours">00</div>
+                <div class="countdown-label">Hours</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-number" id="minutes">00</div>
+                <div class="countdown-label">Minutes</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-number" id="seconds">00</div>
+                <div class="countdown-label">Seconds</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <h2 class="section-title animate-on-scroll">Powerful Features</h2>
+        <div class="features-grid">
+            <!-- Feature 1 -->
+            <div class="feature-card animate-on-scroll">
+                <div class="priority-badge">1</div>
+                <div class="feature-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3 class="feature-title">Advanced Learning Platform</h3>
+                <p class="feature-desc">Comprehensive AI-powered learning environment with all the tools you need to
+                    excel.</p>
+                <div class="sub-features">
+                    <div class="sub-feature-item">Free courses + lecture dashboard</div>
+                    <div class="sub-feature-item">Built-in code editor</div>
+                    <div class="sub-feature-item">Performance analytics</div>
+                    <div class="sub-feature-item">Per lecture quiz generator</div>
+                    <div class="sub-feature-item">Per lecture notes</div>
+                    <div class="sub-feature-item">Test generator for learned topics</div>
+                    <div class="sub-feature-item">Live course discussion chat</div>
+                </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="feature-card animate-on-scroll">
+                <div class="priority-badge">2</div>
+                <div class="feature-icon">
+                    <i class="fas fa-pen-fancy"></i>
+                </div>
+                <h3 class="feature-title">Handwritten Assignment Generator</h3>
+                <p class="feature-desc">Convert digital assignments to natural-looking handwriting instantly.</p>
+                <div class="sub-features">
+                    <div class="sub-feature-item">Upload assignment PDF → auto-convert to natural handwriting</div>
+                    <div class="sub-feature-item">100+ handwriting fonts available</div>
+                    <div class="sub-feature-item">Upload personal handwriting sample for custom assignments</div>
+                    <div class="sub-feature-item">Natural handwriting simulation</div>
+                </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="feature-card animate-on-scroll">
+                <div class="priority-badge">3</div>
+                <div class="feature-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h3 class="feature-title">ATS-Friendly Resume Creator</h3>
+                <p class="feature-desc">Create professional resumes optimized for Applicant Tracking Systems.</p>
+                <div class="sub-features">
+                    <div class="sub-feature-item">One-click professional resume building</div>
+                    <div class="sub-feature-item">ATS optimization</div>
+                </div>
+            </div>
+
+            <!-- Feature 4 -->
+            <div class="feature-card animate-on-scroll">
+                <div class="priority-badge">4</div>
+                <div class="feature-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h3 class="feature-title">AI-Powered Goal Scheduler</h3>
+                <p class="feature-desc">Smart study planning that adapts to your progress and deadlines.</p>
+                <div class="sub-features">
+                    <div class="sub-feature-item">Smart study planning</div>
+                    <div class="sub-feature-item">Adaptive scheduling</div>
+                </div>
+            </div>
+
+            <!-- Feature 5 -->
+            <div class="feature-card animate-on-scroll">
+                <div class="priority-badge">5</div>
+                <div class="feature-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3 class="feature-title">Emotional Support Agent</h3>
+                <p class="feature-desc">Mental health support tailored for students' needs.</p>
+                <div class="sub-features">
+                    <div class="sub-feature-item">Mental health support for students</div>
+                    <div class="sub-feature-item">Stress management</div>
+                </div>
+            </div>
+
+            <!-- Feature 6 -->
+            <div class="feature-card animate-on-scroll">
+                <div class="priority-badge">6</div>
+                <div class="feature-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <h3 class="feature-title">Digital Library</h3>
+                <p class="feature-desc">Access to a vast collection of academic resources.</p>
+                <div class="sub-features">
+                    <div class="sub-feature-item">1 million+ books collection</div>
+                    <div class="sub-feature-item">Comprehensive academic resources</div>
+                </div>
+            </div>
+
+            <!-- Feature 7 -->
+            <div class="feature-card animate-on-scroll">
+                <div class="priority-badge">7</div>
+                <div class="feature-icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <h3 class="feature-title">Previous Year Papers</h3>
+                <p class="feature-desc">Database of college exam papers for practice.</p>
+                <div class="sub-features">
+                    <div class="sub-feature-item">College exam papers database</div>
+                </div>
+            </div>
+
+            <!-- Feature 8 -->
+            <div class="feature-card animate-on-scroll">
+                <div class="priority-badge">8</div>
+                <div class="feature-icon">
+                    <i class="fas fa-fire"></i>
+                </div>
+                <h3 class="feature-title">Motivational Content</h3>
+                <p class="feature-desc">Inspirational content to keep you going.</p>
+                <div class="sub-features">
+                    <div class="sub-feature-item">Inspirational shorts and content</div>
+                </div>
+            </div>
+
+            <!-- Feature 9 -->
+            <div class="feature-card animate-on-scroll">
+                <div class="priority-badge">9</div>
+                <div class="feature-icon">
+                    <i class="fas fa-laptop-code"></i>
+                </div>
+                <h3 class="feature-title">Latest Hackathon News</h3>
+                <p class="feature-desc">Stay updated with current tech competitions.</p>
+                <div class="sub-features">
+                    <div class="sub-feature-item">Current tech competition updates</div>
+                </div>
+            </div>
+
+            <!-- Feature 10 -->
+            <div class="feature-card animate-on-scroll">
+                <div class="priority-badge">10</div>
+                <div class="feature-icon">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <h3 class="feature-title">Health & Support Agent</h3>
+                <p class="feature-desc">Wellness tracking and support for students.</p>
+                <div class="sub-features">
+                    <div class="sub-feature-item">Wellness tracking and support</div>
+                </div>
+            </div>
+
+            <!-- Feature 11 -->
+            <div class="feature-card animate-on-scroll">
+                <div class="priority-badge">11</div>
+                <div class="feature-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3 class="feature-title">Coding Platform Progress Tracker</h3>
+                <p class="feature-desc">Monitor your development skills growth.</p>
+                <div class="sub-features">
+                    <div class="sub-feature-item">Development skill monitoring</div>
+                </div>
+            </div>
+
+            <!-- Feature 12 -->
+            <div class="feature-card animate-on-scroll">
+                <div class="priority-badge">12</div>
+                <div class="feature-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h3 class="feature-title">Achievement Tracker</h3>
+                <p class="feature-desc">Gamify your learning with milestones.</p>
+                <div class="sub-features">
+                    <div class="sub-feature-item">Progress gamification and milestones</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Waitlist Section -->
+    <section class="waitlist animate-on-scroll" id="waitlist">
+        <h2>Join Our Early Access Waitlist</h2>
+        <p>Be among the first to experience Whizan AI when we launch on July 29, 2025. Get exclusive early access offers
+            and updates.</p>
+        <form class="waitlist-form" id="waitlistForm">
+            <input type="email" class="email-input" id="email" placeholder="Enter your email address" required>
+            <button type="submit" class="submit-button">Join Waitlist</button>
+        </form>
+        <div class="form-message" id="formMessage"></div>
+    </section>
+
+    <!-- Platform Support -->
+    <section class="platforms animate-on-scroll" id="platforms">
+        <h2 class="section-title">Available On All Platforms</h2>
+        <div class="platform-badges">
+            <div class="platform-badge">
+                <i class="fab fa-apple"></i>
+                <span class="platform-name">iOS</span>
+            </div>
+            <div class="platform-badge">
+                <i class="fab fa-android"></i>
+                <span class="platform-name">Android</span>
+            </div>
+            <div class="platform-badge">
+                <i class="fas fa-globe"></i>
+                <span class="platform-name">Web</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="animate-on-scroll">
+        <div class="footer-logo">Whizan AI</div>
+        <div class="footer-links">
+            <a href="/index1.html">About Us</a>
+            <a href="/index1.html">Features</a>
+            <a href="preview/subject/contact.html">Contact</a>
+            <a href="preview/subject/privacy.html">Privacy Policy</a>
+            <a href="preview/subject/terms.html">Terms of Service</a>
+        </div>
+        <div class="social-links">
+            <a href="https://x.com/whizanai" class="social-link"><i class="fab fa-twitter"></i></a>
+            <a href="https://www.instagram.com/whizan.ai/" class="social-link"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.facebook.com/profile.php?id=61576231843736" class="social-link"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.linkedin.com/in/whizan-ai-06114a367/" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.youtube.com/@Whizanai" class="social-link"><i class="fab fa-youtube"></i></a>
+        </div>
+        <div class="copyright">
+            &copy; 2025 Whizan AI. All rights reserved.
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+      apiKey: "AIzaSyCVYdfql5aqHrChlA1v3nxRLkIbYyWMvUg",
+      authDomain: "study2-7bdc7.firebaseapp.com",
+      databaseURL: "https://study2-7bdc7-default-rtdb.firebaseio.com",
+      projectId: "study2-7bdc7",
+      storageBucket: "study2-7bdc7.firebasestorage.app",
+      messagingSenderId: "320617984870",
+      appId: "1:320617984870:web:04b61ea4ee88ae057e4ea7",
+      measurementId: "G-VRM14GRNWG"
+    };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Initialize Particles.js
+        document.addEventListener('DOMContentLoaded', function () {
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 80,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#6e00ff"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                        "polygon": {
+                            "nb_sides": 5
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.5,
+                        "random": false,
+                        "anim": {
+                            "enable": false,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": false,
+                            "speed": 40,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#6e00ff",
+                        "opacity": 0.2,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 2,
+                        "direction": "none",
+                        "random": false,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": false,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "grab"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 140,
+                            "line_linked": {
+                                "opacity": 1
+                            }
+                        },
+                        "bubble": {
+                            "distance": 400,
+                            "size": 40,
+                            "duration": 2,
+                            "opacity": 8,
+                            "speed": 3
+                        },
+                        "repulse": {
+                            "distance": 200,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        },
+                        "remove": {
+                            "particles_nb": 2
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
+
+            // Rotating Headlines
+            const headlines = document.querySelectorAll('.headline');
+            let currentHeadline = 0;
+
+            // Show first headline
+            headlines[currentHeadline].classList.add('active');
+
+            function rotateHeadlines() {
+                // Hide current headline
+                headlines[currentHeadline].classList.remove('active');
+
+                // Move to next headline
+                currentHeadline = (currentHeadline + 1) % headlines.length;
+
+                // Show next headline
+                headlines[currentHeadline].classList.add('active');
+            }
+
+            // Rotate every 3 seconds
+            setInterval(rotateHeadlines, 3000);
+
+            // Countdown Timer
+            const launchDate = new Date('July 29, 2025 00:00:00').getTime();
+
+            function updateCountdown() {
+                const now = new Date().getTime();
+                const distance = launchDate - now;
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById('days').innerHTML = days.toString().padStart(2, '0');
+                document.getElementById('hours').innerHTML = hours.toString().padStart(2, '0');
+                document.getElementById('minutes').innerHTML = minutes.toString().padStart(2, '0');
+                document.getElementById('seconds').innerHTML = seconds.toString().padStart(2, '0');
+            }
+
+            // Update immediately and then every second
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+
+            // Waitlist Form Submission
+            const waitlistForm = document.getElementById('waitlistForm');
+            const formMessage = document.getElementById('formMessage');
+
+            waitlistForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const email = document.getElementById('email').value;
+
+                // Simple email validation
+                if (!email || !email.includes('@') || !email.includes('.')) {
+                    formMessage.textContent = 'Please enter a valid email address.';
+                    formMessage.className = 'form-message error-message';
+                    return;
+                }
+
+                // Save to Firebase
+                database.ref('waitlist').push({
+                    email: email,
+                    timestamp: new Date().toISOString()
+                })
+                    .then(() => {
+                        formMessage.textContent = 'Thank you! You have been added to our waitlist.';
+                        formMessage.className = 'form-message success-message';
+                        waitlistForm.reset();
+
+                        // Clear message after 5 seconds
+                        setTimeout(() => {
+                            formMessage.textContent = '';
+                            formMessage.className = 'form-message';
+                        }, 5000);
+                    })
+                    .catch((error) => {
+                        formMessage.textContent = 'There was an error. Please try again.';
+                        formMessage.className = 'form-message error-message';
+                        console.erroddr('Error saving to Firebase:', error);
+                    });
+            });
+
+            // Scroll Animations
+            function checkScroll() {
+                const elements = document.querySelectorAll('.animate-on-scroll');
+
+                elements.forEach(element => {
+                    const elementTop = element.getBoundingClientRect().top;
+                    const windowHeight = window.innerHeight;
+
+                    if (elementTop < windowHeight - 100) {
+                        element.classList.add('visible');
+                    }
+                });
+            }
+
+            // Check on load and scroll
+            window.addEventListener('load', checkScroll);
+            window.addEventListener('scroll', checkScroll);
+
+            // Initial check
+            checkScroll();
+        });
+    </script>
+
+    <!-- <script>
+        document.addEventListener("contextmenu", function (e) {
+            e.preventDefault();
+        });
+    </script> -->
+</body>
+
+</html>

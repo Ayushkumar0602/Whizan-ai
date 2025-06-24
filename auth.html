@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | Whizan.AI</title>
+  <link rel="icon" type="image/png" href="Smart Study.jpeg">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  
+
+  <!-- Google Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a052e, #3b0f66);
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Auth Check Loader Overlay */
+    .auth-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1a052e, #3b0f66);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    .auth-loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .auth-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top: 4px solid #a855f7;
+      border-radius: 50%;
+      animation: authSpin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes authSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .auth-loader-text {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 300;
+      text-align: center;
+    }
+
+    .auth-loader-subtext {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    /* Floating particles */
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      filter: blur(1px);
+      pointer-events: none;
+      animation: float 15s linear infinite;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 1;
+      }
+
+      90% {
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(-100vh) translateX(100px);
+        opacity: 0;
+      }
+    }
+
+    /* Moving gradient background */
+    @keyframes moveBackground {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .moving-bg {
+      background: linear-gradient(270deg, #1a052e, #3b0f66, #6d28d9, #3b0f66, #1a052e);
+      background-size: 400% 400%;
+      animation: moveBackground 15s ease infinite;
+    }
+
+    .form-container {
+      width: 100%;
+      max-width: 450px;
+      padding: 40px;
+      z-index: 10;
+      animation: fadeInUp 0.8s ease-out;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .form-container.visible {
+      opacity: 1;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .form-box {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.4s ease;
+    }
+
+    .form-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      display: block;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-box h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 28px;
+      font-weight: 600;
+      background: linear-gradient(to right, #c084fc, #a855f7, #9333ea);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .input-group i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    input {
+      width: 100%;
+      padding: 15px 15px 15px 45px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      font-size: 16px;
+      color: #fff;
+      transition: all 0.3s ease;
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #a855f7;
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 500;
+      color: white;
+      background: linear-gradient(to right, #9333ea, #7e22ce);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button:hover {
+      background: linear-gradient(to right, #7e22ce, #6b21a8);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button .spinner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    button.loading {
+      pointer-events: none;
+      color: transparent;
+    }
+
+    button.loading .spinner {
+      opacity: 1;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 25px 0;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .divider::before {
+      margin-right: 15px;
+    }
+
+    .divider::after {
+      margin-left: 15px;
+    }
+
+    .google-btn {
+      background: linear-gradient(to right, #4285F4, #34A853);
+    }
+
+    .google-btn:hover {
+      background: linear-gradient(to right, #3367D6, #2E8B57);
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transform: translateX(200%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      backdrop-filter: blur(5px);
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    @keyframes spin {
+      to {
+        transform: translate(-50%, -50%) rotate(360deg);
+      }
+    }
+
+    .footer-text {
+      text-align: center;
+      margin-top: 20px;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 14px;
+    }
+
+    .footer-text a {
+      color: #c084fc;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .footer-text a:hover {
+      color: #a855f7;
+      text-decoration: underline;
+    }
+
+    @media(max-width: 768px) {
+      .form-container {
+        padding: 20px;
+      }
+
+      .form-box {
+        padding: 30px 20px;
+      }
+
+      .auth-loader-text {
+        font-size: 16px;
+      }
+
+      .auth-spinner {
+        width: 50px;
+        height: 50px;
+      }
+    }
+  </style>
+</head>
+
+<body class="moving-bg">
+  <!-- Auth Check Loader -->
+  <div class="auth-loader" id="authLoader">
+    <div class="auth-spinner"></div>
+    <div class="auth-loader-text">Checking authentication...</div>
+    <div class="auth-loader-subtext">Please wait while we verify your session</div>
+  </div>
+
+  <!-- Floating particles -->
+  <div id="particles"></div>
+
+  <div class="form-container" id="formContainer">
+    <div class="form-box">
+      <img src="Smart Study.jpeg" alt="Logo" class="logo">
+      <h2>Welcome Back</h2>
+
+      <div class="input-group">
+        <i class="fas fa-envelope"></i>
+        <input type="email" id="email" placeholder="Email Address">
+      </div>
+
+      <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="password" placeholder="Password">
+      </div>
+
+      <button onclick="login()">
+        <span>Sign In</span>
+        <div class="spinner"></div>
+      </button>
+
+      <button onclick="signup()" style="background: linear-gradient(to right, #6b21a8, #5b21b6);">
+        <span>Create Account</span>
+        <div class="spinner"></div>
+      </button>
+
+      <div class="divider">or continue with</div>
+
+      <button class="google-btn" onclick="googleLogin()">
+        <i class="fab fa-google"></i> <span>Google</span>
+        <div class="spinner"></div>
+      </button>
+
+      <p class="footer-text">
+        By continuing, you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    function createParticles() {
+      const container = document.getElementById('particles');
+      const particleCount = window.innerWidth < 768 ? 20 : 40;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+
+        // Random properties
+        const size = Math.random() * 4 + 1;
+        const posX = Math.random() * 100;
+        const delay = Math.random() * 15;
+        const duration = Math.random() * 10 + 10;
+        const opacity = Math.random() * 0.4 + 0.1;
+
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.left = `${posX}%`;
+        particle.style.bottom = `-20px`;
+        particle.style.opacity = opacity;
+        particle.style.animationDelay = `${delay}s`;
+        particle.style.animationDuration = `${duration}s`;
+
+        container.appendChild(particle);
+      }
+    }
+
+    // Initialize particles
+    createParticles();
+
+    // Function to hide auth loader and show form
+    function hideAuthLoader() {
+      const authLoader = document.getElementById('authLoader');
+      const formContainer = document.getElementById('formContainer');
+      
+      authLoader.classList.add('hidden');
+      setTimeout(() => {
+        formContainer.classList.add('visible');
+      }, 250);
+    }
+
+    // Firebase configuration
+    fetch('https://us-central1-study2-7bdc7.cloudfunctions.net/getConfig')
+      .then(response => response.json())
+      .then(config => {
+        // Use config.firebase instead of undefined firebaseConfig
+      
+        firebase.initializeApp(config.firebase);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Set persistence to LOCAL
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+          .then(() => {
+            // Check if user is already logged in
+            return auth.onAuthStateChanged(user => {
+              if (user) {
+                // User is signed in, show success message and redirect
+                const authLoader = document.getElementById('authLoader');
+                const spinner = authLoader.querySelector('.auth-spinner');
+                const text = authLoader.querySelector('.auth-loader-text');
+                const subtext = authLoader.querySelector('.auth-loader-subtext');
+                
+                // Update loader to show success state
+                spinner.style.borderTopColor = '#10b981';
+                text.textContent = 'Welcome back!';
+                subtext.textContent = 'Redirecting to dashboard...';
+                
+                setTimeout(() => {
+                  window.location.href = "afterlogin.html";
+                }, 1500);
+              } else {
+                // No user signed in, hide loader and show login form
+                hideAuthLoader();
+              }
+            });
+          })
+          .catch(err => {
+            console.error("Error setting persistence:", err);
+            hideAuthLoader();
+          });
+
+        function showToast(message, duration = 3000) {
+          const toast = document.getElementById('toast');
+          toast.textContent = message;
+          toast.classList.add('show');
+
+          setTimeout(() => {
+            toast.classList.remove('show');
+          }, duration);
+        }
+
+        function setButtonLoading(button, isLoading) {
+          button = button.tagName === 'BUTTON' ? button : button.closest('button');
+          if (isLoading) {
+            button.classList.add('loading');
+          } else {
+            button.classList.remove('loading');
+          }
+        }
+
+        function login() {
+          const email = document.getElementById('email').value;
+          const password = document.getElementById('password').value;
+          const button = event.target;
+
+          if (!email || !password) {
+            showToast('Please enter both email and password');
+            return;
+          }
+
+          setButtonLoading(button, true);
+
+          auth.signInWithEmailAndPassword(email, password)
+            .then(() => {
+              showToast('Login successful! Redirecting...');
+              setTimeout(() => window.location.href = "afterlogin.html", 1500);
+            })
+            .catch(err => {
+              setButtonLoading(button, false);
+              showToast('Login error: ' + err.message);
+            });
+        }
+
+        function signup() {
+          const email = document.getElementById('email').value;
+          const password = document.getElementById('password').value;
+          const button = event.target;
+
+          if (!email || !password) {
+            showToast('Please enter both email and password');
+            return;
+          }
+
+          if (password.length < 6) {
+            showToast('Password must be at least 6 characters');
+            return;
+          }
+
+          setButtonLoading(button, true);
+
+          auth.createUserWithEmailAndPassword(email, password)
+            .then(userCredential => {
+              return db.collection("users").doc(userCredential.user.uid).set({
+                email: email,
+                provider: "email",
+                createdAt: new Date()
+              });
+            })
+            .then(() => {
+              showToast('Account created! Redirecting...');
+              setTimeout(() => window.location.href = "afterlogin.html", 1500);
+            })
+            .catch(err => {
+              setButtonLoading(button, false);
+              showToast('Signup error: ' + err.message);
+            });
+        }
+
+        function googleLogin() {
+          const button = event.target.closest('button');
+          setButtonLoading(button, true);
+
+          const provider = new firebase.auth.GoogleAuthProvider();
+          auth.signInWithPopup(provider)
+            .then(result => {
+              return db.collection("users").doc(result.user.uid).set({
+                email: result.user.email,
+                name: result.user.displayName,
+                provider: "google",
+                createdAt: new Date()
+              }, { merge: true });
+            })
+            .then(() => {
+              showToast('Google login successful! Redirecting...');
+              setTimeout(() => window.location.href = "afterlogin.html", 1500);
+            })
+            .catch(err => {
+              setButtonLoading(button, false);
+              showToast('Google login error: ' + err.message);
+            });
+        }
+
+        // Make functions globally accessible so they can be called from HTML onclick events
+        window.login = login;
+        window.signup = signup;
+        window.googleLogin = googleLogin;
+
+      })
+      .catch(error => {
+        console.error("Failed to load config:", error);
+        // Hide loader and show form even on config error
+        hideAuthLoader();
+        // Show user-friendly error message
+        const toast = document.getElementById('toast');
+        if (toast) {
+          toast.textContent = 'Failed to load configuration. Please refresh the page.';
+          toast.classList.add('show');
+        }
+      });
+  </script>
+
+  <script>
+    // This script will obfuscate the main code when the page loads
+    document.addEventListener('DOMContentLoaded', function () {
+      const scripts = document.getElementsByTagName('script');
+      for (let i = 0; i < scripts.length; i++) {
+        if (scripts[i].textContent.includes('initializeFirebase') ||
+          scripts[i].textContent.includes('createParticles')) {
+          const originalContent = scripts[i].textContent;
+          const obfuscated = originalContent
+            .split('')
+            .map(c => c.charCodeAt(0).toString(16))
+            .join('');
+          scripts[i].textContent = `eval(unescape('${escape(obfuscated)}'.replace(/../g, '%$&')))`;
+        }
+      }
+    });
+  </script>
+
+  <!-- <script>
+      document.addEventListener("contextmenu", function (e) {
+        e.preventDefault();
+      });
+  </script> -->
+</body>
+
+</html>

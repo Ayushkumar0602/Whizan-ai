@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Whizan - Text Humanizer</title>
+    <link rel="icon" type="image/png" href="smart study.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0 50%; }
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, #1a1a1a, #000000);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #333;
+            animation: slideDown 0.6s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .app-logo {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .app-title {
+            flex: 1;
+        }
+
+        .app-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #8a2be2, #ff6b6b, #4ecdc4);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: textGradient 3s ease infinite;
+        }
+
+        @keyframes textGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .app-title p {
+            font-size: 12px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 20px;
+            background: rgba(26, 26, 26, 0.8);
+            padding: 25px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid #333;
+            animation: fadeInUp 0.8s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes fadeInUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        h2 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
+            font-size: 22px;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #8a2be2, transparent);
+            border-radius: 3px;
+            animation: underlineGrow 0.8s ease forwards;
+        }
+
+        @keyframes underlineGrow {
+            from { width: 0; opacity: 0; }
+            to { width: 60px; opacity: 1; }
+        }
+
+        .description {
+            text-align: center;
+            color: #888;
+            margin-bottom: 25px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #fff;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        select, button {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border-radius: 12px;
+            border: 1px solid #444;
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23888'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 20px;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #8a2be2;
+            box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.2);
+            transform: translateY(-2px);
+        }
+
+        textarea {
+            width: 100%;
+            height: 160px;
+            padding: 15px;
+            margin-top: 8px;
+            font-size: 16px;
+            line-height: 1.5;
+            border-radius: 12px;
+            border: 1px solid #444;
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            resize: vertical;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #8a2be2;
+            box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.2);
+            transform: translateY(-2px);
+        }
+
+        textarea::placeholder {
+            color: #666;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            background: linear-gradient(135deg, #8a2be2, #ff6b6b);
+            color: white;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(138, 43, 226, 0.3);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.6s ease;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(138, 43, 226, 0.4);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        .clear-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3) !important;
+        }
+
+        .clear-btn:hover {
+            box-shadow: 0 12px 35px rgba(231, 76, 60, 0.4) !important;
+        }
+
+        .output-container {
+            margin-top: 25px;
+            position: relative;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .output-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .output-actions button {
+            padding: 10px 16px;
+            font-size: 14px;
+            background: rgba(138, 43, 226, 0.2);
+            border: 1px solid #8a2be2;
+            flex: none;
+            width: auto;
+        }
+
+        .output-actions button:hover {
+            background: rgba(138, 43, 226, 0.4);
+        }
+
+        .output {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            white-space: pre-wrap;
+            min-height: 140px;
+            border: 1px solid #444;
+            transition: all 0.3s ease;
+            position: relative;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .output:hover {
+            border-color: #8a2be2;
+            box-shadow: inset 0 0 15px rgba(138, 43, 226, 0.1);
+        }
+
+        .output.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-style: italic;
+            text-align: center;
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(138, 43, 226, 0.2);
+            border-top: 4px solid #8a2be2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .feature {
+            background: rgba(138, 43, 226, 0.1);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #fff;
+            animation: featureSlide 0.5s ease;
+            animation-fill-mode: both;
+        }
+
+        .feature:nth-child(1) { animation-delay: 0.1s; }
+        .feature:nth-child(2) { animation-delay: 0.2s; }
+        .feature:nth-child(3) { animation-delay: 0.3s; }
+        .feature:nth-child(4) { animation-delay: 0.4s; }
+        .feature:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes featureSlide {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .feature i {
+            color: #8a2be2;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            background: rgba(26, 26, 26, 0.9);
+            padding: 10px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid #333;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            padding: 12px 20px;
+            background: rgba(138, 43, 226, 0.2);
+            border: 1px solid #8a2be2;
+            border-radius: 20px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: #8a2be2;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(138, 43, 226, 0.4);
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 240px;
+            background-color: rgba(26, 26, 26, 0.95);
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 12px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            border: 1px solid #8a2be2;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .container {
+                margin: 15px;
+                padding: 20px;
+            }
+
+            .app-header {
+                padding: 12px 15px;
+            }
+
+            .app-logo {
+                width: 40px;
+                height: 40px;
+            }
+
+            .app-title h1 {
+                font-size: 20px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            textarea {
+                height: 140px;
+            }
+
+            .output {
+                min-height: 120px;
+                font-size: 14px;
+            }
+
+            .navigation {
+                bottom: 15px;
+                flex-wrap: wrap;
+                max-width: calc(100% - 30px);
+            }
+
+            .nav-btn {
+                padding: 10px 15px;
+                font-size: 12px;
+            }
+
+            .features {
+                justify-content: center;
+            }
+
+            .feature {
+                font-size: 11px;
+                padding: 6px 10px;
+            }
+        }
+
+        /* Touch-friendly improvements */
+        button, .nav-btn, select, textarea {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        textarea {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Hide scrollbar but keep functionality */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(138, 43, 226, 0.5);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(138, 43, 226, 0.8);
+        }
+
+        /* Floating animation */
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-header">
+        <img src="smart study.png" alt="Whizan Logo" class="app-logo">
+        <div class="app-title">
+            <h1>Whizan</h1>
+            <p>Text Humanizer</p>
+        </div>
+    </div>
+
+    <div class="container floating">
+        <h2>AI Text Humanizer</h2>
+        <p class="description">Transform robotic AI text into natural, human-like writing with advanced AI technology</p>
+        
+        <div class="input-group">
+            <label for="tone">Writing Tone:</label>
+            <select id="tone">
+                <option value="friendly">Friendly</option>
+                <option value="professional">Professional</option>
+                <option value="casual">Casual</option>
+                <option value="academic">Academic</option>
+                <option value="conversational">Conversational</option>
+            </select>
+        </div>
+        
+        <div class="input-group">
+            <label for="inputText">Your AI-generated Text:</label>
+            <textarea id="inputText" placeholder="Paste your formal/robotic text here..."></textarea>
+        </div>
+        
+        <div class="button-group">
+            <button onclick="humanize()">
+                ✨ Humanize Text
+            </button>
+            <button onclick="clearText()" class="clear-btn">
+                🗑️ Clear
+            </button>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <i>✓</i> Natural phrasing
+            </div>
+            <div class="feature">
+                <i>✓</i> Adds imperfections
+            </div>
+            <div class="feature">
+                <i>✓</i> Tone adjustment
+            </div>
+            <div class="feature">
+                <i>✓</i> Conversational flow
+            </div>
+            <div class="feature tooltip">
+                <i>ℹ</i> How it works
+                <span class="tooltiptext">Uses Gemini Flash AI to rewrite text with human-like qualities including contractions, varied sentence structure, and natural flow.</span>
+            </div>
+        </div>
+        
+        <div class="output-container">
+            <div class="output-header">
+                <label>Humanized Output:</label>
+                <div class="output-actions">
+                    <button onclick="copyOutput()">
+                        📋 Copy
+                    </button>
+                </div>
+            </div>
+            <div class="output empty" id="outputText">
+                Your humanized text will appear here...
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="navigation">
+        <a href="cheat.html" class="nav-btn">📄 Cheat</a>
+        <a href="humaniser.html" class="nav-btn active">🤖 Humanizer</a>
+        <a href="pi.html" class="nav-btn">💬 AI Chat</a>
+    </div> -->
+
+    <script>
+        const API_KEY = 'AIzaSyAM1p730RTRu40S1sHghd1KD4501K6iCsI';
+        const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+        async function humanize() {
+            const input = document.getElementById('inputText').value.trim();
+            const tone = document.getElementById('tone').value;
+            const outputBox = document.getElementById('outputText');
+            
+            if (!input) {
+                showAlert('Please enter some text first.');
+                return;
+            }
+
+            // Show loading state
+            outputBox.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <div>Rewriting your text in ${tone} tone...</div>
+                </div>
+            `;
+            outputBox.classList.remove('empty');
+
+            const prompt = `
+You are a human editor rewriting AI-generated content so that it no longer appears to be written by AI.
+
+1. Keep the original meaning.
+2. Add some mild imperfections, contractions, and varied sentence lengths.
+3. Use more natural phrasing, idioms, and human expressions.
+4. Avoid overly formal or robotic tones.
+5. Breaks rhythm: fragments, questions, dashes, pauses
+6. Uses contractions ("don't", "I'm")
+7. Makes mistakes or informal transitions ("Anyway..." / "You know what I mean?")
+8. May repeat an idea slightly
+9. Adds real-world references (e.g., "like how TikTok trends come and go")
+10. Write like a human actually would in a ${tone} tone.
+
+Original Text:
+"${input}"
+
+Now rewrite it.`;
+
+            try {
+                const response = await fetch(ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }]
+                    })
+                });
+
+                const data = await response.json();
+                const output = data.candidates?.[0]?.content?.parts?.[0]?.text || '⚠️ No response generated.';
+                
+                // Typewriter effect
+                typeWriter(outputBox, output);
+
+            } catch (error) {
+                console.error(error);
+                outputBox.textContent = '❌ Error communicating with AI. Please check your connection and try again.';
+                outputBox.classList.add('empty');
+            }
+        }
+        
+        function typeWriter(element, text, i = 0) {
+            element.classList.remove('empty');
+            if (i < text.length) {
+                element.textContent = text.substring(0, i + 1);
+                setTimeout(() => typeWriter(element, text, i + 1), 10 + Math.random() * 20);
+            }
+        }
+        
+        function clearText() {
+            document.getElementById('inputText').value = '';
+            const outputBox = document.getElementById('outputText');
+            outputBox.textContent = 'Your humanized text will appear here...';
+            outputBox.classList.add('empty');
+        }
+        
+        function copyOutput() {
+            const outputText = document.getElementById('outputText').textContent;
+            if (outputText && !document.getElementById('outputText').classList.contains('empty')) {
+                navigator.clipboard.writeText(outputText)
+                    .then(() => showAlert('Text copied to clipboard!'))
+                    .catch(err => showAlert('Failed to copy text: ' + err));
+            } else {
+                showAlert('No output text to copy');
+            }
+        }
+        
+        function showAlert(message) {
+            const alert = document.createElement('div');
+            alert.style.position = 'fixed';
+            alert.style.bottom = '100px';
+            alert.style.left = '50%';
+            alert.style.transform = 'translateX(-50%)';
+            alert.style.backgroundColor = '#8a2be2';
+            alert.style.color = 'white';
+            alert.style.padding = '12px 24px';
+            alert.style.borderRadius = '12px';
+            alert.style.boxShadow = '0 8px 25px rgba(138, 43, 226, 0.4)';
+            alert.style.zIndex = '2000';
+            alert.style.fontSize = '14px';
+            alert.style.fontWeight = '500';
+            alert.style.animation = 'fadeIn 0.3s ease';
+            alert.textContent = message;
+            
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => document.body.removeChild(alert), 300);
+            }, 3000);
+        }
+
+        // Auto-resize textarea
+        document.getElementById('inputText').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Add fade in animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+                to { opacity: 1; transform: translateX(-50%) translateY(0); }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translateX(-50%) translateY(0); }
+                to { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Disable context menu
+        document.addEventListener("contextmenu", function (e) {
+            e.preventDefault();
+        });
+    </script>
+</body>
+</html>

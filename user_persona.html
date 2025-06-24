@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>User Personal</title>
+    <link rel="icon" type="image/png" href="Smart Study.jpeg">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-purple: #8B5CF6;
+            --secondary-purple: #A855F7;
+            --accent-purple: #C084FC;
+            --deep-purple: #6B21A8;
+            --neon-purple: #D946EF;
+            --dark-bg: #0F0F0F;
+            --card-bg: rgba(139, 92, 246, 0.08);
+            --card-border: rgba(139, 92, 246, 0.2);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --text-primary: #E5E7EB;
+            --text-secondary: #9CA3AF;
+            --glow-purple: rgba(139, 92, 246, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Animated Background */
+        .cosmic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(217, 70, 239, 0.08) 0%, transparent 50%),
+                linear-gradient(135deg, #0F0F0F 0%, #1A1A1A 50%, #0F0F0F 100%);
+            animation: cosmicPulse 20s ease-in-out infinite;
+            z-index: -2;
+        }
+
+        @keyframes cosmicPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Floating Orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(1px);
+            animation: float 15s linear infinite;
+            z-index: -1;
+        }
+
+        .orb-1 {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.3), transparent);
+            top: 10%;
+            left: -100px;
+            animation-duration: 25s;
+        }
+
+        .orb-2 {
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(217, 70, 239, 0.2), transparent);
+            top: 60%;
+            right: -75px;
+            animation-duration: 30s;
+            animation-direction: reverse;
+        }
+
+        .orb-3 {
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.25), transparent);
+            bottom: 20%;
+            left: 20%;
+            animation-duration: 20s;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(120deg); }
+            66% { transform: translateY(20px) rotate(240deg); }
+            100% { transform: translateY(0px) rotate(360deg); }
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary-purple), var(--neon-purple), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            animation: logoGlow 3s ease-in-out infinite alternate;
+            text-shadow: 0 0 30px var(--glow-purple);
+            position: relative;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(ellipse, var(--glow-purple), transparent 70%);
+            filter: blur(20px);
+            z-index: -1;
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes logoGlow {
+            0% { filter: brightness(1) saturate(1); }
+            100% { filter: brightness(1.2) saturate(1.3); }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            letter-spacing: 2px;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.5s forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Welcome Message */
+        .welcome-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: slideInScale 1s ease 0.8s both;
+        }
+
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, var(--primary-purple), transparent);
+            animation: rotate 10s linear infinite;
+            z-index: -1;
+        }
+
+        .welcome-section::after {
+            content: '';
+            position: absolute;
+            inset: 1px;
+            background: var(--dark-bg);
+            border-radius: 20px;
+            z-index: -1;
+        }
+
+        @keyframes slideInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .welcome-message {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent-purple);
+        }
+
+        .welcome-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Navigation Grid */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+            margin-bottom: 3rem;
+        }
+
+        .nav-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 2.5rem 2rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+            animation: cardAppear 0.8s ease forwards;
+            animation-delay: calc(var(--delay) * 0.1s);
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .nav-card:nth-child(1) { --delay: 1; }
+        .nav-card:nth-child(2) { --delay: 2; }
+        .nav-card:nth-child(3) { --delay: 3; }
+        .nav-card:nth-child(4) { --delay: 4; }
+        .nav-card:nth-child(5) { --delay: 5; }
+        .nav-card:nth-child(6) { --delay: 6; }
+        .nav-card:nth-child(7) { --delay: 7; }
+        .nav-card:nth-child(8) { --delay: 8; }
+
+        @keyframes cardAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .nav-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary-purple), var(--neon-purple));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 24px;
+            z-index: -1;
+        }
+
+        .nav-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            border-color: var(--primary-purple);
+            box-shadow: 
+                0 20px 40px rgba(139, 92, 246, 0.2),
+                0 0 0 1px rgba(139, 92, 246, 0.3);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--primary-purple), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        .nav-card:hover .card-icon {
+            transform: scale(1.2) rotate(5deg);
+            filter: drop-shadow(0 0 10px var(--glow-purple));
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-card:hover .card-title {
+            color: var(--accent-purple);
+        }
+
+        .card-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--neon-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+            animation: fabPulse 3s ease-in-out infinite;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(139, 92, 246, 0.6);
+        }
+
+        @keyframes fabPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Sign Out Button */
+        .sign-out-btn {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(217, 70, 239, 0.2));
+            border: 2px solid var(--primary-purple);
+            color: var(--text-primary);
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            animation: buttonSlideIn 1s ease 1.5s both;
+        }
+
+        .sign-out-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .sign-out-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+            border-color: var(--accent-purple);
+        }
+
+        .sign-out-btn:hover::before {
+            left: 100%;
+        }
+
+        @keyframes buttonSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Loading State */
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(139, 92, 246, 0.3);
+            border-top: 3px solid var(--primary-purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        /* Particles */
+        .particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: var(--primary-purple);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFloat 8s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+
+            .logo {
+                font-size: 2.5rem;
+            }
+
+            .nav-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .nav-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .fab {
+                bottom: 1rem;
+                right: 1rem;
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 2rem;
+            }
+
+            .nav-card {
+                padding: 1.5rem 1rem;
+            }
+
+            .card-title {
+                font-size: 1.1rem;
+            }
+
+            .sign-out-btn {
+                padding: 0.8rem 2rem;
+                font-size: 1rem;
+            }
+        }
+
+        /* Hidden states */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <div class="cosmic-bg"></div>
+    
+    <!-- Floating Orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- Loading State -->
+    <div id="loading" class="loading-state">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Initializing WhizanAi...</div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="content" class="main-container hidden">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="logo">WhizanAi</h1>
+            <p class="subtitle">Your Gateway to Knowledge</p>
+        </header>
+
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <h2 id="welcomeMsg" class="welcome-message">Welcome!</h2>
+            <p class="welcome-subtitle">Ready to explore the universe of learning?</p>
+        </section>
+
+        <!-- Navigation Grid -->
+        <nav class="nav-grid">
+            
+            <a href="resume.html" class="nav-card">
+                <i class="fas fa-briefcase card-icon"></i>
+                <div class="card-title">Resume & Portfolio</div>
+                <div class="card-description">Create professional resumes and showcases</div>
+            </a>
+
+            <a href="interview.html" class="nav-card">
+                <i class="fas fa-laptop-code card-icon"></i>
+                <div class="card-title">Mock Interview</div>
+                <div class="card-description">Practice with AI-powered interview simulations</div>
+            </a>
+            
+
+            <a href="abc.html" class="nav-card">
+                <i class="fas fa-fire card-icon"></i>
+                <div class="card-title">Motivational Hub</div>
+                <div class="card-description">Get inspired with motivational content</div>
+            </a>
+
+            <a href="pi.html" class="nav-card">
+                <i class="fas fa-heart card-icon"></i>
+                <div class="card-title">Emotional Support</div>
+                <div class="card-description">AI companion for emotional guidance</div>
+            </a>
+
+            <a href="health.html" class="nav-card">
+                <i class="fas fa-heartbeat card-icon"></i>
+                <div class="card-title">Health & Wellness</div>
+                <div class="card-description">Monitor and improve your wellbeing</div>
+            </a>
+
+            <a href="hackathon.html" class="nav-card">
+                <i class="fas fa-trophy card-icon"></i>
+                <div class="card-title">Latest Hackathons</div>
+                <div class="card-description">Discover coding competitions and events</div>
+            </a>
+
+            <a href="humaniser.html" class="nav-card">
+                <i class="fas fa-magic card-icon"></i>
+                <div class="card-title">Text Humanizer</div>
+                <div class="card-description">Transform AI text to human-like content</div>
+            </a>
+
+            <a href="cheat.html" class="nav-card">
+                <i class="fas fa-scroll card-icon"></i>
+                <div class="card-title">Exam Cheat Sheets</div>
+                <div class="card-description">Quick reference guides for exams</div>
+            </a>
+            
+        </nav>
+
+        <!-- Sign Out Button -->
+        <button id="signOutBtn" class="sign-out-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            Sign Out
+        </button>
+    </div>
+
+    <!-- Not Logged In State -->
+    <div id="not-logged-in" class="loading-state hidden">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">You are not logged in. Redirecting...</div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <div class="fab" title="Quick Actions">
+        <i class="fas fa-plus"></i>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const particleCount = window.innerWidth < 768 ? 15 : 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random properties
+                const size = Math.random() * 3 + 2;
+                const posX = Math.random() * 100;
+                const duration = Math.random() * 6 + 4;
+                const delay = Math.random() * 8;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `-${delay}s`;
+                
+                // Random purple shades
+                const purpleShades = ['#8B5CF6', '#A855F7', '#C084FC', '#D946EF'];
+                particle.style.background = purpleShades[Math.floor(Math.random() * purpleShades.length)];
+                
+                document.body.appendChild(particle);
+            }
+        }
+
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVYdfql5aqHrChlA1v3nxRLkIbYyWMvUg",
+            authDomain: "study2-7bdc7.firebaseapp.com",
+            databaseURL: "https://study2-7bdc7-default-rtdb.firebaseio.com",
+            projectId: "study2-7bdc7",
+            storageBucket: "study2-7bdc7.firebasestorage.app",
+            messagingSenderId: "320617984870",
+            appId: "1:320617984870:web:04b61ea4ee88ae057e4ea7",
+            measurementId: "G-VRM14GRNWG"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        const loadingDiv = document.getElementById('loading');
+        const contentDiv = document.getElementById('content');
+        const notLoggedInDiv = document.getElementById('not-logged-in');
+        const welcomeMsg = document.getElementById('welcomeMsg');
+        const signOutBtn = document.getElementById('signOutBtn');
+
+        // Initialize particles
+        window.addEventListener('load', () => {
+            createParticles();
+            
+            // Add some delay for dramatic effect
+            setTimeout(() => {
+                loadingDiv.style.opacity = '0';
+                setTimeout(() => {
+                    loadingDiv.style.display = 'none';
+                }, 500);
+            }, 2000);
+        });
+
+        // Auth state observer
+        auth.onAuthStateChanged(user => {
+            setTimeout(() => {
+                loadingDiv.classList.add('hidden');
+                
+                if (user) {
+                    contentDiv.classList.remove('hidden');
+                    const displayName = user.displayName || user.email.split('@')[0];
+                    welcomeMsg.textContent = `Welcome back, ${displayName}!`;
+                } else {
+                    notLoggedInDiv.classList.remove('hidden');
+                    setTimeout(() => {
+                        window.location.href = "auth.html";
+                    }, 3000);
+                }
+            }, 2000);
+        });
+
+        // Sign out functionality
+        signOutBtn.addEventListener('click', () => {
+            signOutBtn.style.opacity = '0.5';
+            signOutBtn.style.pointerEvents = 'none';
+            
+            auth.signOut().then(() => {
+                window.location.href = "auth.html";
+            }).catch((error) => {
+                signOutBtn.style.opacity = '1';
+                signOutBtn.style.pointerEvents = 'auto';
+                console.error('Sign out error:', error);
+            });
+        });
+
+        // FAB functionality
+        document.querySelector('.fab').addEventListener('click', () => {
+            // Add quick action functionality here
+            alert('Quick actions coming soon!');
+        });
+
+        // Add hover sound effect simulation
+        document.querySelectorAll('.nav-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                // Visual feedback for hover
+                card.style.transform = 'translateY(-12px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+            });
+        });
+
+        // Prevent right-click context menu
+        document.addEventListener("contextmenu", function (e) {
+            e.preventDefault();
+        });
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                // Close any open modals or return to main view
+                console.log('Escape pressed');
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Whizan Resume Builder</title>
+  <link rel="icon" type="image/png" href="smart study.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --primary-dark: #5b21b6;
+      --secondary: #a855f7;
+      --accent: #c084fc;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --bg-primary: #000000;
+      --bg-secondary: #111111;
+      --bg-tertiary: #1a1a1a;
+      --text-primary: #ffffff;
+      --text-secondary: #a1a1aa;
+      --border: #27272a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated Background */
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .floating-shape {
+      position: absolute;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      border-radius: 50%;
+      opacity: 0.1;
+      animation: float 20s infinite linear;
+    }
+
+    .floating-shape:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      top: 20%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+
+    .floating-shape:nth-child(2) {
+      width: 120px;
+      height: 120px;
+      top: 60%;
+      right: 15%;
+      animation-delay: -5s;
+    }
+
+    .floating-shape:nth-child(3) {
+      width: 60px;
+      height: 60px;
+      bottom: 30%;
+      left: 20%;
+      animation-delay: -10s;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0px) rotate(0deg);
+        opacity: 0.1;
+      }
+      50% {
+        transform: translateY(-20px) rotate(180deg);
+        opacity: 0.2;
+      }
+      100% {
+        transform: translateY(0px) rotate(360deg);
+        opacity: 0.1;
+      }
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      margin-right: 15px;
+      border-radius: 8px;
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .container {
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    h2, h3 {
+      color: var(--secondary);
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    /* Form Elements */
+    form input,
+    form textarea,
+    form button,
+    select {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 16px;
+      font-family: inherit;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      transition: all 0.3s;
+    }
+
+    form input:focus,
+    form textarea:focus,
+    select:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.3);
+    }
+
+    form button {
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      cursor: pointer;
+      width: auto;
+      padding: 12px 28px;
+      border-radius: 25px;
+      margin: 15px 0;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+    }
+
+    form button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+    }
+
+    /* Resume Preview */
+    #resumePreview {
+      margin-top: 30px;
+      background: var(--bg-secondary);
+      padding: 25px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      min-height: 200px;
+    }
+
+    /* Buttons */
+    #downloadBtn,
+    #shareBtn {
+      margin-top: 20px;
+      background: linear-gradient(90deg, var(--secondary), var(--accent));
+      color: white;
+      border: none;
+      cursor: pointer;
+      padding: 12px 25px;
+      border-radius: 25px;
+      margin-right: 10px;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+    }
+
+    #downloadBtn:hover,
+    #shareBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4);
+    }
+
+    .remove-btn {
+      background: var(--error);
+      color: white;
+      margin-top: 8px;
+      width: auto;
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: none;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .remove-btn:hover {
+      background: #dc2626;
+      transform: translateY(-2px);
+    }
+
+    /* Sections */
+    .section-group {
+      margin-bottom: 15px;
+      padding: 15px;
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      transition: all 0.3s;
+    }
+
+    .section-group:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Loading State */
+    .loading {
+      color: var(--secondary);
+      font-weight: 600;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Error Message */
+    .error-msg {
+      color: var(--error);
+      font-weight: 600;
+      margin: 10px 0;
+    }
+
+    /* Public Link Box */
+    #publicLinkBox {
+      margin-top: 15px;
+      padding: 12px 16px;
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      color: var(--secondary);
+      font-size: 14px;
+      word-break: break-all;
+      border: 1px solid var(--border);
+    }
+
+    /* Template Selector */
+    .template-selector {
+      margin: 15px 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .template-option {
+      padding: 15px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      background: var(--bg-secondary);
+      transition: all 0.3s;
+      color: var(--text-primary);
+    }
+
+    .template-option.selected {
+      border-color: var(--primary);
+      background: rgba(124, 58, 237, 0.1);
+      color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    /* Content Editable Summary */
+    #summary[contenteditable="true"] {
+      border: 1px solid var(--border);
+      min-height: 80px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      padding: 12px;
+      outline: none;
+      color: var(--text-primary);
+      transition: all 0.3s;
+    }
+
+    #summary[contenteditable="true"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.3);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 1.2rem;
+      }
+      
+      .logo {
+        width: 35px;
+        height: 35px;
+      }
+      
+      .container {
+        padding: 15px;
+        margin: 15px;
+      }
+      
+      .template-selector {
+        grid-template-columns: 1fr;
+      }
+      
+      #downloadBtn,
+      #shareBtn {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header {
+        padding: 15px;
+      }
+      
+      .container {
+        padding: 10px;
+        margin: 10px;
+      }
+      
+      form input,
+      form textarea,
+      form button,
+      select {
+        font-size: 16px; /* Prevent zoom on iOS */
+      }
+    }
+
+    /* Skill Bars */
+    .skill-bar-container {
+      margin: 8px 0;
+    }
+
+    .skill-bar-label {
+      font-weight: 500;
+      margin-bottom: 4px;
+      color: var(--text-primary);
+    }
+
+    .skill-bar {
+      width: 100%;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      height: 6px;
+    }
+
+    .skill-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      transition: width 0.7s;
+    }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+
+<body>
+  <div class="animated-bg">
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+    <div class="floating-shape"></div>
+  </div>
+
+  <div class="header">
+    <img src="smart study.png" alt="Whizan" class="logo">
+    <h1>Whizan Resume Builder</h1>
+  </div>
+
+  <div class="container">
+    <!-- Theme Selector -->
+    <label for="themeSelect"><b>Choose Resume Theme:</b></label>
+    <select id="themeSelect">
+      <option value="classic">Classic</option>
+      <option value="modern">Modern</option>
+      <option value="elegant">Elegant</option>
+      <option value="minimal">Minimal</option>
+    </select>
+
+    <!-- Resume Template Selector -->
+    <h3>Select Resume Template</h3>
+    <div class="template-selector" id="templateSelector">
+      <div class="template-option selected" data-template="single-column">Single Column</div>
+      <div class="template-option" data-template="double-column">Double Column</div>
+      <div class="template-option" data-template="sidebar">Sidebar Layout</div>
+    </div>
+
+    <!-- Login Form -->
+    <form id="loginForm">
+      <h2>Sign In</h2>
+      <input type="email" id="loginEmail" placeholder="Email" required />
+      <input type="password" id="loginPassword" placeholder="Password" required />
+      <button type="submit">Sign In</button>
+      <button type="button" id="registerBtn">Register</button>
+      <div id="loginError" class="error-msg"></div>
+    </form>
+
+    <!-- Resume Builder Form -->
+    <form id="resumeForm" autocomplete="off" class="hidden">
+      <h2>Personal Information</h2>
+      <input type="text" id="name" placeholder="Full Name" required />
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="text" id="phone" placeholder="Phone Number" required />
+      <input type="text" id="location" placeholder="City, State, Country" required />
+      <input type="text" id="linkedin" placeholder="LinkedIn URL" />
+      <input type="text" id="github" placeholder="GitHub URL" />
+      <input type="text" id="portfolio" placeholder="Portfolio URL" />
+
+      <h3>Industry & Job Role</h3>
+      <input type="text" id="industry" placeholder="Industry (e.g. Software Development)" />
+      <input type="text" id="jobRole" placeholder="Job Role (e.g. Frontend Developer)" />
+      <button type="button" id="getKeywordsBtn">Get ATS Keywords</button>
+      <textarea id="keywordSuggestions" rows="3" readonly placeholder="Keyword suggestions will appear here..."></textarea>
+
+      <h2>Professional Summary</h2>
+      <div id="summary" contenteditable="true" placeholder="Brief summary about yourself..."></div>
+
+      <h2>Education</h2>
+      <div id="educationSection"></div>
+      <button type="button" onclick="addEducation()">Add Education</button>
+
+      <h2>Experience</h2>
+      <div id="experienceSection"></div>
+      <button type="button" onclick="addExperience()">Add Experience</button>
+
+      <h2>Projects</h2>
+      <div id="projectsSection"></div>
+      <button type="button" onclick="addProject()">Add Project</button>
+
+      <h2>Skills</h2>
+      <input type="text" id="skills" placeholder="Comma-separated skills" required />
+
+      <h2>Certifications & Achievements</h2>
+      <div id="certificationsSection"></div>
+      <button type="button" onclick="addCertification()">Add Certification</button>
+
+      <button type="submit">Generate Resume</button>
+    </form>
+
+    <div id="loading" class="loading hidden">Generating your resume with AI...</div>
+    <div id="resumePreview"></div>
+    <button id="downloadBtn" class="hidden">Download PDF</button>
+    <button id="shareBtn" class="hidden">Share Link</button>
+    <div id="publicLinkBox" class="hidden"></div>
+  </div>
+
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCVYdfql5aqHrChlA1v3nxRLkIbYyWMvUg",
+      authDomain: "study2-7bdc7.firebaseapp.com",
+      databaseURL: "https://study2-7bdc7-default-rtdb.firebaseio.com",
+      projectId: "study2-7bdc7",
+      storageBucket: "study2-7bdc7.appspot.com",
+      messagingSenderId: "320617984870",
+      appId: "1:320617984870:web:04b61ea4ee88ae057e4ea7",
+      measurementId: "G-VRM14GRNWG"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Auth Logic
+    const loginForm = document.getElementById('loginForm');
+    const resumeForm = document.getElementById('resumeForm');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const loginError = document.getElementById('loginError');
+    const publicLinkBox = document.getElementById('publicLinkBox');
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        loginForm.classList.add('hidden');
+        resumeForm.classList.remove('hidden');
+        document.getElementById('email').value = user.email || '';
+      } else {
+        loginForm.classList.remove('hidden');
+        resumeForm.classList.add('hidden');
+        downloadBtn.classList.add('hidden');
+        shareBtn.classList.add('hidden');
+        document.getElementById('resumePreview').innerHTML = '';
+        publicLinkBox.classList.add('hidden');
+      }
+    });
+
+    loginForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      loginError.textContent = '';
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .catch(err => {
+          loginError.textContent = err.message;
+        });
+    });
+
+    document.getElementById('registerBtn').addEventListener('click', function () {
+      loginError.textContent = '';
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      if (!email || !password) {
+        loginError.textContent = "Enter email and password to register.";
+        return;
+      }
+      firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then(() => {
+          loginError.textContent = "Registration successful!";
+        })
+        .catch(err => {
+          loginError.textContent = err.message;
+        });
+    });
+
+    // Resume Form Logic
+    function addEducation() {
+      const div = document.createElement('div');
+      div.className = "section-group";
+      div.innerHTML = `
+        <input type="text" placeholder="Degree" class="edu-degree" required />
+        <input type="text" placeholder="Institution" class="edu-inst" required />
+        <input type="text" placeholder="Year" class="edu-year" required />
+        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">Remove</button>
+      `;
+      document.getElementById('educationSection').appendChild(div);
+    }
+
+    function addExperience() {
+      const div = document.createElement('div');
+      div.className = "section-group";
+      div.innerHTML = `
+        <input type="text" placeholder="Job Title" class="exp-title" required />
+        <input type="text" placeholder="Company" class="exp-company" required />
+        <input type="text" placeholder="Location" class="exp-location" required />
+        <input type="text" placeholder="Duration" class="exp-duration" required />
+        <textarea placeholder="Description" class="exp-desc" required></textarea>
+        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">Remove</button>
+      `;
+      document.getElementById('experienceSection').appendChild(div);
+    }
+
+    function addProject() {
+      const div = document.createElement('div');
+      div.className = "section-group";
+      div.innerHTML = `
+        <input type="text" placeholder="Project Name" class="proj-name" required />
+        <textarea placeholder="Project Description" class="proj-desc" required></textarea>
+        <input type="url" placeholder="Project Link (optional)" class="proj-link" />
+        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">Remove</button>
+      `;
+      document.getElementById('projectsSection').appendChild(div);
+    }
+
+    function addCertification() {
+      const div = document.createElement('div');
+      div.className = "section-group";
+      div.innerHTML = `
+        <input type="text" placeholder="Certification Name" class="cert-name" required />
+        <input type="url" placeholder="Certificate Link (optional)" class="cert-link" />
+        <button type="button" class="remove-btn" onclick="this.parentElement.remove()">Remove</button>
+      `;
+      document.getElementById('certificationsSection').appendChild(div);
+    }
+
+    function getSectionValues(classNameSets) {
+      const sections = [];
+      const firstClass = classNameSets[0];
+      const elements = document.querySelectorAll(`.${firstClass}`);
+      for (let i = 0; i < elements.length; i++) {
+        const entry = {};
+        classNameSets.forEach(cls => {
+          entry[cls] = document.getElementsByClassName(cls)[i].value;
+        });
+        sections.push(entry);
+      }
+      return sections;
+    }
+
+    // Gemini API integration
+    async function generateWithGemini(prompt) {
+      const apiKey = "AIzaSyAM1p730RTRu40S1sHghd1KD4501K6iCsI";
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+      const body = {
+        contents: [{ parts: [{ text: prompt }] }]
+      };
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const data = await response.json();
+      if (data && data.candidates && data.candidates.length > 0) {
+        return data.candidates[0].content.parts[0].text;
+      }
+      return "";
+    }
+
+    let lastResumeId = null;
+    let selectedTemplate = 'single-column';
+
+    // Template Selector Logic
+    const templateSelector = document.getElementById('templateSelector');
+    templateSelector.addEventListener('click', e => {
+      if (e.target.classList.contains('template-option')) {
+        [...templateSelector.children].forEach(child => child.classList.remove('selected'));
+        e.target.classList.add('selected');
+        selectedTemplate = e.target.dataset.template;
+      }
+    });
+
+    // ATS Keywords
+    const getKeywordsBtn = document.getElementById('getKeywordsBtn');
+    const keywordSuggestions = document.getElementById('keywordSuggestions');
+    getKeywordsBtn.addEventListener('click', async () => {
+      const industry = document.getElementById('industry').value.trim();
+      const jobRole = document.getElementById('jobRole').value.trim();
+      if (!industry || !jobRole) {
+        alert("Please enter both Industry and Job Role.");
+        return;
+      }
+      getKeywordsBtn.disabled = true;
+      keywordSuggestions.value = "Fetching keywords...";
+      try {
+        const prompt = `Generate 10-15 ATS-friendly keywords for ${industry} and ${jobRole}. Provide keywords separated by commas.`;
+        const keywordsText = await generateWithGemini(prompt);
+        keywordSuggestions.value = keywordsText.trim();
+      } catch (err) {
+        keywordSuggestions.value = "Error: " + err.message;
+      }
+      getKeywordsBtn.disabled = false;
+    });
+
+    // Resume Form Submission
+    let lastResumeData = null;
+    resumeForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      document.getElementById('loading').classList.remove('hidden');
+      document.getElementById('resumePreview').innerHTML = '';
+      downloadBtn.classList.add('hidden');
+      shareBtn.classList.add('hidden');
+      publicLinkBox.classList.add('hidden');
+
+      const user = firebase.auth().currentUser;
+      if (!user) {
+        alert("You must be signed in.");
+        return;
+      }
+
+      // Gather data
+      const data = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        location: document.getElementById('location').value,
+        linkedin: document.getElementById('linkedin').value,
+        github: document.getElementById('github').value,
+        portfolio: document.getElementById('portfolio').value,
+        summary: document.getElementById('summary').innerText,
+        education: getSectionValues(['edu-degree', 'edu-inst', 'edu-year']),
+        experience: getSectionValues(['exp-title', 'exp-company', 'exp-location', 'exp-duration', 'exp-desc']),
+        projects: getSectionValues(['proj-name', 'proj-desc', 'proj-link']),
+        skills: document.getElementById('skills').value.split(',').map(s => s.trim()).filter(Boolean),
+        certifications: []
+      };
+
+      // Gather certifications
+      const certEntries = document.querySelectorAll('#certificationsSection .section-group');
+      certEntries.forEach(cert => {
+        const name = cert.querySelector('.cert-name').value.trim();
+        const link = cert.querySelector('.cert-link').value.trim();
+        if (name) {
+          data.certifications.push(link ? { name, link } : name);
+        }
+      });
+
+      // Save to Firebase
+      const resumeRef = db.ref('publicResumes').push();
+      await resumeRef.set(data);
+      lastResumeId = resumeRef.key;
+
+      // Generate AI content
+      let summaryPrompt = `Write a professional summary for ${data.name}, ${data.location}, skills: ${data.skills.join(', ')}`;
+      let aiSummary = await generateWithGemini(summaryPrompt);
+
+      lastResumeData = { data, aiSummary };
+      renderResumePreview(data, aiSummary, selectedTemplate);
+
+      document.getElementById('loading').classList.add('hidden');
+      downloadBtn.classList.remove('hidden');
+      shareBtn.classList.remove('hidden');
+    });
+
+    function renderResumePreview(data, aiSummary, template) {
+      const skillsHtml = (data.skills || []).map(skill => `
+        <div class="skill-bar-container">
+          <span class="skill-bar-label">${skill}</span>
+          <div class="skill-bar"><div class="skill-bar-fill" style="width:${60 + Math.random() * 40}%"></div></div>
+        </div>
+      `).join('');
+
+      const educationHtml = (data.education || []).map(e => 
+        `<li><b>${e['edu-degree']}</b>, ${e['edu-inst']} (${e['edu-year']})</li>`
+      ).join('');
+
+      const experienceHtml = (data.experience || []).map(e => `
+        <li>
+          <b>${e['exp-title']}</b> at ${e['exp-company']} (${e['exp-duration']}, ${e['exp-location']})
+          <p>${e['exp-desc']}</p>
+        </li>
+      `).join('');
+
+      const projectsHtml = (data.projects || []).map(p => `
+        <li>
+          <b>${p['proj-name']}</b>
+          ${p['proj-link'] ? `<a href="${p['proj-link']}" target="_blank">[Link]</a>` : ""}
+          <p>${p['proj-desc']}</p>
+        </li>
+      `).join('');
+
+      const certificationsHtml = (data.certifications || []).map(c => {
+        if (typeof c === "object" && c.name) {
+          return `<li>${c.name}${c.link ? ` <a href="${c.link}" target="_blank">[Link]</a>` : ""}</li>`;
+        }
+        return `<li>${c}</li>`;
+      }).join('');
+
+      const html = `
+        <div style="max-width: 800px; margin: 0 auto; background: white; color: black; padding: 30px; border-radius: 8px;">
+          <h2 style="color: #333; text-align: center; margin-bottom: 20px;">${data.name}</h2>
+          <div style="text-align: center; margin-bottom: 20px;">
+            <strong>Email:</strong> ${data.email} | <strong>Phone:</strong> ${data.phone} | <strong>Location:</strong> ${data.location}
+          </div>
+          <div style="text-align: center; margin-bottom: 30px;">
+            ${data.linkedin ? `<a href="${data.linkedin}" target="_blank">LinkedIn</a> | ` : ""}
+            ${data.github ? `<a href="${data.github}" target="_blank">GitHub</a> | ` : ""}
+            ${data.portfolio ? `<a href="${data.portfolio}" target="_blank">Portfolio</a>` : ""}
+          </div>
+          <hr style="margin: 20px 0;">
+          <h3 style="color: #333;">Professional Summary</h3>
+          <p style="margin-bottom: 20px;">${aiSummary || data.summary}</p>
+          <h3 style="color: #333;">Education</h3>
+          <ul style="margin-bottom: 20px;">${educationHtml}</ul>
+          <h3 style="color: #333;">Experience</h3>
+          <ul style="margin-bottom: 20px;">${experienceHtml}</ul>
+          <h3 style="color: #333;">Projects</h3>
+          <ul style="margin-bottom: 20px;">${projectsHtml}</ul>
+          <h3 style="color: #333;">Skills</h3>
+          <div style="margin-bottom: 20px;">${skillsHtml}</div>
+          <h3 style="color: #333;">Certifications & Achievements</h3>
+          <ul>${certificationsHtml}</ul>
+        </div>
+      `;
+      document.getElementById('resumePreview').innerHTML = html;
+    }
+
+    // PDF Download
+    downloadBtn.onclick = function () {
+      const element = document.getElementById('resumePreview');
+      const opt = {
+        margin: 0.5,
+        filename: 'resume.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+      html2pdf().from(element).set(opt).save();
+    };
+
+    // Share Link
+    shareBtn.onclick = function () {
+      if (!lastResumeId) return;
+      const url = `${location.origin}/public-resume.html?id=${lastResumeId}`;
+      publicLinkBox.textContent = "Share Link: " + url;
+      publicLinkBox.classList.remove('hidden');
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(url);
+      }
+    };
+
+    // Expose functions for inline onclick
+    window.addEducation = addEducation;
+    window.addExperience = addExperience;
+    window.addProject = addProject;
+    window.addCertification = addCertification;
+
+    // Prevent context menu
+    document.addEventListener("contextmenu", function(e) {
+      e.preventDefault();
+    });
+  </script>
+</body>
+</html>

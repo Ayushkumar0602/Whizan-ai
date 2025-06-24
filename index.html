@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome | Whizan.AI</title>
+  <link rel="icon" type="image/png" href="Smart Study.jpeg">
+
+  <!-- PWA Manifest and Theme -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#1a052e" />
+
+  <!-- iOS specific PWA tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Whizan.AI">
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            purple: {
+              950: '#1a052e',
+              900: '#2a0a4a',
+              800: '#3b0f66',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 0.6;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes moveBackground {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 1s ease-out forwards;
+    }
+
+    .float {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .pulse {
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .moving-bg {
+      background: linear-gradient(270deg, #1a052e, #3b0f66, #6d28d9, #3b0f66, #1a052e);
+      background-size: 400% 400%;
+      animation: moveBackground 15s ease infinite;
+    }
+
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      filter: blur(1px);
+      pointer-events: none;
+    }
+
+    .continue-btn {
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(109, 40, 217, 0.4);
+    }
+
+    .continue-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(109, 40, 217, 0.6);
+    }
+
+    .continue-btn:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+
+<body class="moving-bg text-white flex flex-col items-center justify-center min-h-screen px-4 overflow-hidden relative">
+  <!-- Floating particles -->
+  <div id="particles"></div>
+
+  <div class="text-center fade-in z-10">
+    <div class="float pulse mb-8">
+      <img src="Smart Study.jpeg" alt="Logo" class="mx-auto w-24 h-24 rounded-full shadow-lg border-2 border-purple-400" />
+    </div>
+    <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-purple-100">
+      Welcome to Whizan.AI
+    </h1>
+    <p class="text-lg md:text-xl mb-8 text-purple-200">Empowering education with Technology</p>
+
+    <!-- Continue Button (hidden initially) -->
+    <button id="continueBtn" class="continue-btn hidden px-8 py-3 bg-gradient-to-r from-purple-600 to-purple-800 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-purple-900">
+      Continue
+    </button>
+  </div>
+
+  <script>
+    // Create floating particles
+    function createParticles() {
+      const container = document.getElementById('particles');
+      const particleCount = 30;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        
+        // Random properties
+        const size = Math.random() * 3 + 1;
+        const posX = Math.random() * 100;
+        const posY = Math.random() * 100;
+        const opacity = Math.random() * 0.5 + 0.1;
+        const animationDuration = Math.random() * 15 + 10;
+        const animationDelay = Math.random() * 5;
+        
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.left = `${posX}%`;
+        particle.style.top = `${posY}%`;
+        particle.style.opacity = opacity;
+        particle.style.animation = `float ${animationDuration}s ease-in-out ${animationDelay}s infinite`;
+        
+        container.appendChild(particle);
+      }
+    }
+
+    // Initialize particles
+    createParticles();
+
+    // Show continue button after animations
+    setTimeout(() => {
+      const continueBtn = document.getElementById('continueBtn');
+      continueBtn.classList.remove('hidden');
+      continueBtn.classList.add('fade-in');
+    }, 2000);
+
+    // Handle continue button click
+    document.getElementById('continueBtn').addEventListener('click', () => {
+      window.location.href = 'auth.html';
+    });
+
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('Service Worker registered'))
+        .catch(err => console.error('Service Worker failed:', err));
+    }
+  </script>
+
+<script>
+  // This script will obfuscate the main code when the page loads
+  document.addEventListener('DOMContentLoaded', function() {
+      const scripts = document.getElementsByTagName('script');
+      for (let i = 0; i < scripts.length; i++) {
+          if (scripts[i].textContent.includes('initializeFirebase') || 
+              scripts[i].textContent.includes('createParticles')) {
+              const originalContent = scripts[i].textContent;
+              const obfuscated = originalContent
+                  .split('')
+                  .map(c => c.charCodeAt(0).toString(16))
+                  .join('');
+              scripts[i].textContent = `eval(unescape('${escape(obfuscated)}'.replace(/../g, '%$&')))`;
+          }
+      }
+  });
+</script>
+
+<script>
+  document.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+  });
+</script>
+
+</body>
+
+</html>

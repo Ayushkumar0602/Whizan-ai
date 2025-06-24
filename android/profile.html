@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Study Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .profile-content {
+            padding: 40px;
+        }
+
+        .profile-photo-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .photo-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .profile-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 6px solid #667eea;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #999;
+            transition: all 0.3s ease;
+        }
+
+        .profile-photo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .photo-upload-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .photo-upload-btn:hover {
+            background: #5a67d8;
+            transform: scale(1.1);
+        }
+
+        #photoInput {
+            display: none;
+        }
+
+        .form-section {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .save-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-message,
+        .error-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-content {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .logout-btn {
+                position: static;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="logout-btn" onclick="logout()">Logout</button>
+            <h1>My Profile</h1>
+            <p>Manage your account settings and preferences</p>
+        </div>
+
+        <div class="profile-content">
+            <div class="success-message" id="successMessage"></div>
+            <div class="error-message" id="errorMessage"></div>
+
+            <div class="profile-photo-section">
+                <div class="photo-container">
+                    <div class="profile-photo" id="profilePhoto">📷</div>
+                    <button class="photo-upload-btn" onclick="document.getElementById('photoInput').click()">
+                        📷
+                    </button>
+                    <input type="file" id="photoInput" accept="image/*" onchange="handlePhotoUpload(event)">
+                </div>
+                <p style="color: #666; margin-top: 10px;">Click the camera icon to upload a new photo</p>
+            </div>
+
+            <form id="profileForm">
+                <div class="form-section">
+                    <h3>Personal Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name *</label>
+                            <input type="text" id="firstName" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name *</label>
+                            <input type="text" id="lastName" name="lastName" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" readonly style="background: #f5f5f5;">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="dateOfBirth">Date of Birth</label>
+                            <input type="date" id="dateOfBirth" name="dateOfBirth">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>About Me</h3>
+                    <div class="form-group">
+                        <label for="bio">Bio</label>
+                        <textarea id="bio" name="bio" placeholder="Tell us about yourself..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="occupation">Occupation</label>
+                            <input type="text" id="occupation" name="occupation" placeholder="e.g., Student, Developer, Teacher">
+                        </div>
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <input type="text" id="location" name="location" placeholder="e.g., New York, USA">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Preferences</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="studyLevel">Study Level</label>
+                            <select id="studyLevel" name="studyLevel">
+                                <option value="">Select your level</option>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                                <option value="expert">Expert</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="preferredSubjects">Preferred Subjects</label>
+                            <input type="text" id="preferredSubjects" name="preferredSubjects" placeholder="e.g., Math, Science, History">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="save-btn" id="saveBtn">
+                    <span id="saveText">Save Changes</span>
+                    <div class="loading" id="loading">
+                        <div class="spinner"></div>
+                    </div>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+    <script>
+        let firebaseConfig = null;
+        let user = null;
+        let db = null;
+        let storage = null;
+
+        // Initialize Firebase
+        async function initFirebase() {
+            try {
+                // Fetch Firebase config from your endpoint
+                const response = await fetch('https://us-central1-study2-7bdc7.cloudfunctions.net/getConfig'); // Adjust this URL to match your endpoint
+                const config = await response.json();
+                firebaseConfig = config.firebase;
+
+                // Initialize Firebase
+                firebase.initializeApp(firebaseConfig);
+                
+                // Initialize services
+                db = firebase.firestore();
+                storage = firebase.storage();
+
+                // Check authentication state
+                firebase.auth().onAuthStateChanged((authUser) => {
+                    if (authUser) {
+                        user = authUser;
+                        loadUserProfile();
+                    } else {
+                        // Redirect to login if not authenticated
+                        window.location.href = '/login.html'; // Adjust path as needed
+                    }
+                });
+            } catch (error) {
+                console.error('Error initializing Firebase:', error);
+                showError('Failed to initialize. Please refresh the page.');
+            }
+        }
+
+        // Load user profile data
+        async function loadUserProfile() {
+            try {
+                // Set email from auth
+                document.getElementById('email').value = user.email;
+
+                // Load profile data from Firestore
+                const profileDoc = await db.collection('users').doc(user.uid).get();
+                
+                if (profileDoc.exists) {
+                    const profileData = profileDoc.data();
+                    
+                    // Populate form fields
+                    document.getElementById('firstName').value = profileData.firstName || '';
+                    document.getElementById('lastName').value = profileData.lastName || '';
+                    document.getElementById('phone').value = profileData.phone || '';
+                    document.getElementById('dateOfBirth').value = profileData.dateOfBirth || '';
+                    document.getElementById('bio').value = profileData.bio || '';
+                    document.getElementById('occupation').value = profileData.occupation || '';
+                    document.getElementById('location').value = profileData.location || '';
+                    document.getElementById('studyLevel').value = profileData.studyLevel || '';
+                    document.getElementById('preferredSubjects').value = profileData.preferredSubjects || '';
+                    
+                    // Load profile photo
+                    if (profileData.photoURL) {
+                        const photoElement = document.getElementById('profilePhoto');
+                        photoElement.style.backgroundImage = `url(${profileData.photoURL})`;
+                        photoElement.style.backgroundSize = 'cover';
+                        photoElement.style.backgroundPosition = 'center';
+                        photoElement.innerHTML = '';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showError('Failed to load profile data.');
+            }
+        }
+
+        // Handle photo upload
+        async function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showError('Please select a valid image file.');
+                return;
+            }
+
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showError('Image size must be less than 5MB.');
+                return;
+            }
+
+            try {
+                showLoading('Uploading photo...');
+
+                // Create storage reference
+                const storageRef = storage.ref(`profile-photos/${user.uid}/${Date.now()}_${file.name}`);
+                
+                // Upload file
+                const uploadTask = storageRef.put(file);
+                
+                // Monitor upload progress
+                uploadTask.on('state_changed', 
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        console.log('Upload progress:', progress);
+                    },
+                    (error) => {
+                        console.error('Upload error:', error);
+                        showError('Failed to upload photo.');
+                        hideLoading();
+                    },
+                    async () => {
+                        // Upload completed successfully
+                        try {
+                            const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                            
+                            // Update Firestore with new photo URL
+                            await db.collection('users').doc(user.uid).update({
+                                photoURL: downloadURL,
+                                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                            
+                            // Update UI
+                            const photoElement = document.getElementById('profilePhoto');
+                            photoElement.style.backgroundImage = `url(${downloadURL})`;
+                            photoElement.style.backgroundSize = 'cover';
+                            photoElement.style.backgroundPosition = 'center';
+                            photoElement.innerHTML = '';
+                            
+                            showSuccess('Photo updated successfully!');
+                            hideLoading();
+                        } catch (error) {
+                            console.error('Error updating photo URL:', error);
+                            showError('Failed to save photo.');
+                            hideLoading();
+                        }
+                    }
+                );
+            } catch (error) {
+                console.error('Error uploading photo:', error);
+                showError('Failed to upload photo.');
+                hideLoading();
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            try {
+                showLoading('Saving changes...');
+
+                // Collect form data
+                const formData = new FormData(e.target);
+                const profileData = {
+                    firstName: formData.get('firstName'),
+                    lastName: formData.get('lastName'),
+                    phone: formData.get('phone'),
+                    dateOfBirth: formData.get('dateOfBirth'),
+                    bio: formData.get('bio'),
+                    occupation: formData.get('occupation'),
+                    location: formData.get('location'),
+                    studyLevel: formData.get('studyLevel'),
+                    preferredSubjects: formData.get('preferredSubjects'),
+                    email: user.email,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                // Update Firestore
+                await db.collection('users').doc(user.uid).set(profileData, { merge: true });
+
+                showSuccess('Profile updated successfully!');
+                hideLoading();
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                showError('Failed to update profile. Please try again.');
+                hideLoading();
+            }
+        });
+
+        // Utility functions
+        function showLoading(text) {
+            const saveBtn = document.getElementById('saveBtn');
+            const saveText = document.getElementById('saveText');
+            const loading = document.getElementById('loading');
+            
+            saveBtn.disabled = true;
+            saveText.style.opacity = '0';
+            loading.style.display = 'block';
+        }
+
+        function hideLoading() {
+            const saveBtn = document.getElementById('saveBtn');
+            const saveText = document.getElementById('saveText');
+            const loading = document.getElementById('loading');
+            
+            saveBtn.disabled = false;
+            saveText.style.opacity = '1';
+            loading.style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                firebase.auth().signOut().then(() => {
+                    window.location.href = 'auth.html'; // Adjust path as needed
+                }).catch((error) => {
+                    console.error('Error signing out:', error);
+                });
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initFirebase);
+    </script>
+</body>
+</html>

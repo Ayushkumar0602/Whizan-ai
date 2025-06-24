@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Whizan's Emotional AI Agent provides compassionate, judgment-free support. Talk freely and feel heard with AI-powered emotional intelligence.">
+    <meta name="keywords" content="emotional support, AI emotional intelligence, emotional intelligence, non-judgmental AI, AI listener, mental wellness AI">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Whizan Emotional AI Agent - Always Here to Listen">
+    <meta property="og:description" content="A compassionate AI that listens without judgment. Get emotional support anytime, anywhere.">
+    <meta property="og:url" content="https://whizan.xyz/preview/emotional-support-preview.html">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://whizan.xyz/images/emotional-support-og.jpg">
+    <link rel="canonical" href="https://whizan.xyz/preview/emotional-support-preview.html">
+    <title>Emotional Support AI | Non-Judgmental Listener | Whizan</title>
+    <link rel="icon" href="/preview/Smart Study.jpeg" type="image/jpeg">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "Whizan Emotional AI Agent",
+      "description": "An AI companion that provides compassionate, judgment-free emotional support using advanced emotional intelligence.",
+      "brand": {
+        "@type": "Brand",
+        "name": "Whizan"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does the Emotional AI Agent work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Our AI uses natural language processing and emotional intelligence algorithms to understand your feelings, respond with empathy, and provide a safe space to express yourself without fear of judgment."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is this AI really non-judgmental?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Unlike human conversations, our AI has no biases, preconceptions, or emotional reactions. It listens objectively and responds with kindness, never criticism."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can this replace therapy?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "While our AI provides emotional support, it is not a substitute for professional therapy. It's best used as a supplemental tool for daily emotional well-being."
+          }
+        }
+      ]
+    }
+    </script>
+    <style>
+        :root {
+            --primary-blue-dark: #0d47a1;
+            --primary-blue-light: #1976d2;
+            --secondary-black: #121212;
+            --accent-teal: #00897b;
+            --text-light: #f5f5f5;
+            --text-dark: #212121;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--secondary-black);
+            color: var(--text-light);
+            overflow-x: hidden;
+            position: relative;
+            line-height: 1.6;
+        }
+        
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, var(--primary-blue-dark), var(--secondary-black), var(--primary-blue-light), var(--secondary-black));
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        header {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(18, 18, 18, 0.8);
+            border-bottom: 1px solid var(--accent-teal);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo {
+            height: 50px;
+            width: auto;
+            border-radius: 8px;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(to right, var(--accent-teal), var(--primary-blue-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .cta-button {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(to right, var(--accent-teal), var(--primary-blue-light));
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 137, 123, 0.4);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 137, 123, 0.6);
+        }
+        
+        .hero {
+            padding: 4rem 2rem;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--text-light), #80deea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .highlight {
+            color: #80deea;
+            font-weight: bold;
+        }
+        
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .feature-card {
+            background-color: rgba(30, 30, 30, 0.7);
+            border-radius: 15px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 350px;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(0, 137, 123, 0.3);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-teal);
+            box-shadow: 0 10px 25px rgba(0, 137, 123, 0.3);
+        }
+        
+        .feature-card h3 {
+            color: var(--accent-teal);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .feature-card p {
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .demo-section {
+            padding: 4rem 2rem;
+            text-align: center;
+            background-color: rgba(18, 18, 18, 0.7);
+            margin: 3rem 0;
+        }
+        
+        .demo-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--text-light);
+        }
+        
+        .demo-image-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .demo-image {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--accent-teal);
+        }
+        
+        .how-it-works {
+            padding: 4rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .how-it-works h2 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--text-light);
+        }
+        
+        .step {
+            display: flex;
+            margin-bottom: 2rem;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .step-number {
+            background-color: var(--accent-teal);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .step-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent-teal);
+        }
+        
+        .step-content p {
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .faq-section {
+            padding: 4rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .faq-section h2 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--text-light);
+        }
+        
+        .faq-item {
+            margin-bottom: 2rem;
+            background-color: rgba(30, 30, 30, 0.7);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--accent-teal);
+        }
+        
+        .faq-question {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent-teal);
+            margin-bottom: 0.5rem;
+        }
+        
+        .faq-answer {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .pricing {
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+        
+        .pricing h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+        }
+        
+        .pricing p {
+            font-size: 1.5rem;
+            margin-bottom: 3rem;
+            color: var(--accent-teal);
+        }
+        
+        .pricing-features {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: left;
+            background-color: rgba(30, 30, 30, 0.7);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid var(--accent-teal);
+        }
+        
+        .pricing-features ul {
+            list-style-type: none;
+        }
+        
+        .pricing-features li {
+            margin-bottom: 1rem;
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .pricing-features li:before {
+            content: "✓";
+            color: #4caf50;
+            position: absolute;
+            left: 0;
+        }
+        
+        footer {
+            padding: 3rem 2rem;
+            background-color: rgba(18, 18, 18, 0.9);
+            text-align: center;
+            border-top: 1px solid var(--accent-teal);
+        }
+        
+        .footer-logo {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--accent-teal), var(--primary-blue-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent-teal);
+        }
+        
+        .copyright {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .step {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .step-content {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    
+    <header>
+        <div class="logo-container">
+            <img src="/preview/Smart Study.jpeg" alt="Whizan Logo" class="logo" itemprop="logo">
+            <span class="logo-text">Whizan</span>
+        </div>
+        <a href="/auth.html" class="cta-button" itemprop="url">Start Talking - It's Free</a>
+    </header>
+    
+    <main>
+        <section class="hero" itemscope itemtype="https://schema.org/Product">
+            <h1 itemprop="name">A Safe Space to Be Heard</h1>
+            <p itemprop="description">Whizan's <span class="highlight">Emotional AI Agent</span> listens without judgment, responds with empathy, and provides <span class="highlight">compassionate support</span> whenever you need to talk. No biases. No criticism. Just understanding.</p>
+            <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                <meta itemprop="priceCurrency" content="USD" />
+                <meta itemprop="price" content="0.00" />
+                <link itemprop="availability" href="https://schema.org/InStock" />
+            </div>
+            <a href="/auth.html" class="cta-button">Talk to the AI Now</a>
+            <meta itemprop="brand" content="Whizan">
+            <meta itemprop="url" content="https://whizan.xyz/preview/emotional-support-preview.html">
+        </section>
+        
+        <section class="features">
+            <div class="feature-card" itemscope itemtype="https://schema.org/Product">
+              <h3 itemprop="name">Always Available</h3>
+              <p itemprop="description">
+                Unlike human listeners, our AI is available 24/7 whenever you need emotional support—late at night, during stressful moments, or whenever you feel alone.
+              </p>
+              <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                <meta itemprop="priceCurrency" content="USD" />
+                <meta itemprop="price" content="0.00" />
+                <link itemprop="availability" href="https://schema.org/InStock" />
+              </div>
+            </div>
+          
+            <div class="feature-card" itemscope itemtype="https://schema.org/Product">
+              <h3 itemprop="name">Zero Judgment</h3>
+              <p itemprop="description">
+                Free from human biases, our AI listens objectively. You can share your deepest thoughts without fear of criticism, shame, or unwanted advice.
+              </p>
+              <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                <meta itemprop="priceCurrency" content="USD" />
+                <meta itemprop="price" content="0.00" />
+                <link itemprop="availability" href="https://schema.org/InStock" />
+              </div>
+            </div>
+          
+            <div class="feature-card" itemscope itemtype="https://schema.org/Product">
+              <h3 itemprop="name">Emotionally Intelligent</h3>
+              <p itemprop="description">
+                Using advanced AI emotional intelligence, it recognizes feelings, validates emotions, and responds with genuine care—not just scripted replies.
+              </p>
+              <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                <meta itemprop="priceCurrency" content="USD" />
+                <meta itemprop="price" content="0.00" />
+                <link itemprop="availability" href="https://schema.org/InStock" />
+              </div>
+            </div>
+          </section>
+          
+        
+        <section class="demo-section">
+            <h2>How the Emotional AI Listens</h2>
+            <div class="demo-image-container">
+                <img src="images /emotional 1.png" alt="Whizan Emotional AI Agent in Action" class="demo-image" itemprop="image">
+            </div>
+            <p style="margin-top: 1.5rem;">A compassionate AI companion that helps you process emotions in a healthy way</p>
+        </section>
+        
+        <section class="how-it-works">
+            <h2>How It Works</h2>
+            
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Start Talking or Typing</h3>
+                    <p>Express yourself freely through voice or text. The AI adapts to your communication style—whether you want to vent, reflect, or seek comfort.</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>AI Understands Your Emotions</h3>
+                    <p>Using natural language processing, it detects emotional cues (sadness, anxiety, frustration) and responds with appropriate empathy and support.</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Receive Compassionate Responses</h3>
+                    <p>Get validating, thoughtful replies—never generic advice. The AI helps you explore feelings without pushing solutions.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="faq-section">
+            <h2>Common Questions</h2>
+            
+            <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <div class="faq-question" itemprop="name">Is this AI confidential?</div>
+                <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                    <div itemprop="text">Yes. Conversations are private and not stored long-term. You can speak freely without worrying about privacy breaches.</div>
+                </div>
+            </div>
+            
+            <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <div class="faq-question" itemprop="name">Can it help with anxiety or depression?</div>
+                <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                    <div itemprop="text">While it provides emotional support, it's not a replacement for professional mental health care. However, many users find it helpful for daily emotional management.</div>
+                </div>
+            </div>
+            
+            <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                <div class="faq-question" itemprop="name">Does the AI remember past conversations?</div>
+                <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                    <div itemprop="text">For continuity, it may recall recent chats, but long-term memory is limited to protect privacy.</div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="pricing">
+            <h2>Free Emotional Support, Always</h2>
+            <p>No Fees. No Premium Plans. Just Compassion.</p>
+            
+            <div class="pricing-features">
+                <ul>
+                    <li>Unlimited conversations with the AI</li>
+                    <li>Voice and text support</li>
+                    <li>Emotionally intelligent responses</li>
+                    <li>Non-judgmental listening</li>
+                    <li>No ads or data mining</li>
+                    <li>Privacy-focused design</li>
+                </ul>
+            </div>
+            
+            <a href="/auth.html" class="cta-button" style="margin-top: 3rem;">Start Talking Now</a>
+        </section>
+    </main>
+    
+    <footer>
+        <div class="footer-logo">Whizan</div>
+        <div class="footer-links">
+            <a href="/index1.html">About Us</a>
+            <a href="/index1.html">Features</a>
+            <a href="subject/contact.html">Contact</a>
+            <a href="subject/privacy.html">Privacy Policy</a>
+            <a href="subject/terms.html">Terms of Service</a>
+        </div>
+        <p class="copyright">© 2025 Whizan. Providing compassionate AI for emotional well-being.</p>
+    </footer>
+    
+    <script>
+        // Animation for feature cards on scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            const featureCards = document.querySelectorAll('.feature-card');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            featureCards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>

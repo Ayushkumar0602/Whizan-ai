@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whizan - Smart Study</title>
+    <link rel="icon" type="image/png" href="smart study.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <style>
+        :root {
+            --primary-purple: #8B5CF6;
+            --secondary-purple: #A78BFA;
+            --accent-blue: #06B6D4;
+            --accent-pink: #EC4899;
+            --black-primary: #000000;
+            --black-secondary: #0F0F0F;
+            --black-tertiary: #1A1A1A;
+            --gray-light: #2A2A2A;
+            --white-primary: #FFFFFF;
+            --white-secondary: #F8FAFC;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--black-primary);
+            color: var(--white-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .floating-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: floatOrb 15s infinite ease-in-out;
+        }
+        
+        .orb-1 {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--primary-purple), var(--secondary-purple));
+            top: 10%;
+            left: -50px;
+            animation-delay: 0s;
+        }
+        
+        .orb-2 {
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, var(--accent-blue), var(--primary-purple));
+            top: 60%;
+            right: -30px;
+            animation-delay: -5s;
+        }
+        
+        .orb-3 {
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, var(--accent-pink), var(--secondary-purple));
+            bottom: 20%;
+            left: 20%;
+            animation-delay: -10s;
+        }
+        
+        .orb-4 {
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, var(--secondary-purple), var(--accent-blue));
+            top: 30%;
+            right: 10%;
+            animation-delay: -7s;
+        }
+        
+        @keyframes floatOrb {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(30px, -40px) scale(1.1);
+            }
+            50% {
+                transform: translate(-20px, 30px) scale(0.9);
+            }
+            75% {
+                transform: translate(40px, 20px) scale(1.05);
+            }
+        }
+        
+        /* App Container */
+        .app-container {
+            min-height: 100vh;
+            padding: 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Header */
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+            padding: 16px 20px;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 100%;
+        }
+        
+        .app-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--accent-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: logoGlow 3s ease-in-out infinite alternate;
+        }
+        
+        .logo-image img {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+        }
+        
+        @keyframes logoGlow {
+            from { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+            to { box-shadow: 0 0 30px rgba(139, 92, 246, 0.6); }
+        }
+        
+        .app-title {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-purple), var(--accent-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: titleShimmer 4s ease-in-out infinite;
+        }
+        
+        @keyframes titleShimmer {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-purple), var(--accent-pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            animation: avatarPulse 2s infinite;
+        }
+        
+        @keyframes avatarPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .logout-button {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            color: var(--white-primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .logout-button:hover {
+            background: rgba(139, 92, 246, 0.2);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 24px 20px;
+            max-width: 100%;
+        }
+        
+        /* Feature Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .feature-card {
+            background: linear-gradient(135deg, var(--black-secondary), var(--black-tertiary));
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+            transition: left 0.6s;
+        }
+        
+        .feature-card:hover::before {
+            left: 100%;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 12px 40px rgba(139, 92, 246, 0.15);
+        }
+        
+        .feature-card.active {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(6, 182, 212, 0.05));
+            border-color: var(--primary-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
+        }
+        
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--accent-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        
+        .feature-icon i {
+            font-size: 24px;
+            color: var(--white-primary);
+        }
+        
+        .feature-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--white-primary);
+        }
+        
+        .feature-description {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.5;
+        }
+        
+        /* Content Panel */
+        .content-panel {
+            background: linear-gradient(135deg, var(--black-secondary), var(--black-tertiary));
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+            display: none;
+            animation: panelSlideIn 0.5s ease;
+        }
+        
+        .content-panel.active {
+            display: block;
+        }
+        
+        @keyframes panelSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .content-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--accent-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            position: relative;
+        }
+        
+        .content-title::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--accent-blue));
+            border-radius: 1px;
+        }
+        
+        .content-description {
+            font-size: 16px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+        }
+        
+        .features-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+        
+        .features-list li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+        }
+        
+        .features-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--primary-purple);
+            font-weight: bold;
+        }
+        
+        .action-button {
+            background: linear-gradient(135deg, var(--primary-purple), var(--accent-blue));
+            color: var(--white-primary);
+            border: none;
+            padding: 14px 28px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .action-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
+            transition: left 0.3s;
+            z-index: -1;
+        }
+        
+        .action-button:hover::before {
+            left: 0;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+        }
+        
+        /* Footer */
+        .app-footer {
+            text-align: center;
+            padding: 24px 20px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            border-top: 1px solid rgba(139, 92, 246, 0.1);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Mobile Optimizations */
+        @media (max-width: 480px) {
+            .app-header {
+                padding: 12px 16px;
+            }
+            
+            .app-title {
+                font-size: 20px;
+            }
+            
+            .main-content {
+                padding: 20px 16px;
+            }
+            
+            .feature-card {
+                padding: 20px;
+            }
+            
+            .content-panel {
+                padding: 20px;
+            }
+            
+            .content-title {
+                font-size: 20px;
+            }
+            
+            .action-button {
+                padding: 12px 24px;
+                font-size: 15px;
+            }
+        }
+        
+        /* Tablet Optimizations */
+        @media (min-width: 768px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .main-content {
+                padding: 32px 24px;
+            }
+        }
+        
+        /* Desktop Optimizations */
+        @media (min-width: 1024px) {
+            .app-container {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .action-button {
+                width: auto;
+                display: inline-block;
+            }
+        }
+        
+        /* Loading Animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--white-primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Error Message */
+        .error-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--error);
+            color: var(--white-primary);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="floating-orb orb-1"></div>
+        <div class="floating-orb orb-2"></div>
+        <div class="floating-orb orb-3"></div>
+        <div class="floating-orb orb-4"></div>
+    </div>
+    
+    <!-- App Container -->
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="app-logo">
+                    <div class="logo-image">
+                        <img src="smart study.png" alt="Whizan Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-graduation-cap\'></i>'">
+                    </div>
+                    <h1 class="app-title">Whizan</h1>
+                </div>
+                <div class="user-section">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <button class="logout-button" id="logoutBtn">Logout</button>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Features Grid -->
+            <div class="features-grid">
+                <div class="feature-card active" data-tab="genius-assistant">
+                    <div class="feature-icon">
+                        <i class="fas fa-magic"></i>
+                    </div>
+                    <h3 class="feature-title">Assignment Generator</h3>
+                    <p class="feature-description">AI-powered help for all your assignments</p>
+                </div>
+                
+                <div class="feature-card" data-tab="quiz-master">
+                    <div class="feature-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <h3 class="feature-title">Quiz Master</h3>
+                    <p class="feature-description">Get accurate solutions to any quiz</p>
+                </div>
+                
+                <div class="feature-card" data-tab="viva-practice">
+                    <div class="feature-icon">
+                        <i class="fas fa-microphone-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Viva Practice</h3>
+                    <p class="feature-description">Interactive viva preparation sessions</p>
+                </div>
+                
+                <div class="feature-card" data-tab="knowledge-hub">
+                    <div class="feature-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h3 class="feature-title">Knowledge Hub</h3>
+                    <p class="feature-description">Comprehensive study materials</p>
+                </div>
+                
+                <div class="feature-card" data-tab="archive">
+                    <div class="feature-icon">
+                        <i class="fas fa-archive"></i>
+                    </div>
+                    <h3 class="feature-title">Archive</h3>
+                    <p class="feature-description">Past papers and exam resources</p>
+                </div>
+            </div>
+            
+            <!-- Content Panels -->
+            <div class="content-panel active" id="genius-assistant-content">
+                <h2 class="content-title">Assignment Generator</h2>
+                <p class="content-description">Our AI-powered assistant helps you generate high-quality assignments tailored to your requirements. Just provide the topic and requirements, and we'll create a customized assignment for you.</p>
+                <ul class="features-list">
+                    <li>Generate assignments in various formats</li>
+                    <li>Include citations and references</li>
+                    <li>Customize length and complexity</li>
+                    <li>Support for multiple subjects</li>
+                </ul>
+                <button class="action-button" onclick="window.location.href='assignment.html'">Try Assignment Generator</button>
+            </div>
+            
+            <div class="content-panel" id="quiz-master-content">
+                <h2 class="content-title">Quiz Master</h2>
+                <p class="content-description">Struggling with a quiz? Our 100% accurate quiz solver can help you find the correct answers instantly. Upload your quiz or enter the questions, and get precise solutions.</p>
+                <ul class="features-list">
+                    <li>Supports multiple question types</li>
+                    <li>Step-by-step explanations</li>
+                    <li>Works with images and text</li>
+                    <li>Instant results</li>
+                </ul>
+                <button class="action-button" onclick="window.location.href='quiz.html'">Access Quiz Master</button>
+            </div>
+            
+            <div class="content-panel" id="viva-practice-content">
+                <h2 class="content-title">Viva Practice</h2>
+                <p class="content-description">Prepare for your viva voce examinations with our interactive AI-powered practice sessions. Get real-time feedback and improve your presentation skills.</p>
+                <ul class="features-list">
+                    <li>Subject-specific viva questions</li>
+                    <li>Real-time AI feedback and scoring</li>
+                    <li>Practice with voice or text responses</li>
+                    <li>Performance analytics and improvement tips</li>
+                    <li>Mock viva sessions with time limits</li>
+                    <li>Expert-curated question banks</li>
+                </ul>
+                <button class="action-button" onclick="window.location.href='viva.html'">Start Viva Practice</button>
+            </div>
+            
+            <div class="content-panel" id="knowledge-hub-content">
+                <h2 class="content-title">Knowledge Hub</h2>
+                <p class="content-description">Access a vast collection of study materials curated by experts. Find textbooks, lecture notes, summaries, and more for all your courses.</p>
+                <ul class="features-list">
+                    <li>Organized by subject and topic</li>
+                    <li>Searchable database</li>
+                    <li>Downloadable resources</li>
+                    <li>User-contributed content</li>
+                </ul>
+                <button class="action-button" onclick="window.location.href='material.html'">Explore Knowledge Hub</button>
+            </div>
+            
+            <div class="content-panel" id="archive-content">
+                <h2 class="content-title">Archive</h2>
+                <p class="content-description">Prepare for your exams with our collection of past papers and exam resources. Find papers from previous years with solutions to help you practice.</p>
+                <ul class="features-list">
+                    <li>Past papers from multiple institutions</li>
+                    <li>Model answers and solutions</li>
+                    <li>Organized by year and subject</li>
+                    <li>Exam preparation tips</li>
+                </ul>
+                <button class="action-button" onclick="window.location.href='studymaterial.html'">Browse Archive</button>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>© 2024 Whizan - Smart Study Platform. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        let currentUser = null;
+    
+        async function initializeApp() {
+            try {
+                // 1. Get Firebase config from backend
+                const configResponse = await fetch('https://us-central1-study2-7bdc7.cloudfunctions.net/getConfig');
+                if (!configResponse.ok) throw new Error('Failed to get Firebase config');
+                
+                const config = await configResponse.json();
+                firebase.initializeApp(config.firebase);
+                
+                // 2. Set up auth state listener
+                firebase.auth().onAuthStateChanged(async (user) => {
+                    try {
+                        if (user) {
+                            currentUser = user;
+                            const displayName = user.displayName || user.email.split('@')[0];
+                            const userAvatar = document.getElementById('userAvatar');
+                            
+                            if (userAvatar) {
+                                userAvatar.textContent = displayName.charAt(0).toUpperCase();
+                                userAvatar.title = displayName; // Add tooltip
+                            }
+                            
+                            setupTabs();
+                            setupLogout();
+                            checkUserProfile(user);
+                        } else {
+                            redirectToLogin();
+                        }
+                    } catch (error) {
+                        console.error('Auth state error:', error);
+                        redirectToLogin();
+                    }
+                });
+                
+                // 3. Set up service worker for PWA (if needed)
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(registration => {
+                            console.log('ServiceWorker registration successful');
+                        })
+                        .catch(err => {
+                            console.log('ServiceWorker registration failed: ', err);
+                        });
+                }
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showError('Failed to initialize application. Please refresh.');
+            }
+        }
+    
+        function setupTabs() {
+            try {
+                const tabs = document.querySelectorAll('.feature-card');
+                const contents = document.querySelectorAll('.content-panel');
+                
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        // Remove active classes
+                        tabs.forEach(t => t.classList.remove('active'));
+                        contents.forEach(c => c.classList.remove('active'));
+                        
+                        // Add active class to clicked tab
+                        tab.classList.add('active');
+                        
+                        // Show corresponding content
+                        const tabId = tab.getAttribute('data-tab');
+                        const contentElement = document.getElementById(`${tabId}-content`);
+                        
+                        if (contentElement) {
+                            contentElement.classList.add('active');
+                            
+                            // Lazy load tab content if needed
+                            if (contentElement.dataset.loaded !== 'true') {
+                                loadTabContent(tabId);
+                                contentElement.dataset.loaded = 'true';
+                            }
+                        }
+                    });
+                });
+                
+                // Activate first tab by default
+                if (tabs.length > 0) tabs[0].click();
+            } catch (error) {
+                console.error('Tab setup error:', error);
+            }
+        }
+    
+        function setupLogout() {
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async () => {
+                    try {
+                        // Optional: Call backend logout endpoint
+                        const idToken = await currentUser?.getIdToken();
+                        if (idToken) {
+                            await fetch('https://us-central1-study2-7bdc7.cloudfunctions.net/logoutUser', {
+                                method: 'POST',
+                                headers: {
+                                    'Authorization': `Bearer ${idToken}`
+                                }
+                            });
+                        }
+                        
+                        // Perform client-side logout
+                        await firebase.auth().signOut();
+                        redirectToLogin();
+                    } catch (error) {
+                        console.error('Logout error:', error);
+                        showError('Logout failed. Please try again.');
+                    }
+                });
+            }
+        }
+    
+        function checkUserProfile(user) {
+            // Check if user needs to complete profile
+            // if (!user.displayName || !user.photoURL) {
+            //     const profileComplete = confirm('Would you like to complete your profile now?');
+            //     if (profileComplete) {
+            //         window.location.href = 'profile.html';
+            //     }
+            // }
+        }
+    
+        function redirectToLogin() {
+            // Store current path for post-login redirect
+            sessionStorage.setItem('redirectPath', window.location.pathname);
+            // window.location.href = 'auth.html';
+        }
+    
+        function showError(message) {
+            const errorElement = document.getElementById('error-message') || createErrorElement();
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 5000);
+        }
+    
+        function createErrorElement() {
+            const errorElement = document.createElement('div');
+            errorElement.id = 'error-message';
+            errorElement.className = 'error-message';
+            document.body.appendChild(errorElement);
+            return errorElement;
+        }
+    
+        function loadTabContent(tabId) {
+            // Placeholder for lazy loading content
+            console.log(`Loading content for ${tabId}`);
+        }
+    
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializeApp);
+        
+        // Add touch feedback for mobile
+        document.addEventListener('touchstart', function() {}, {passive: true});
+    </script>
+</body>
+</html>

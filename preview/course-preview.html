@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Whizan offers free online courses with inbuilt code editor, lecture-wise tools, peer discussions, and performance analytics. 100% free learning with certificates.">
+    <meta name="keywords" content="free online courses, tech courses, coding platform, inbuilt code editor, lecture quizzes, learning analytics, free certificates">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Whizan | Free Online Courses with Code Editor & Certificates">
+    <meta property="og:description" content="Learn with free courses featuring built-in coding environment, quizzes, and performance tracking. 100% free with certificates.">
+    <meta property="og:url" content="https://whizan.xyz/preview/free-courses-preview.html">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://whizan.xyz/preview/images/course 1.png">
+    <link rel="canonical" href="https://whizan.xyz/preview/free-courses-preview.html">
+    <title>Free Online Courses with Code Editor | Whizan</title>
+    <link rel="icon" type="image/png" href="/preview/Smart Study.jpeg">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Whizan Learning Platform",
+      "description": "Free online courses with integrated coding environment and analytics",
+      "applicationCategory": "EducationalApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    <style>
+        :root {
+            --primary-purple-dark: #4a148c;
+            --primary-purple-light: #7b1fa2;
+            --secondary-black: #121212;
+            --accent-teal: #1de9b6;
+            --text-light: #f5f5f5;
+            --text-dark: #212121;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--secondary-black);
+            color: var(--text-light);
+            overflow-x: hidden;
+            position: relative;
+            line-height: 1.6;
+        }
+        
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, var(--primary-purple-dark), var(--secondary-black), var(--primary-purple-light), var(--secondary-black));
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        header {
+            padding: 3rem 2rem;
+            text-align: center;
+            background-color: rgba(18, 18, 18, 0.8);
+            border-bottom: 1px solid var(--accent-teal);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .logo {
+            height: 50px;
+            width: auto;
+            border-radius: 8px;
+        }
+        
+        .logo-text {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(to right, var(--accent-teal), var(--primary-purple-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--text-light), var(--accent-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background: linear-gradient(to right, var(--accent-teal), var(--primary-purple-light));
+            color: var(--text-dark);
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+            box-shadow: 0 4px 15px rgba(29, 233, 182, 0.4);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(29, 233, 182, 0.6);
+        }
+        
+        .features {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            background: linear-gradient(to right, var(--text-light), var(--accent-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-card {
+            background-color: rgba(30, 30, 30, 0.7);
+            border-radius: 10px;
+            padding: 2rem;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(29, 233, 182, 0.3);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-teal);
+            box-shadow: 0 10px 25px rgba(29, 233, 182, 0.3);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-teal);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-teal);
+        }
+        
+        .feature-card p {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .demo-section {
+            padding: 5rem 2rem;
+            background-color: rgba(18, 18, 18, 0.7);
+            margin: 3rem 0;
+        }
+        
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+        
+        .demo-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-teal);
+        }
+        
+        .demo-text p {
+            margin-bottom: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .demo-image {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--accent-teal);
+            transition: transform 0.3s ease;
+        }
+        
+        .demo-image:hover {
+            transform: scale(1.02);
+        }
+        
+        .how-it-works {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .step-card {
+            background-color: rgba(30, 30, 30, 0.7);
+            border-radius: 10px;
+            padding: 2rem;
+            position: relative;
+            border-left: 4px solid var(--accent-teal);
+        }
+        
+        .step-number {
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            background-color: var(--accent-teal);
+            color: var(--text-dark);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .step-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-teal);
+        }
+        
+        .testimonials {
+            padding: 5rem 2rem;
+            background-color: rgba(18, 18, 18, 0.7);
+        }
+        
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .testimonial-card {
+            background-color: rgba(30, 30, 30, 0.7);
+            padding: 2rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-teal);
+        }
+        
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .testimonial-author {
+            font-weight: bold;
+            color: var(--accent-teal);
+        }
+        
+        .pricing {
+            padding: 5rem 2rem;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .pricing-card {
+            background-color: rgba(30, 30, 30, 0.7);
+            border-radius: 10px;
+            padding: 3rem;
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid var(--accent-teal);
+        }
+        
+        .pricing-card h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--accent-teal);
+        }
+        
+        .pricing-card p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .features-list {
+            text-align: left;
+            max-width: 400px;
+            margin: 0 auto 2rem;
+        }
+        
+        .features-list li {
+            margin-bottom: 0.5rem;
+            position: relative;
+            padding-left: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .features-list li:before {
+            content: "✓";
+            color: var(--accent-teal);
+            position: absolute;
+            left: 0;
+        }
+        
+        footer {
+            padding: 3rem 2rem;
+            background-color: rgba(18, 18, 18, 0.9);
+            text-align: center;
+            border-top: 1px solid var(--accent-teal);
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent-teal);
+        }
+        
+        .copyright {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .demo-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    
+    <header>
+        <div class="logo-container">
+            <img src="/preview/Smart Study.jpeg" alt="Whizan Logo" class="logo">
+            <span class="logo-text">Whizan</span>
+        </div>
+        <div class="hero">
+            <h1>Learn, Code & Grow with Free Online Courses</h1>
+            <p>Whizan offers complete learning experience with inbuilt code editor, quizzes, peer discussions, and performance analytics - all 100% free with certificates.</p>
+            <div>
+                <a href="/auth.html" class="cta-button">Start Learning Free</a>
+                <a href="#demo" class="cta-button">See How It Works</a>
+            </div>
+        </div>
+    </header>
+    
+    <main>
+        <section class="features">
+            <h2 class="section-title">Everything You Need to Master New Skills</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📚</div>
+                    <h3>500+ Free Courses</h3>
+                    <p>Tech and non-tech courses covering programming, business, design, languages, and interview preparation.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💻</div>
+                    <h3>Inbuilt Code Editor</h3>
+                    <p>Practice coding directly in your browser with our powerful IDE supporting 20+ programming languages.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3>Lecture-Wise Tools</h3>
+                    <p>Save code snippets, take notes, and complete quizzes for each lecture - all organized automatically.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Performance Analytics</h3>
+                    <p>Detailed insights on your learning progress, weak areas, and personalized improvement suggestions.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <h3>Course Discussions</h3>
+                    <p>Connect with peers, ask questions, and share knowledge in dedicated course forums.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏆</div>
+                    <h3>Free Certificates</h3>
+                    <p>Earn verifiable certificates upon course completion to showcase your skills to employers.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="demo-section" id="demo">
+            <div class="demo-container">
+                <div class="demo-text">
+                    <h2>Interactive Learning Experience</h2>
+                    <p>Our unique platform combines video lectures with hands-on practice in a seamless environment. Code along with instructors, save your work, and get instant feedback - all without leaving your browser.</p>
+                    <ul style="margin-top: 1.5rem; color: rgba(255, 255, 255, 0.9);">
+                        <li style="margin-bottom: 0.5rem;">✅ Lecture-specific code playgrounds</li>
+                        <li style="margin-bottom: 0.5rem;">✅ Auto-saved progress across devices</li>
+                        <li style="margin-bottom: 0.5rem;">✅ Instant code execution with results</li>
+                        <li>✅ Peer code comparison for learning</li>
+                    </ul>
+                </div>
+                <div>
+                    <img src="images /course 2.png" alt="Whizan Course Interface Demo" class="demo-image">
+                </div>
+            </div>
+        </section>
+        
+        <section class="how-it-works">
+            <h2 class="section-title">How Whizan Helps You Learn Better</h2>
+            <div class="steps">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3>Choose Your Course</h3>
+                    <p>Browse our extensive catalog of free courses in programming, data science, business, design, and interview preparation.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3>Learn by Doing</h3>
+                    <p>Watch video lectures while practicing directly in our integrated coding environment with real-time feedback.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3>Track Your Progress</h3>
+                    <p>Monitor your performance through detailed analytics and get personalized recommendations for improvement.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h3>Validate Your Skills</h3>
+                    <p>Complete course assessments and earn free certificates to showcase your new skills to employers.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- <section class="testimonials">
+            <h2 class="section-title">What Learners Say About Whizan</h2>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"The inbuilt code editor and lecture-wise saving features helped me learn Python 3x faster than other platforms. Being able to practice without switching windows is a game-changer."</p>
+                    <p class="testimonial-author">- Sarah K., Aspiring Data Scientist</p>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"I landed my first tech job thanks to Whizan's interview prep courses and mock tests. The performance analytics showed exactly where I needed to improve."</p>
+                    <p class="testimonial-author">- Michael T., Junior Developer</p>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"As a non-tech professional, I appreciated the business courses with interactive exercises. The discussion forums connected me with amazing mentors."</p>
+                    <p class="testimonial-author">- Priya M., Marketing Manager</p>
+                </div>
+            </div>
+        </section> -->
+        
+        <section class="pricing">
+            <h2 class="section-title">100% Free Forever</h2>
+            <div class="pricing-card">
+                <h2>$0</h2>
+                <p>All features included with no hidden costs</p>
+                <ul class="features-list">
+                    <li>Unlimited access to all courses</li>
+                    <li>Inbuilt code editor with 20+ languages</li>
+                    <li>Lecture-wise code and notes saving</li>
+                    <li>Automated quizzes and assessments</li>
+                    <li>Detailed performance analytics</li>
+                    <li>Course discussion forums</li>
+                    <li>Free verifiable certificates</li>
+                </ul>
+                <a href="/auth.html" class="cta-button">Get Started Now</a>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <div class="footer-links">
+            <a href="subject/privacy.html">Privacy Policy</a>
+            <a href="subject/terms.html">Terms of Service</a>
+            <a href="subject/contact.html">Contact Us</a>
+            <a href="subject/contact.html">FAQ</a>
+        </div>
+        <p class="copyright">© 2025 Whizan Learning Platform. All courses are completely free to access.</p>
+    </footer>
+</body>
+</html>
