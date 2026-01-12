@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MP4 to MP3 Converter</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding-top: 50px; }
+    button, input { padding: 10px; font-size: 16px; margin-top: 10px; }
+    #progress { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>MP4 to MP3 Converter</h1>
+  <input type="file" id="fileInput" accept="video/mp4"><br>
+  <button id="convertBtn">Convert to MP3</button>
+  <div id="progress">No file selected.</div>
+
+  <script type="module">
+    import { createFFmpeg, fetchFile } from 'https://cdn.skypack.dev/@ffmpeg/ffmpeg';
+
+    const ffmpeg = createFFmpeg({ log: true });
+    const fileInput = document.getElementById('fileInput');
+    const convertBtn = document.getElementById('convertBtn');
+    const progress = document.getElementById('progress');
+
+    convertBtn.addEventListener('click', async () => {
+      const file = fileInput.files[0];
+      if (!file) {
+        alert("Please select an MP4 file.");
+        return;
+      }
+
+      progress.textContent = "Loading FFmpeg...";
+      if (!ffmpeg.isLoaded()) await ffmpeg.load();
+
+      progress.textContent = "Converting...";
+
+      ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(file));
+      await ffmpeg.run('-i', 'input.mp4', '-q:a', '0', '-map', 'a', 'output.mp3');
+
+      const data = ffmpeg.FS('readFile', 'output.mp3');
+      const mp3Blob = new Blob([data.buffer], { type: 'audio/mp3' });
+      const mp3Url = URL.createObjectURL(mp3Blob);
+
+      const downloadLink = document.createElement('a');
+      downloadLink.href = mp3Url;
+      downloadLink.download = file.name.replace(/\.mp4$/, '.mp3');
+      downloadLink.textContent = 'Download MP3';
+      progress.innerHTML = '';
+      progress.appendChild(downloadLink);
+    });
+  </script>
+</body>
+</html>

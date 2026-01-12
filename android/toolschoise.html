@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whizan Tools</title>
+    <style>
+        :root {
+            --dark-bg: #0a0a12;
+            --light-purple: #bb86fc;
+            --dark-purple: #3700b3;
+            --accent-red: #ff3d3d;
+            --text-light: #e1e1e1;
+            --text-dark: #121212;
+            --card-bg: #1e1e2e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--dark-purple), var(--dark-bg));
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(to right, var(--light-purple), var(--accent-red));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 20px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .user-profile:hover {
+            background-color: rgba(187, 134, 252, 0.1);
+        }
+        
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--light-purple);
+            margin-right: 8px;
+        }
+        
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .loading {
+            display: flex;
+            align-items: center;
+            color: var(--light-purple);
+            font-size: 0.9rem;
+        }
+        
+        .loading::after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            border: 2px solid var(--light-purple);
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            margin-left: 8px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .container {
+            padding: 15px;
+            padding-bottom: 80px;
+        }
+        
+        .search-bar {
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        .search-bar input {
+            width: 100%;
+            padding: 12px 15px;
+            padding-left: 45px;
+            border-radius: 25px;
+            border: none;
+            background-color: var(--card-bg);
+            color: var(--text-light);
+            font-size: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .search-bar::before {
+            content: "🔍";
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            color: var(--light-purple);
+        }
+        
+        .category-title {
+            margin: 20px 0 10px;
+            font-size: 1.2rem;
+            color: var(--light-purple);
+            display: flex;
+            align-items: center;
+        }
+        
+        .category-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, var(--light-purple), transparent);
+            margin-left: 10px;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .tool-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            border: 1px solid rgba(187, 134, 252, 0.1);
+        }
+        
+        .tool-card::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(187, 134, 252, 0.1) 0%, rgba(187, 134, 252, 0) 70%);
+            transform: scale(0);
+            transition: transform 0.6s ease;
+            pointer-events: none;
+        }
+        
+        .tool-card:hover::before {
+            transform: scale(1);
+        }
+        
+        .tool-card:active {
+            transform: scale(0.95);
+        }
+        
+        .tool-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--light-purple), var(--accent-red));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+            color: var(--text-dark);
+        }
+        
+        .tool-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+        }
+        
+        .tool-desc {
+            font-size: 0.8rem;
+            color: rgba(225, 225, 225, 0.7);
+        }
+        
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, var(--dark-bg), transparent);
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+        
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .nav-btn i {
+            font-size: 1.5rem;
+            margin-bottom: 3px;
+        }
+        
+        .nav-btn.active {
+            opacity: 1;
+            color: var(--light-purple);
+            transform: translateY(-5px);
+        }
+        
+        .nav-btn:active {
+            transform: scale(0.9);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tool-card {
+            animation: fadeIn 0.5s ease forwards;
+            opacity: 0;
+        }
+        
+        .tool-card:nth-child(1) { animation-delay: 0.1s; }
+        .tool-card:nth-child(2) { animation-delay: 0.2s; }
+        .tool-card:nth-child(3) { animation-delay: 0.3s; }
+        .tool-card:nth-child(4) { animation-delay: 0.4s; }
+        .tool-card:nth-child(5) { animation-delay: 0.5s; }
+        .tool-card:nth-child(6) { animation-delay: 0.6s; }
+        .tool-card:nth-child(7) { animation-delay: 0.7s; }
+        .tool-card:nth-child(8) { animation-delay: 0.8s; }
+        .tool-card:nth-child(9) { animation-delay: 0.9s; }
+        .tool-card:nth-child(10) { animation-delay: 1s; }
+        
+        /* Responsive adjustments */
+        @media (max-width: 400px) {
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .user-name {
+                display: none;
+            }
+        }
+        
+        /* Profile dropdown */
+        .profile-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            min-width: 150px;
+            display: none;
+            z-index: 1000;
+        }
+        
+        .profile-dropdown.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .dropdown-item:hover {
+            background-color: rgba(187, 134, 252, 0.1);
+        }
+        
+        .logout-btn {
+            color: var(--accent-red);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <img src="smart%20study.png" alt="Whizan Logo">
+            <h1>Whizan</h1>
+        </div>
+        
+        <div class="user-section">
+            <div class="loading" id="loading">Loading...</div>
+            <div class="user-profile" id="userProfile" style="display: none;">
+                <img src="" alt="User Avatar" class="user-avatar" id="userAvatar">
+                <span class="user-name" id="userName"></span>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-item" onclick="navigateToProfile()">Profile</div>
+                    <div class="dropdown-item" onclick="navigateToSettings()">Settings</div>
+                    <div class="dropdown-item logout-btn" onclick="logout()">Logout</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" placeholder="Search tools...">
+        </div>
+        
+        <h2 class="category-title">Conversion Tools</h2>
+        <div class="tools-grid">
+            <div class="tool-card" onclick="navigateToTool('tools/base64.html')">
+                <div class="tool-icon">64</div>
+                <h3 class="tool-name">Base64 Converter</h3>
+                <p class="tool-desc">Encode/decode text to Base64</p>
+            </div>
+            
+            <div class="tool-card" onclick="navigateToTool('tools/formatconverter.html')">
+                <div class="tool-icon">⇄</div>
+                <h3 class="tool-name">JPG ↔ PNG</h3>
+                <p class="tool-desc">Convert between image formats</p>
+            </div>
+            
+            <div class="tool-card" onclick="navigateToTool('tools/mp3.html')">
+                <div class="tool-icon">🎵</div>
+                <h3 class="tool-name">MP4 to MP3</h3>
+                <p class="tool-desc">Extract audio from videos</p>
+            </div>
+            
+            <div class="tool-card" onclick="navigateToTool('tools/imagetopdf.html')">
+                <div class="tool-icon">📄</div>
+                <h3 class="tool-name">Images to PDF</h3>
+                <p class="tool-desc">Combine images into PDF</p>
+            </div>
+        </div>
+        
+        <h2 class="category-title">Development Tools</h2>
+        <div class="tools-grid">
+            <div class="tool-card" onclick="navigateToTool('tools/codeimage.html')">
+                <div class="tool-icon">💻</div>
+                <h3 class="tool-name">Code to Image</h3>
+                <p class="tool-desc">Convert code snippets to images</p>
+            </div>
+            
+            <div class="tool-card" onclick="navigateToTool('tools/htmlpreview.html')">
+                <div class="tool-icon">🌐</div>
+                <h3 class="tool-name">HTML Preview</h3>
+                <p class="tool-desc">Preview HTML code in real-time</p>
+            </div>
+            
+            <div class="tool-card" onclick="navigateToTool('tools/hash.html')">
+                <div class="tool-icon">#</div>
+                <h3 class="tool-name">Hash Encoder</h3>
+                <p class="tool-desc">Generate hash values</p>
+            </div>
+        </div>
+        
+        <h2 class="category-title">Document Tools</h2>
+        <div class="tools-grid">
+            <div class="tool-card" onclick="navigateToTool('tools/editor.html')">
+                <div class="tool-icon">✏️</div>
+                <h3 class="tool-name">Advanced PDF Editor</h3>
+                <p class="tool-desc">Edit PDF files with ease</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <button class="nav-btn active" data-page="home">
+            <i>🏠</i>
+            <span>Home</span>
+        </button>
+        <button class="nav-btn" data-page="favorites">
+            <i>⭐</i>
+            <span>Favorites</span>
+        </button>
+        <button class="nav-btn" data-page="settings">
+            <i>⚙️</i>
+            <span>Settings</span>
+        </button>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+
+    <script>
+        let firebaseConfig = null;
+        let auth = null;
+        let database = null;
+        let currentUser = null;
+
+        // Initialize Firebase
+        async function initializeFirebase() {
+            try {
+                const response = await fetch('https://us-central1-study2-7bdc7.cloudfunctions.net/getConfig');
+                const data = await response.json();
+                firebaseConfig = data.firebase;
+                
+                firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                database = firebase.database();
+                
+                // Listen for auth state changes
+                auth.onAuthStateChanged(handleAuthStateChange);
+            } catch (error) {
+                console.error('Failed to initialize Firebase:', error);
+                redirectToAuth();
+            }
+        }
+
+        // Handle authentication state changes
+        function handleAuthStateChange(user) {
+            const loading = document.getElementById('loading');
+            const userProfile = document.getElementById('userProfile');
+            
+            console.log('Auth state changed:', user);
+            
+            if (user) {
+                console.log('User is authenticated:', {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName,
+                    photoURL: user.photoURL,
+                    emailVerified: user.emailVerified
+                });
+                
+                currentUser = user;
+                loadUserProfile(user);
+                loading.style.display = 'none';
+                userProfile.style.display = 'flex';
+            } else {
+                console.log('User is not authenticated');
+                loading.style.display = 'none';
+                redirectToAuth();
+            }
+        }
+
+        // Load user profile data
+        async function loadUserProfile(user) {
+            console.log('Loading user profile for:', user.uid);
+            console.log('User object:', user);
+            
+            const userAvatar = document.getElementById('userAvatar');
+            const userName = document.getElementById('userName');
+            
+            try {
+                // Try to get data from Firebase Realtime Database first
+                const userRef = database.ref(`users/${user.uid}`);
+                const snapshot = await userRef.once('value');
+                const userData = snapshot.val();
+                
+                console.log('Database user data:', userData);
+                
+                let profilePicture = null;
+                let displayName = null;
+                
+                // Priority 1: Database data
+                if (userData) {
+                    profilePicture = userData.profilePicture || userData.profilePic || userData.photoURL || userData.photo;
+                    displayName = userData.displayName || userData.name || userData.username;
+                }
+                
+                // Priority 2: Firebase Auth data
+                if (!profilePicture) {
+                    profilePicture = user.photoURL;
+                }
+                if (!displayName) {
+                    displayName = user.displayName;
+                }
+                
+                // Priority 3: Email-based fallback
+                if (!displayName && user.email) {
+                    displayName = user.email.split('@')[0];
+                }
+                
+                // Priority 4: Default fallback
+                if (!displayName) {
+                    displayName = 'User';
+                }
+                
+                console.log('Final profilePicture:', profilePicture);
+                console.log('Final displayName:', displayName);
+                
+                // Set user name
+                userName.textContent = displayName;
+                
+                // Set user avatar with enhanced error handling
+                if (profilePicture && profilePicture.trim() !== '') {
+                    console.log('Attempting to load image:', profilePicture);
+                    
+                    // Test if image URL is accessible
+                    const testImg = new Image();
+                    testImg.crossOrigin = 'anonymous';
+                    
+                    testImg.onload = function() {
+                        console.log('Image test successful, setting avatar');
+                        userAvatar.src = profilePicture;
+                    };
+                    
+                    testImg.onerror = function() {
+                        console.log('Image test failed, trying direct load');
+                        // Try direct load without crossOrigin
+                        userAvatar.src = profilePicture;
+                    };
+                    
+                    testImg.src = profilePicture;
+                    
+                } else {
+                    console.log('No profile picture found, using placeholder');
+                    // Generate placeholder with first letter
+                    const firstLetter = displayName.charAt(0).toUpperCase();
+                    userAvatar.src = `https://ui-avatars.com/api/?name=${firstLetter}&background=bb86fc&color=ffffff&size=35`;
+                }
+                
+                // Handle image load errors with multiple fallbacks
+                userAvatar.onerror = function() {
+                    console.log('Avatar image failed to load:', this.src);
+                    const firstLetter = displayName.charAt(0).toUpperCase();
+                    
+                    // Try different placeholder services
+                    if (this.src.includes('ui-avatars.com')) {
+                        console.log('Trying placeholder.com fallback');
+                        this.src = `https://via.placeholder.com/35/bb86fc/ffffff?text=${firstLetter}`;
+                    } else if (this.src.includes('placeholder.com')) {
+                        console.log('Trying generated SVG fallback');
+                        // Create a data URL with SVG
+                        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 35 35">
+                            <rect width="35" height="35" fill="#bb86fc"/>
+                            <text x="50%" y="50%" text-anchor="middle" dy="0.35em" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">${firstLetter}</text>
+                        </svg>`;
+                        this.src = 'data:image/svg+xml;base64,' + btoa(svg);
+                    } else {
+                        console.log('All fallbacks failed, using ui-avatars');
+                        this.src = `https://ui-avatars.com/api/?name=${firstLetter}&background=bb86fc&color=ffffff&size=35`;
+                    }
+                };
+                
+                userAvatar.onload = function() {
+                    console.log('Avatar image loaded successfully:', this.src);
+                };
+                
+            } catch (error) {
+                console.error('Failed to load user profile:', error);
+                
+                // Fallback handling with better image testing
+                const displayName = user.displayName || (user.email ? user.email.split('@')[0] : 'User');
+                userName.textContent = displayName;
+                
+                if (user.photoURL) {
+                    console.log('Using Firebase Auth photoURL:', user.photoURL);
+                    
+                    // Test image accessibility
+                    const testImg = new Image();
+                    testImg.onload = function() {
+                        userAvatar.src = user.photoURL;
+                    };
+                    testImg.onerror = function() {
+                        console.log('Firebase photoURL failed, using placeholder');
+                        const firstLetter = displayName.charAt(0).toUpperCase();
+                        userAvatar.src = `https://ui-avatars.com/api/?name=${firstLetter}&background=bb86fc&color=ffffff&size=35`;
+                    };
+                    testImg.src = user.photoURL;
+                } else {
+                    console.log('No Firebase photoURL, using placeholder');
+                    const firstLetter = displayName.charAt(0).toUpperCase();
+                    userAvatar.src = `https://ui-avatars.com/api/?name=${firstLetter}&background=bb86fc&color=ffffff&size=35`;
+                }
+                
+                userAvatar.onerror = function() {
+                    console.log('Fallback avatar failed:', this.src);
+                    const firstLetter = displayName.charAt(0).toUpperCase();
+                    
+                    if (this.src.includes('ui-avatars.com')) {
+                        this.src = `https://via.placeholder.com/35/bb86fc/ffffff?text=${firstLetter}`;
+                    } else {
+                        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 35 35">
+                            <rect width="35" height="35" fill="#bb86fc"/>
+                            <text x="50%" y="50%" text-anchor="middle" dy="0.35em" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold">${firstLetter}</text>
+                        </svg>`;
+                        this.src = 'data:image/svg+xml;base64,' + btoa(svg);
+                    }
+                };
+            }
+        }
+
+        // Redirect to authentication page
+        function redirectToAuth() {
+            window.location.href = 'android/auth.html';
+        }
+
+        // Navigation functions
+        function navigateToTool(toolPath) {
+            if (!currentUser) {
+                redirectToAuth();
+                return;
+            }
+            window.location.href = toolPath;
+        }
+
+        function navigateToProfile() {
+            window.location.href = 'profile.html';
+        }
+
+        function navigateToSettings() {
+            window.location.href = 'settings.html';
+        }
+
+        function navigateToPage(page) {
+            switch(page) {
+                case 'home':
+                    window.location.href = 'profile.html';
+                    break;
+                case 'favorites':
+                    window.location.href = 'favorites.html';
+                    break;
+                case 'settings':
+                    window.location.href = 'profile.html';
+                    break;
+            }
+        }
+
+        // Logout function
+        async function logout() {
+            try {
+                await auth.signOut();
+                redirectToAuth();
+            } catch (error) {
+                console.error('Logout failed:', error);
+            }
+        }
+
+        // Profile dropdown toggle
+        document.getElementById('userProfile').addEventListener('click', function(e) {
+            e.stopPropagation();
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function() {
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.classList.remove('show');
+        });
+
+        // Search functionality
+        document.querySelector('.search-bar input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.tool-card');
+            
+            cards.forEach(card => {
+                const name = card.querySelector('.tool-name').textContent.toLowerCase();
+                const desc = card.querySelector('.tool-desc').textContent.toLowerCase();
+                
+                if (name.includes(searchTerm) || desc.includes(searchTerm)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+        
+        // Navigation buttons
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const page = this.getAttribute('data-page');
+                
+                // Update active state
+                document.querySelector('.nav-btn.active').classList.remove('active');
+                this.classList.add('active');
+                
+                // Navigate to page
+                if (page !== 'home') {
+                    navigateToPage(page);
+                }
+            });
+        });
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFirebase();
+        });
+    </script>
+</body>
+</html>

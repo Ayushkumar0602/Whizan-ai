@@ -41,6 +41,81 @@ exports.getConfig = functions.https.onRequest((req, res) => {
 
 // Add your page-specific endpoints below this line
 
+
+
+// GitHub OAuth Configuration
+const GITHUB_CLIENT_ID = "Iv23liK0VPSmBmbi5eRo";
+const GITHUB_CLIENT_SECRET = "8d2b5ad45ec59e38e8066bf65a86875d67096a00"; // Replace with your actual secret
+
+// GitHub OAuth token exchange endpoint
+exports.githubAuth = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    try {
+      const { code } = req.body;
+
+      if (!code) {
+        return handleResponse(res, 400, { error: "Authorization code is required" });
+      }
+
+      // Exchange code for access token
+      const tokenResponse = await axios.post('https://github.com/login/oauth/access_token', {
+        client_id: GITHUB_CLIENT_ID,
+        client_secret: GITHUB_CLIENT_SECRET,
+        code: code,
+      }, {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        }
+      });
+
+      const tokenData = tokenResponse.data;
+
+      if (tokenData.error) {
+        return handleResponse(res, 400, { error: tokenData.error_description || "GitHub authentication failed" });
+      }
+
+      handleResponse(res, 200, {
+        access_token: tokenData.access_token,
+        scope: tokenData.scope,
+        token_type: tokenData.token_type
+      });
+
+    } catch (error) {
+      console.error('GitHub auth error:', error);
+      handleResponse(res, 500, { error: "Internal server error during GitHub authentication" });
+    }
+  });
+});
+
+// GitHub API proxy endpoint
+exports.githubProxy = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    try {
+      const { token, endpoint, method = 'GET', data } = req.body;
+
+      if (!token || !endpoint) {
+        return handleResponse(res, 400, { error: "Token and endpoint are required" });
+      }
+
+      const response = await axios({
+        method,
+        url: `https://api.github.com${endpoint}`,
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+        data
+      });
+
+      handleResponse(res, 200, response.data);
+
+    } catch (error) {
+      console.error('GitHub proxy error:', error);
+      handleResponse(res, 500, { error: "Internal server error during GitHub API call" });
+    }
+  });
+});
 //course.html
 // Add these endpoints to your existing index.js
 
@@ -90,7 +165,7 @@ exports.getCourses = functions.https.onRequest(async (req, res) => {
             title: "java dsa",
             description: "Comprehensive Data Structures and Algorithms course covering all fundamentals with implementation.",
             difficulty: "intermediate",
-            playlistId: "PL9gnSGHSqcnr_DxHsP7AW9ftq0AtAyYqJ&si=PYekS2IehcVHX1Th",
+            playlistId: "PLQEaRBV9gAFu4ovJ41PywklqI7IyXwr01&si=Eks_UJkvN9zk-9QB",
             duration: "8 weeks",
             lessons: "32 lessons"
           }
@@ -940,10 +1015,4 @@ exports.getApiKeys = functions.https.onRequest((req, res) => {
 });
 
 // Gemini API endpoint for mock interview
-
-
-// notifications endpoint
-
-
-
 

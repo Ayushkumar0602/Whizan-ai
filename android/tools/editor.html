@@ -1,0 +1,3147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced PDF Editor</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4a6bff;
+      --secondary-color: #f8f9fa;
+      --accent-color: #ff6b6b;
+      --text-color: #333;
+      --light-text: #6c757d;
+      --border-color: #dee2e6;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+      --dark-bg: #1a1a1a;
+      --dark-text: #f0f0f0;
+      --dark-border: #333;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: #f5f7ff;
+      padding: 20px;
+    }
+
+    body.dark-mode {
+      background-color: #121212;
+      color: var(--dark-text);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    body.dark-mode header {
+      border-bottom-color: var(--dark-border);
+    }
+
+    h1 {
+      color: var(--primary-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    body.dark-mode .toolbar {
+      background-color: var(--dark-bg);
+    }
+
+    .toolbar-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+    }
+
+    .file-input-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 15px;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .file-input-label:hover {
+      background-color: #3a5bef;
+      transform: translateY(-2px);
+    }
+
+    #upload {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 15px;
+      background-color: white;
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+      border-radius: 5px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    body.dark-mode button {
+      background-color: var(--dark-bg);
+      color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    button:hover {
+      background-color: var(--primary-color);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    body.dark-mode button:hover {
+      color: white;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background-color: var(--secondary-color);
+      color: var(--light-text);
+      border-color: var(--border-color);
+    }
+
+    body.dark-mode button:disabled {
+      background-color: #333;
+      color: #777;
+      border-color: #444;
+    }
+
+    button.danger {
+      color: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+
+    button.danger:hover {
+      background-color: var(--accent-color);
+      color: white;
+    }
+
+    button.success {
+      color: #28a745;
+      border-color: #28a745;
+    }
+
+    button.success:hover {
+      background-color: #28a745;
+      color: white;
+    }
+
+    button.info {
+      color: #17a2b8;
+      border-color: #17a2b8;
+    }
+
+    button.info:hover {
+      background-color: #17a2b8;
+      color: white;
+    }
+
+    .pdf-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .page-wrapper {
+      position: relative;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    body.dark-mode .page-wrapper {
+      background-color: #333;
+    }
+
+    .page-wrapper:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-wrapper.selected {
+      outline: 3px solid var(--primary-color);
+    }
+
+    canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .page-number {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+
+    .status-bar {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: white;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: var(--light-text);
+    }
+
+    body.dark-mode .status-bar {
+      background-color: var(--dark-bg);
+      color: #aaa;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      gap: 20px;
+    }
+
+    body.dark-mode .loading-overlay {
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .spinner {
+      border: 5px solid rgba(74, 107, 255, 0.3);
+      border-radius: 50%;
+      border-top: 5px solid var(--primary-color);
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1001;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+
+    .modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: var(--shadow);
+      transform: translateY(-20px);
+      transition: var(--transition);
+    }
+
+    body.dark-mode .modal-content {
+      background-color: var(--dark-bg);
+      color: var(--dark-text);
+    }
+
+    .modal.active .modal-content {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    body.dark-mode .modal-header {
+      border-bottom-color: var(--dark-border);
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--light-text);
+    }
+
+    body.dark-mode .close-modal {
+      color: #aaa;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    body.dark-mode label {
+      color: var(--dark-text);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-family: inherit;
+    }
+
+    body.dark-mode input,
+    body.dark-mode select,
+    body.dark-mode textarea {
+      background-color: #333;
+      border-color: #444;
+      color: var(--dark-text);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .tab-container {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 15px;
+    }
+
+    body.dark-mode .tab-container {
+      border-bottom-color: var(--dark-border);
+    }
+
+    .tab {
+      padding: 10px 15px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab.active {
+      border-bottom: 2px solid var(--primary-color);
+      font-weight: bold;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .annotation-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .annotation-tool {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    body.dark-mode .annotation-tool {
+      border-color: var(--dark-border);
+    }
+
+    .annotation-tool.active {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .form-fields {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .form-field {
+      padding: 10px;
+      border: 1px dashed var(--border-color);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    body.dark-mode .form-field {
+      border-color: var(--dark-border);
+    }
+
+    .form-field:hover {
+      background-color: rgba(74, 107, 255, 0.1);
+    }
+
+    body.dark-mode .form-field:hover {
+      background-color: rgba(74, 107, 255, 0.2);
+    }
+
+    .settings-panel {
+      position: fixed;
+      top: 0;
+      right: -300px;
+      width: 300px;
+      height: 100%;
+      background-color: white;
+      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      transition: var(--transition);
+      z-index: 999;
+      overflow-y: auto;
+    }
+
+    body.dark-mode .settings-panel {
+      background-color: var(--dark-bg);
+    }
+
+    .settings-panel.open {
+      right: 0;
+    }
+
+    .settings-toggle {
+      position: fixed;
+      top: 100px;
+      right: 0;
+      background-color: white;
+      padding: 10px;
+      border-radius: 5px 0 0 5px;
+      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      z-index: 998;
+    }
+
+    body.dark-mode .settings-toggle {
+      background-color: var(--dark-bg);
+    }
+
+    .color-preview {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-left: 10px;
+      vertical-align: middle;
+      border: 1px solid var(--border-color);
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+      margin-left: 10px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--primary-color);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    .drag-handle {
+      cursor: move;
+      padding: 5px;
+      background-color: rgba(0, 0, 0, 0.1);
+      border-radius: 3px;
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    body.dark-mode .drag-handle {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+      .toolbar {
+        flex-direction: column;
+      }
+      
+      .pdf-container {
+        grid-template-columns: 1fr;
+      }
+
+      .settings-panel {
+        width: 250px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-file-pdf"></i> Advanced PDF Editor</h1>
+      <div class="status-bar" id="statusBar">
+        <span id="fileInfo">No files loaded</span>
+        <span id="pageInfo">0 pages</span>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <div class="toolbar-section">
+        <div class="file-input-wrapper">
+          <label for="upload" class="file-input-label">
+            <i class="fas fa-upload"></i> Upload PDF(s)
+          </label>
+          <input type="file" id="upload" accept="application/pdf" multiple />
+        </div>
+        
+        <button id="mergeBtn" onclick="mergePDFs()" disabled>
+          <i class="fas fa-object-group"></i> Merge PDFs
+        </button>
+        <button id="downloadBtn" onclick="downloadPDF()" disabled>
+          <i class="fas fa-download"></i> Download PDF
+        </button>
+      </div>
+
+      <div class="toolbar-section">
+        <button id="splitBtn" onclick="showSplitModal()" disabled>
+          <i class="fas fa-cut"></i> Split PDF
+        </button>
+        <button id="addPageBtn" onclick="showAddPageModal()" disabled>
+          <i class="fas fa-plus"></i> Add Page
+        </button>
+        <button id="insertPageBtn" onclick="showInsertPageModal()" disabled>
+          <i class="fas fa-arrow-down"></i> Insert Page
+        </button>
+        <button id="removeBtn" onclick="removeSelectedPages()" class="danger" disabled>
+          <i class="fas fa-trash"></i> Remove Selected
+        </button>
+      </div>
+
+      <div class="toolbar-section">
+        <button id="editPageBtn" onclick="showEditPageModal()" class="success" disabled>
+          <i class="fas fa-edit"></i> Edit Page
+        </button>
+        <button id="rotateBtn" onclick="showRotateModal()" class="info" disabled>
+          <i class="fas fa-sync-alt"></i> Rotate
+        </button>
+        <button id="watermarkBtn" onclick="showWatermarkModal()" class="info" disabled>
+          <i class="fas fa-stamp"></i> Watermark
+        </button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="toolbar-section">
+        <button id="highlightBtn" onclick="startHighlighting()" disabled>
+          <i class="fas fa-highlighter"></i> Highlight
+        </button>
+        <button id="underlineBtn" onclick="startUnderlining()" disabled>
+          <i class="fas fa-underline"></i> Underline
+        </button>
+        <button id="strikeBtn" onclick="startStriking()" disabled>
+          <i class="fas fa-strikethrough"></i> Strikethrough
+        </button>
+      </div>
+
+      <div class="toolbar-section">
+        <button id="commentBtn" onclick="addComment()" disabled>
+          <i class="fas fa-comment"></i> Comment
+        </button>
+        <button id="shapeBtn" onclick="showShapeModal()" disabled>
+          <i class="fas fa-shapes"></i> Shapes
+        </button>
+        <button id="signBtn" onclick="showSignatureModal()" disabled>
+          <i class="fas fa-signature"></i> Sign
+        </button>
+      </div>
+
+      <div class="toolbar-section">
+        <button id="formBtn" onclick="showFormModal()" disabled>
+          <i class="fas fa-list-alt"></i> Forms
+        </button>
+        <button id="ocrBtn" onclick="showOCRModal()" disabled>
+          <i class="fas fa-eye"></i> OCR
+        </button>
+        <button id="convertBtn" onclick="showConvertModal()" disabled>
+          <i class="fas fa-exchange-alt"></i> Convert
+        </button>
+      </div>
+    </div>
+
+    <div class="pdf-container" id="pdfContainer"></div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+    <div class="spinner"></div>
+    <div id="loadingText">Processing PDF...</div>
+  </div>
+
+  <!-- Split PDF Modal -->
+  <div class="modal" id="splitModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Split PDF</div>
+        <button class="close-modal" onclick="hideModal('splitModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label for="splitPageNumber">Split after page number:</label>
+        <input type="number" id="splitPageNumber" min="1" max="1000" value="1">
+      </div>
+      <div class="modal-actions">
+        <button onclick="hideModal('splitModal')">Cancel</button>
+        <button class="success" onclick="splitPDF()">Split PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Page Modal -->
+  <div class="modal" id="addPageModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Add Blank Page</div>
+        <button class="close-modal" onclick="hideModal('addPageModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label for="pageSize">Page Size:</label>
+        <select id="pageSize">
+          <option value="letter">Letter (8.5 × 11 in)</option>
+          <option value="a4">A4 (8.27 × 11.7 in)</option>
+          <option value="legal">Legal (8.5 × 14 in)</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+      <div class="form-group" id="customSizeGroup" style="display: none;">
+        <label for="customWidth">Width (points):</label>
+        <input type="number" id="customWidth" value="612">
+        <label for="customHeight">Height (points):</label>
+        <input type="number" id="customHeight" value="792">
+      </div>
+      <div class="modal-actions">
+        <button onclick="hideModal('addPageModal')">Cancel</button>
+        <button class="success" onclick="addBlankPage()">Add Page</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Insert Page Modal -->
+  <div class="modal" id="insertPageModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Insert Blank Page</div>
+        <button class="close-modal" onclick="hideModal('insertPageModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label for="insertPosition">Insert after page number:</label>
+        <input type="number" id="insertPosition" min="1" max="1000" value="1">
+      </div>
+      <div class="form-group">
+        <label for="insertPageSize">Page Size:</label>
+        <select id="insertPageSize">
+          <option value="letter">Letter (8.5 × 11 in)</option>
+          <option value="a4">A4 (8.27 × 11.7 in)</option>
+          <option value="legal">Legal (8.5 × 14 in)</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+      <div class="form-group" id="insertCustomSizeGroup" style="display: none;">
+        <label for="insertCustomWidth">Width (points):</label>
+        <input type="number" id="insertCustomWidth" value="612">
+        <label for="insertCustomHeight">Height (points):</label>
+        <input type="number" id="insertCustomHeight" value="792">
+      </div>
+      <div class="modal-actions">
+        <button onclick="hideModal('insertPageModal')">Cancel</button>
+        <button class="success" onclick="insertBlankPage()">Insert Page</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Page Modal -->
+  <div class="modal" id="editPageModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Edit Page</div>
+        <button class="close-modal" onclick="hideModal('editPageModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label for="editPageNumber">Page number to edit:</label>
+        <input type="number" id="editPageNumber" min="1" max="1000" value="1">
+      </div>
+      <div class="form-group">
+        <label>Edit Options:</label>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button onclick="showAddTextModal()"><i class="fas fa-font"></i> Add Text</button>
+          <button onclick="showAddImageModal()"><i class="fas fa-image"></i> Add Image</button>
+          <button onclick="showEditTextModal()"><i class="fas fa-edit"></i> Edit Text</button>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button onclick="hideModal('editPageModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Text Modal -->
+  <div class="modal" id="addTextModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Add Text to Page</div>
+        <button class="close-modal" onclick="hideModal('addTextModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label for="textContent">Text:</label>
+        <textarea id="textContent" rows="4"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="textX">X Position (points):</label>
+        <input type="number" id="textX" value="50">
+      </div>
+      <div class="form-group">
+        <label for="textY">Y Position (points):</label>
+        <input type="number" id="textY" value="50">
+      </div>
+      <div class="form-group">
+        <label for="textSize">Font Size:</label>
+        <input type="number" id="textSize" value="12">
+      </div>
+      <div class="form-group">
+        <label for="textColor">Text Color:</label>
+        <input type="color" id="textColor" value="#000000">
+      </div>
+      <div class="form-group">
+        <label for="textFont">Font:</label>
+        <select id="textFont">
+          <option value="Helvetica">Helvetica</option>
+          <option value="Times-Roman">Times Roman</option>
+          <option value="Courier">Courier</option>
+          <option value="Symbol">Symbol</option>
+          <option value="ZapfDingbats">Zapf Dingbats</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button onclick="hideModal('addTextModal')">Cancel</button>
+        <button class="success" onclick="addTextToPage()">Add Text</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Text Modal -->
+  <div class="modal" id="editTextModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Edit Text on Page</div>
+        <button class="close-modal" onclick="hideModal('editTextModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label for="editTextContent">Text:</label>
+        <textarea id="editTextContent" rows="4"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="editTextX">X Position (points):</label>
+        <input type="number" id="editTextX" value="50">
+      </div>
+      <div class="form-group">
+        <label for="editTextY">Y Position (points):</label>
+        <input type="number" id="editTextY" value="50">
+      </div>
+      <div class="form-group">
+        <label for="editTextSize">Font Size:</label>
+        <input type="number" id="editTextSize" value="12">
+      </div>
+      <div class="form-group">
+        <label for="editTextColor">Text Color:</label>
+        <input type="color" id="editTextColor" value="#000000">
+      </div>
+      <div class="form-group">
+        <label for="editTextFont">Font:</label>
+        <select id="editTextFont">
+          <option value="Helvetica">Helvetica</option>
+          <option value="Times-Roman">Times Roman</option>
+          <option value="Courier">Courier</option>
+          <option value="Symbol">Symbol</option>
+          <option value="ZapfDingbats">Zapf Dingbats</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button onclick="hideModal('editTextModal')">Cancel</button>
+        <button class="success" onclick="updateTextOnPage()">Update Text</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Image Modal -->
+  <div class="modal" id="addImageModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Add Image to Page</div>
+        <button class="close-modal" onclick="hideModal('addImageModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label for="imageUpload">Select Image:</label>
+        <input type="file" id="imageUpload" accept="image/*">
+      </div>
+      <div class="form-group">
+        <label for="imageX">X Position (points):</label>
+        <input type="number" id="imageX" value="50">
+      </div>
+      <div class="form-group">
+        <label for="imageY">Y Position (points):</label>
+        <input type="number" id="imageY" value="50">
+      </div>
+      <div class="form-group">
+        <label for="imageWidth">Width (points):</label>
+        <input type="number" id="imageWidth" value="100">
+      </div>
+      <div class="form-group">
+        <label for="imageHeight">Height (points):</label>
+        <input type="number" id="imageHeight" value="100">
+      </div>
+      <div class="modal-actions">
+        <button onclick="hideModal('addImageModal')">Cancel</button>
+        <button class="success" onclick="addImageToPage()">Add Image</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rotate Page Modal -->
+  <div class="modal" id="rotateModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Rotate Page</div>
+        <button class="close-modal" onclick="hideModal('rotateModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label for="rotatePageNumber">Page number to rotate:</label>
+        <input type="number" id="rotatePageNumber" min="1" max="1000" value="1">
+      </div>
+      <div class="form-group">
+        <label for="rotateDegrees">Rotation angle:</label>
+        <select id="rotateDegrees">
+          <option value="90">90° Clockwise</option>
+          <option value="180">180°</option>
+          <option value="270">90° Counter-Clockwise</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button onclick="hideModal('rotateModal')">Cancel</button>
+        <button class="success" onclick="rotatePage()">Rotate Page</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Watermark Modal -->
+  <div class="modal" id="watermarkModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Add Watermark</div>
+        <button class="close-modal" onclick="hideModal('watermarkModal')">&times;</button>
+      </div>
+      <div class="tab-container">
+        <div class="tab active" onclick="switchTab('watermarkTextTab')">Text Watermark</div>
+        <div class="tab" onclick="switchTab('watermarkImageTab')">Image Watermark</div>
+      </div>
+      
+      <div id="watermarkTextTab" class="tab-content active">
+        <div class="form-group">
+          <label for="watermarkText">Watermark Text:</label>
+          <input type="text" id="watermarkText" value="Confidential">
+        </div>
+        <div class="form-group">
+          <label for="watermarkFontSize">Font Size:</label>
+          <input type="number" id="watermarkFontSize" value="48">
+        </div>
+        <div class="form-group">
+          <label for="watermarkColor">Color:</label>
+          <input type="color" id="watermarkColor" value="#000000">
+        </div>
+        <div class="form-group">
+          <label for="watermarkOpacity">Opacity:</label>
+          <input type="range" id="watermarkOpacity" min="0.1" max="1" step="0.1" value="0.5">
+          <span id="opacityValue">0.5</span>
+        </div>
+        <div class="form-group">
+          <label for="watermarkAngle">Angle:</label>
+          <input type="range" id="watermarkAngle" min="0" max="360" value="45">
+          <span id="angleValue">45°</span>
+        </div>
+      </div>
+      
+      <div id="watermarkImageTab" class="tab-content">
+        <div class="form-group">
+          <label for="watermarkImageUpload">Select Watermark Image:</label>
+          <input type="file" id="watermarkImageUpload" accept="image/*">
+        </div>
+        <div class="form-group">
+          <label for="watermarkImageScale">Scale (%):</label>
+          <input type="number" id="watermarkImageScale" min="10" max="200" value="50">
+        </div>
+        <div class="form-group">
+          <label for="watermarkImageOpacity">Opacity:</label>
+          <input type="range" id="watermarkImageOpacity" min="0.1" max="1" step="0.1" value="0.5">
+          <span id="imageOpacityValue">0.5</span>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="watermarkPages">Apply to:</label>
+        <select id="watermarkPages">
+          <option value="all">All pages</option>
+          <option value="selected">Selected pages only</option>
+          <option value="range">Page range</option>
+        </select>
+      </div>
+      <div class="form-group" id="watermarkRangeGroup" style="display: none;">
+        <label for="watermarkRange">Page range (e.g., 1-5,8,10-12):</label>
+        <input type="text" id="watermarkRange">
+      </div>
+      <div class="modal-actions">
+        <button onclick="hideModal('watermarkModal')">Cancel</button>
+        <button class="success" onclick="addWatermark()">Add Watermark</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shape Modal -->
+  <div class="modal" id="shapeModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Add Shape</div>
+        <button class="close-modal" onclick="hideModal('shapeModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label for="shapeType">Shape Type:</label>
+        <select id="shapeType">
+          <option value="rectangle">Rectangle</option>
+          <option value="circle">Circle</option>
+          <option value="line">Line</option>
+          <option value="arrow">Arrow</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="shapeX">X Position (points):</label>
+        <input type="number" id="shapeX" value="100">
+      </div>
+      <div class="form-group">
+        <label for="shapeY">Y Position (points):</label>
+        <input type="number" id="shapeY" value="100">
+      </div>
+      <div class="form-group" id="shapeWidthGroup">
+        <label for="shapeWidth">Width (points):</label>
+        <input type="number" id="shapeWidth" value="100">
+      </div>
+      <div class="form-group" id="shapeHeightGroup">
+        <label for="shapeHeight">Height (points):</label>
+        <input type="number" id="shapeHeight" value="50">
+      </div>
+      <div class="form-group" id="shapeEndXGroup" style="display: none;">
+        <label for="shapeEndX">End X (points):</label>
+        <input type="number" id="shapeEndX" value="200">
+      </div>
+      <div class="form-group" id="shapeEndYGroup" style="display: none;">
+        <label for="shapeEndY">End Y (points):</label>
+        <input type="number" id="shapeEndY" value="200">
+      </div>
+      <div class="form-group">
+        <label for="shapeBorderColor">Border Color:</label>
+        <input type="color" id="shapeBorderColor" value="#000000">
+      </div>
+      <div class="form-group">
+        <label for="shapeFillColor">Fill Color:</label>
+        <input type="color" id="shapeFillColor" value="#ffffff">
+      </div>
+      <div class="form-group">
+        <label for="shapeBorderWidth">Border Width:</label>
+        <input type="number" id="shapeBorderWidth" min="1" max="10" value="1">
+      </div>
+      <div class="form-group">
+        <label for="shapeOpacity">Opacity:</label>
+        <input type="range" id="shapeOpacity" min="0.1" max="1" step="0.1" value="1">
+        <span id="shapeOpacityValue">1</span>
+      </div>
+      <div class="modal-actions">
+        <button onclick="hideModal('shapeModal')">Cancel</button>
+        <button class="success" onclick="addShapeToPage()">Add Shape</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Signature Modal -->
+  <div class="modal" id="signatureModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Add Signature</div>
+        <button class="close-modal" onclick="hideModal('signatureModal')">&times;</button>
+      </div>
+      <div class="tab-container">
+        <div class="tab active" onclick="switchTab('drawTab')">Draw</div>
+        <div class="tab" onclick="switchTab('uploadTab')">Upload</div>
+        <div class="tab" onclick="switchTab('typeTab')">Type</div>
+      </div>
+      
+      <div id="drawTab" class="tab-content active">
+        <div style="border: 1px solid #ccc; height: 200px; margin-bottom: 15px;">
+          <canvas id="signatureCanvas" width="400" height="200" style="width: 100%; height: 100%;"></canvas>
+        </div>
+        <button onclick="clearSignature()" class="danger" style="margin-bottom: 15px;">
+          <i class="fas fa-trash"></i> Clear
+        </button>
+      </div>
+      
+      <div id="uploadTab" class="tab-content">
+        <div class="form-group">
+          <label for="signatureUpload">Upload Signature Image:</label>
+          <input type="file" id="signatureUpload" accept="image/*">
+        </div>
+      </div>
+      
+      <div id="typeTab" class="tab-content">
+        <div class="form-group">
+          <label for="typedSignature">Signature Text:</label>
+          <input type="text" id="typedSignature" placeholder="Your name">
+        </div>
+        <div class="form-group">
+          <label for="signatureFont">Font:</label>
+          <select id="signatureFont">
+            <option value="Brush Script MT">Brush Script</option>
+            <option value="Lucida Handwriting">Lucida Handwriting</option>
+            <option value="Monotype Corsiva">Monotype Corsiva</option>
+            <option value="Segoe Script">Segoe Script</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="signatureSize">Font Size:</label>
+          <input type="number" id="signatureSize" min="10" max="72" value="24">
+        </div>
+        <div class="form-group">
+          <label for="signatureColor">Color:</label>
+          <input type="color" id="signatureColor" value="#000000">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="signatureX">X Position (points):</label>
+        <input type="number" id="signatureX" value="100">
+      </div>
+      <div class="form-group">
+        <label for="signatureY">Y Position (points):</label>
+        <input type="number" id="signatureY" value="100">
+      </div>
+      <div class="form-group">
+        <label for="signatureWidth">Width (points):</label>
+        <input type="number" id="signatureWidth" value="150">
+      </div>
+      <div class="modal-actions">
+        <button onclick="hideModal('signatureModal')">Cancel</button>
+        <button class="success" onclick="addSignatureToPage()">Add Signature</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Modal -->
+  <div class="modal" id="formModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Add Form Field</div>
+        <button class="close-modal" onclick="hideModal('formModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label for="formFieldType">Field Type:</label>
+        <select id="formFieldType">
+          <option value="text">Text Field</option>
+          <option value="checkbox">Checkbox</option>
+          <option value="radio">Radio Button</option>
+          <option value="dropdown">Dropdown</option>
+          <option value="button">Button</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="formFieldName">Field Name:</label>
+        <input type="text" id="formFieldName" placeholder="e.g., first_name">
+      </div>
+      <div class="form-group">
+        <label for="formFieldLabel">Field Label:</label>
+        <input type="text" id="formFieldLabel" placeholder="e.g., First Name">
+      </div>
+      <div class="form-group" id="formFieldOptionsGroup" style="display: none;">
+        <label for="formFieldOptions">Options (comma separated):</label>
+        <input type="text" id="formFieldOptions" placeholder="e.g., Option 1, Option 2, Option 3">
+      </div>
+      <div class="form-group">
+        <label for="formFieldX">X Position (points):</label>
+        <input type="number" id="formFieldX" value="100">
+      </div>
+      <div class="form-group">
+        <label for="formFieldY">Y Position (points):</label>
+        <input type="number" id="formFieldY" value="100">
+      </div>
+      <div class="form-group" id="formFieldWidthGroup">
+        <label for="formFieldWidth">Width (points):</label>
+        <input type="number" id="formFieldWidth" value="200">
+      </div>
+      <div class="form-group" id="formFieldHeightGroup">
+        <label for="formFieldHeight">Height (points):</label>
+        <input type="number" id="formFieldHeight" value="30">
+      </div>
+      <div class="form-group">
+        <label for="formFieldRequired">Required:</label>
+        <input type="checkbox" id="formFieldRequired">
+      </div>
+      <div class="modal-actions">
+        <button onclick="hideModal('formModal')">Cancel</button>
+        <button class="success" onclick="addFormFieldToPage()">Add Field</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OCR Modal -->
+  <div class="modal" id="ocrModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">OCR (Optical Character Recognition)</div>
+        <button class="close-modal" onclick="hideModal('ocrModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label for="ocrLanguage">Language:</label>
+        <select id="ocrLanguage">
+          <option value="eng">English</option>
+          <option value="spa">Spanish</option>
+          <option value="fra">French</option>
+          <option value="deu">German</option>
+          <option value="chi_sim">Chinese (Simplified)</option>
+          <option value="jpn">Japanese</option>
+          <option value="ara">Arabic</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="ocrPages">Apply to:</label>
+        <select id="ocrPages">
+          <option value="all">All pages</option>
+          <option value="selected">Selected pages only</option>
+          <option value="range">Page range</option>
+        </select>
+      </div>
+      <div class="form-group" id="ocrRangeGroup" style="display: none;">
+        <label for="ocrRange">Page range (e.g., 1-5,8,10-12):</label>
+        <input type="text" id="ocrRange">
+      </div>
+      <div class="form-group">
+        <label for="ocrPreserveLayout">Preserve original layout:</label>
+        <input type="checkbox" id="ocrPreserveLayout" checked>
+      </div>
+      <div class="modal-actions">
+        <button onclick="hideModal('ocrModal')">Cancel</button>
+        <button class="success" onclick="performOCR()">Process OCR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Convert Modal -->
+  <div class="modal" id="convertModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Convert PDF</div>
+        <button class="close-modal" onclick="hideModal('convertModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label for="convertFormat">Convert to:</label>
+        <select id="convertFormat">
+          <option value="docx">Word Document (.docx)</option>
+          <option value="xlsx">Excel Spreadsheet (.xlsx)</option>
+          <option value="pptx">PowerPoint (.pptx)</option>
+          <option value="jpg">JPEG Image (.jpg)</option>
+          <option value="png">PNG Image (.png)</option>
+          <option value="html">HTML Web Page (.html)</option>
+          <option value="txt">Plain Text (.txt)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="convertPages">Convert:</label>
+        <select id="convertPages">
+          <option value="all">All pages</option>
+          <option value="selected">Selected pages only</option>
+          <option value="range">Page range</option>
+        </select>
+      </div>
+      <div class="form-group" id="convertRangeGroup" style="display: none;">
+        <label for="convertRange">Page range (e.g., 1-5,8,10-12):</label>
+        <input type="text" id="convertRange">
+      </div>
+      <div class="form-group" id="convertImageOptions" style="display: none;">
+        <label for="imageQuality">Image Quality:</label>
+        <input type="range" id="imageQuality" min="1" max="100" value="90">
+        <span id="imageQualityValue">90%</span>
+      </div>
+      <div class="modal-actions">
+        <button onclick="hideModal('convertModal')">Cancel</button>
+        <button class="success" onclick="convertPDF()">Convert</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Panel -->
+  <div class="settings-toggle" onclick="toggleSettings()">
+    <i class="fas fa-cog"></i> Settings
+  </div>
+  
+  <div class="settings-panel" id="settingsPanel">
+    <h3>Settings</h3>
+    
+    <div class="form-group">
+      <label>Dark Mode: 
+        <label class="toggle-switch">
+          <input type="checkbox" id="darkModeToggle">
+          <span class="slider"></span>
+        </label>
+      </label>
+    </div>
+    
+    <div class="form-group">
+      <label>Default Font:</label>
+      <select id="defaultFont">
+        <option value="Helvetica">Helvetica</option>
+        <option value="Times-Roman">Times Roman</option>
+        <option value="Courier">Courier</option>
+        <option value="Symbol">Symbol</option>
+        <option value="ZapfDingbats">Zapf Dingbats</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label>Default Font Size:</label>
+      <input type="number" id="defaultFontSize" min="8" max="72" value="12">
+    </div>
+    
+    <div class="form-group">
+      <label>Default Text Color:</label>
+      <input type="color" id="defaultTextColor" value="#000000">
+      <span class="color-preview" id="textColorPreview" style="background-color: #000000;"></span>
+    </div>
+    
+    <div class="form-group">
+      <label>Default Highlight Color:</label>
+      <input type="color" id="defaultHighlightColor" value="#ffff00">
+      <span class="color-preview" id="highlightColorPreview" style="background-color: #ffff00;"></span>
+    </div>
+    
+    <div class="form-group">
+      <label>Default Page Size:</label>
+      <select id="defaultPageSize">
+        <option value="letter">Letter (8.5 × 11 in)</option>
+        <option value="a4">A4 (8.27 × 11.7 in)</option>
+        <option value="legal">Legal (8.5 × 14 in)</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label>Auto-save Interval (minutes):</label>
+      <input type="number" id="autoSaveInterval" min="0" max="60" value="5">
+      <small>Set to 0 to disable auto-save</small>
+    </div>
+    
+    <div class="form-group">
+      <label>Default Export Quality:</label>
+      <select id="defaultExportQuality">
+        <option value="high">High (300dpi)</option>
+        <option value="medium" selected>Medium (150dpi)</option>
+        <option value="low">Low (72dpi)</option>
+      </select>
+    </div>
+    
+    <button onclick="saveSettings()" class="success" style="margin-top: 20px;">
+      <i class="fas fa-save"></i> Save Settings
+    </button>
+  </div>
+
+  <!-- PDF.js worker -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+  </script>
+  
+  <!-- PDF-lib for editing -->
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.16.0/dist/pdf-lib.min.js"></script>
+  
+  <!-- FileSaver.js for better download handling -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  
+  <!-- Tesseract.js for OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+
+  <script>
+    // Global variables
+    let loadedPDFs = [];
+    let selectedPages = [];
+    let currentPDFDoc = null;
+    let totalPages = 0;
+    let editingText = null;
+    let signatureCanvas = null;
+    let signatureCtx = null;
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+    let settings = {
+      darkMode: false,
+      defaultFont: 'Helvetica',
+      defaultFontSize: 12,
+      defaultTextColor: '#000000',
+      defaultHighlightColor: '#ffff00',
+      defaultPageSize: 'letter',
+      autoSaveInterval: 5,
+      defaultExportQuality: 'medium'
+    };
+
+    // DOM elements
+    const pdfContainer = document.getElementById('pdfContainer');
+    const upload = document.getElementById('upload');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingText = document.getElementById('loadingText');
+    const fileInfo = document.getElementById('fileInfo');
+    const pageInfo = document.getElementById('pageInfo');
+    const mergeBtn = document.getElementById('mergeBtn');
+    const splitBtn = document.getElementById('splitBtn');
+    const addPageBtn = document.getElementById('addPageBtn');
+    const insertPageBtn = document.getElementById('insertPageBtn');
+    const removeBtn = document.getElementById('removeBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const editPageBtn = document.getElementById('editPageBtn');
+    const rotateBtn = document.getElementById('rotateBtn');
+    const watermarkBtn = document.getElementById('watermarkBtn');
+    const highlightBtn = document.getElementById('highlightBtn');
+    const underlineBtn = document.getElementById('underlineBtn');
+    const strikeBtn = document.getElementById('strikeBtn');
+    const commentBtn = document.getElementById('commentBtn');
+    const shapeBtn = document.getElementById('shapeBtn');
+    const signBtn = document.getElementById('signBtn');
+    const formBtn = document.getElementById('formBtn');
+    const ocrBtn = document.getElementById('ocrBtn');
+    const convertBtn = document.getElementById('convertBtn');
+    const settingsPanel = document.getElementById('settingsPanel');
+
+    // Initialize the app
+    function init() {
+      // Set up event listeners for modals
+      document.getElementById('pageSize').addEventListener('change', function() {
+        document.getElementById('customSizeGroup').style.display = 
+          this.value === 'custom' ? 'block' : 'none';
+      });
+
+      document.getElementById('insertPageSize').addEventListener('change', function() {
+        document.getElementById('insertCustomSizeGroup').style.display = 
+          this.value === 'custom' ? 'block' : 'none';
+      });
+
+      document.getElementById('watermarkOpacity').addEventListener('input', function() {
+        document.getElementById('opacityValue').textContent = this.value;
+      });
+
+      document.getElementById('watermarkAngle').addEventListener('input', function() {
+        document.getElementById('angleValue').textContent = this.value + '°';
+      });
+
+      document.getElementById('watermarkImageOpacity').addEventListener('input', function() {
+        document.getElementById('imageOpacityValue').textContent = this.value;
+      });
+
+      document.getElementById('watermarkPages').addEventListener('change', function() {
+        document.getElementById('watermarkRangeGroup').style.display = 
+          this.value === 'range' ? 'block' : 'none';
+      });
+
+      document.getElementById('ocrPages').addEventListener('change', function() {
+        document.getElementById('ocrRangeGroup').style.display = 
+          this.value === 'range' ? 'block' : 'none';
+      });
+
+      document.getElementById('convertPages').addEventListener('change', function() {
+        document.getElementById('convertRangeGroup').style.display = 
+          this.value === 'range' ? 'block' : 'none';
+      });
+
+      document.getElementById('convertFormat').addEventListener('change', function() {
+        document.getElementById('convertImageOptions').style.display = 
+          ['jpg', 'png'].includes(this.value) ? 'block' : 'none';
+      });
+
+      document.getElementById('imageQuality').addEventListener('input', function() {
+        document.getElementById('imageQualityValue').textContent = this.value + '%';
+      });
+
+      document.getElementById('shapeType').addEventListener('change', function() {
+        const isLine = this.value === 'line' || this.value === 'arrow';
+        document.getElementById('shapeWidthGroup').style.display = isLine ? 'none' : 'block';
+        document.getElementById('shapeHeightGroup').style.display = isLine ? 'none' : 'block';
+        document.getElementById('shapeEndXGroup').style.display = isLine ? 'block' : 'none';
+        document.getElementById('shapeEndYGroup').style.display = isLine ? 'block' : 'none';
+      });
+
+      document.getElementById('formFieldType').addEventListener('change', function() {
+        document.getElementById('formFieldOptionsGroup').style.display = 
+          ['radio', 'dropdown'].includes(this.value) ? 'block' : 'none';
+      });
+
+      document.getElementById('shapeOpacity').addEventListener('input', function() {
+        document.getElementById('shapeOpacityValue').textContent = this.value;
+      });
+
+      // Initialize signature canvas
+      signatureCanvas = document.getElementById('signatureCanvas');
+      signatureCtx = signatureCanvas.getContext('2d');
+      signatureCtx.lineWidth = 2;
+      signatureCtx.lineCap = 'round';
+      signatureCtx.strokeStyle = '#000000';
+
+      // Set up signature drawing
+      signatureCanvas.addEventListener('mousedown', startDrawing);
+      signatureCanvas.addEventListener('mousemove', draw);
+      signatureCanvas.addEventListener('mouseup', stopDrawing);
+      signatureCanvas.addEventListener('mouseout', stopDrawing);
+      signatureCanvas.addEventListener('touchstart', handleTouch);
+      signatureCanvas.addEventListener('touchmove', handleTouch);
+      signatureCanvas.addEventListener('touchend', stopDrawing);
+
+      // Load settings
+      loadSettings();
+
+      updateUI();
+    }
+
+    // Update UI based on current state
+    function updateUI() {
+      const hasPDFs = loadedPDFs.length > 0;
+      const hasMultiplePDFs = loadedPDFs.length > 1;
+      const hasSelections = selectedPages.length > 0;
+
+      mergeBtn.disabled = !hasMultiplePDFs;
+      splitBtn.disabled = !hasPDFs;
+      addPageBtn.disabled = !hasPDFs;
+      insertPageBtn.disabled = !hasPDFs;
+      removeBtn.disabled = !(hasPDFs && hasSelections);
+      downloadBtn.disabled = !hasPDFs;
+      editPageBtn.disabled = !hasPDFs;
+      rotateBtn.disabled = !hasPDFs;
+      watermarkBtn.disabled = !hasPDFs;
+      highlightBtn.disabled = !hasPDFs;
+      underlineBtn.disabled = !hasPDFs;
+      strikeBtn.disabled = !hasPDFs;
+      commentBtn.disabled = !hasPDFs;
+      shapeBtn.disabled = !hasPDFs;
+      signBtn.disabled = !hasPDFs;
+      formBtn.disabled = !hasPDFs;
+      ocrBtn.disabled = !hasPDFs;
+      convertBtn.disabled = !hasPDFs;
+
+      fileInfo.textContent = hasPDFs 
+        ? `${loadedPDFs.length} PDF${loadedPDFs.length > 1 ? 's' : ''} loaded` 
+        : 'No files loaded';
+      
+      pageInfo.textContent = hasPDFs 
+        ? `${totalPages} page${totalPages > 1 ? 's' : ''}` 
+        : '0 pages';
+    }
+
+    // Show modal
+    function showModal(id) {
+      document.getElementById(id).classList.add('active');
+    }
+
+    // Hide modal
+    function hideModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    // Switch between tabs in modals
+    function switchTab(tabId) {
+      const modal = document.querySelector('.modal.active');
+      if (!modal) return;
+      
+      // Hide all tab contents and remove active class from tabs
+      const tabContents = modal.querySelectorAll('.tab-content');
+      tabContents.forEach(content => content.classList.remove('active'));
+      
+      const tabs = modal.querySelectorAll('.tab');
+      tabs.forEach(tab => tab.classList.remove('active'));
+      
+      // Show selected tab content and mark tab as active
+      document.getElementById(tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    // Show loading overlay
+    function showLoading(message = 'Processing PDF...') {
+      loadingText.textContent = message;
+      loadingOverlay.style.display = 'flex';
+    }
+
+    // Hide loading overlay
+    function hideLoading() {
+      loadingOverlay.style.display = 'none';
+    }
+
+    // Handle PDF upload
+    upload.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files);
+      if (files.length === 0) return;
+
+      showLoading('Loading PDF files...');
+      
+      try {
+        loadedPDFs = [];
+        selectedPages = [];
+        pdfContainer.innerHTML = '';
+        totalPages = 0;
+
+        for (let file of files) {
+          const arrayBuffer = await file.arrayBuffer();
+          const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+          loadedPDFs.push({
+            doc: pdfDoc,
+            name: file.name,
+            pages: pdfDoc.getPageCount()
+          });
+          totalPages += pdfDoc.getPageCount();
+          await renderPDF(pdfDoc, loadedPDFs.length - 1);
+        }
+
+        currentPDFDoc = loadedPDFs[0]?.doc || null;
+        updateUI();
+      } catch (error) {
+        console.error('Error loading PDF:', error);
+        alert('Failed to load PDF: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    });
+
+    // Render PDF pages
+    async function renderPDF(pdfDoc, pdfIndex) {
+      try {
+        const newDoc = await pdfDoc.save();
+        const blob = new Blob([newDoc], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const pdf = await pdfjsLib.getDocument(url).promise;
+        
+        for (let i = 0; i < pdf.numPages; i++) {
+          const page = await pdf.getPage(i + 1);
+          const viewport = page.getViewport({ scale: 1.5 });
+          
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+          
+          await page.render({
+            canvasContext: context,
+            viewport: viewport
+          }).promise;
+
+          const wrapper = document.createElement('div');
+          wrapper.className = 'page-wrapper';
+          
+          // Add page number indicator
+          const pageNumber = document.createElement('div');
+          pageNumber.className = 'page-number';
+          pageNumber.textContent = `PDF ${pdfIndex + 1} - Page ${i + 1}`;
+          wrapper.appendChild(pageNumber);
+          
+          wrapper.appendChild(canvas);
+          
+          // Click handler for page selection
+          wrapper.onclick = () => {
+            const pageIndex = totalPages > 1 ? i : i; // Adjust if needed for multi-PDF
+            wrapper.classList.toggle('selected');
+            
+            if (wrapper.classList.contains('selected')) {
+              selectedPages.push(pageIndex);
+            } else {
+              selectedPages = selectedPages.filter(p => p !== pageIndex);
+            }
+            
+            updateUI();
+          };
+
+          pdfContainer.appendChild(wrapper);
+        }
+      } catch (error) {
+        console.error('Error rendering PDF:', error);
+        throw error;
+      }
+    }
+
+    // Merge all loaded PDFs
+    async function mergePDFs() {
+      if (loadedPDFs.length < 2) {
+        alert('You need at least 2 PDFs to merge');
+        return;
+      }
+
+      showLoading('Merging PDFs...');
+      
+      try {
+        const mergedPdf = await PDFLib.PDFDocument.create();
+        
+        for (let pdf of loadedPDFs) {
+          const copiedPages = await mergedPdf.copyPages(pdf.doc, pdf.doc.getPageIndices());
+          copiedPages.forEach(p => mergedPdf.addPage(p));
+        }
+        
+        const bytes = await mergedPdf.save();
+        saveAs(new Blob([bytes], { type: 'application/pdf' }), `merged_${new Date().toISOString().slice(0,10)}.pdf`);
+      } catch (error) {
+        console.error('Error merging PDFs:', error);
+        alert('Failed to merge PDFs: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Show split modal
+    function showSplitModal() {
+      if (!currentPDFDoc) return;
+      document.getElementById('splitPageNumber').max = currentPDFDoc.getPageCount();
+      document.getElementById('splitPageNumber').value = 1;
+      showModal('splitModal');
+    }
+
+    // Split PDF at selected page
+    async function splitPDF() {
+      if (!currentPDFDoc) return;
+
+      const splitAt = parseInt(document.getElementById('splitPageNumber').value);
+      if (isNaN(splitAt) || splitAt < 1 || splitAt >= currentPDFDoc.getPageCount()) {
+        alert('Please enter a valid page number between 1 and ' + (currentPDFDoc.getPageCount() - 1));
+        return;
+      }
+
+      showLoading('Splitting PDF...');
+      hideModal('splitModal');
+      
+      try {
+        const doc = currentPDFDoc;
+        const pageCount = doc.getPageCount();
+        
+        // Create first part (pages 1 to splitAt)
+        const firstPart = await PDFLib.PDFDocument.create();
+        const firstPages = await firstPart.copyPages(doc, Array.from({length: splitAt}, (_, i) => i));
+        firstPages.forEach(p => firstPart.addPage(p));
+        const firstBytes = await firstPart.save();
+        
+        // Create second part (pages splitAt+1 to end)
+        const secondPart = await PDFLib.PDFDocument.create();
+        const secondPages = await secondPart.copyPages(doc, 
+          Array.from({length: pageCount - splitAt}, (_, i) => i + splitAt));
+        secondPages.forEach(p => secondPart.addPage(p));
+        const secondBytes = await secondPart.save();
+        
+        // Download both parts
+        saveAs(new Blob([firstBytes], { type: 'application/pdf' }), 
+          `part1_pages_1-${splitAt}.pdf`);
+        saveAs(new Blob([secondBytes], { type: 'application/pdf' }), 
+          `part2_pages_${splitAt+1}-${pageCount}.pdf`);
+      } catch (error) {
+        console.error('Error splitting PDF:', error);
+        alert('Failed to split PDF: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Show add page modal
+    function showAddPageModal() {
+      showModal('addPageModal');
+    }
+
+    // Add blank page to current PDF
+    async function addBlankPage() {
+      if (!currentPDFDoc) return;
+
+      showLoading('Adding blank page...');
+      hideModal('addPageModal');
+      
+      try {
+        const pageSize = document.getElementById('pageSize').value;
+        let width, height;
+        
+        if (pageSize === 'custom') {
+          width = parseInt(document.getElementById('customWidth').value);
+          height = parseInt(document.getElementById('customHeight').value);
+        } else {
+          // Default sizes in points (1 inch = 72 points)
+          switch(pageSize) {
+            case 'letter':
+              width = 612; // 8.5 * 72
+              height = 792; // 11 * 72
+              break;
+            case 'a4':
+              width = 595; // 8.27 * 72
+              height = 842; // 11.7 * 72
+              break;
+            case 'legal':
+              width = 612; // 8.5 * 72
+              height = 1008; // 14 * 72
+              break;
+            default:
+              width = 612;
+              height = 792;
+          }
+        }
+        
+        currentPDFDoc.addPage([width, height]);
+        pdfContainer.innerHTML = '';
+        selectedPages = [];
+        totalPages = currentPDFDoc.getPageCount();
+        await renderPDF(currentPDFDoc, 0);
+        updateUI();
+      } catch (error) {
+        console.error('Error adding page:', error);
+        alert('Failed to add page: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Show insert page modal
+    function showInsertPageModal() {
+      if (!currentPDFDoc) return;
+      document.getElementById('insertPosition').max = currentPDFDoc.getPageCount();
+      document.getElementById('insertPosition').value = 1;
+      showModal('insertPageModal');
+    }
+
+    // Insert blank page at specific position
+    async function insertBlankPage() {
+      if (!currentPDFDoc) return;
+
+      const insertAt = parseInt(document.getElementById('insertPosition').value);
+      if (isNaN(insertAt)) {
+        alert('Please enter a valid page number');
+        return;
+      }
+
+      showLoading('Inserting blank page...');
+      hideModal('insertPageModal');
+      
+      try {
+        const pageSize = document.getElementById('insertPageSize').value;
+        let width, height;
+        
+        if (pageSize === 'custom') {
+          width = parseInt(document.getElementById('insertCustomWidth').value);
+          height = parseInt(document.getElementById('insertCustomHeight').value);
+        } else {
+          // Default sizes in points (1 inch = 72 points)
+          switch(pageSize) {
+            case 'letter':
+              width = 612; // 8.5 * 72
+              height = 792; // 11 * 72
+              break;
+            case 'a4':
+              width = 595; // 8.27 * 72
+              height = 842; // 11.7 * 72
+              break;
+            case 'legal':
+              width = 612; // 8.5 * 72
+              height = 1008; // 14 * 72
+              break;
+            default:
+              width = 612;
+              height = 792;
+          }
+        }
+        
+        // Create a new document and copy pages with the inserted blank page
+        const newDoc = await PDFLib.PDFDocument.create();
+        const pageCount = currentPDFDoc.getPageCount();
+        
+        // Copy pages before insertion point
+        for (let i = 0; i < insertAt; i++) {
+          const [page] = await newDoc.copyPages(currentPDFDoc, [i]);
+          newDoc.addPage(page);
+        }
+        
+        // Add the new blank page
+        newDoc.addPage([width, height]);
+        
+        // Copy pages after insertion point
+        for (let i = insertAt; i < pageCount; i++) {
+          const [page] = await newDoc.copyPages(currentPDFDoc, [i]);
+          newDoc.addPage(page);
+        }
+        
+        currentPDFDoc = newDoc;
+        loadedPDFs[0].doc = newDoc;
+        pdfContainer.innerHTML = '';
+        selectedPages = [];
+        totalPages = newDoc.getPageCount();
+        await renderPDF(newDoc, 0);
+        updateUI();
+      } catch (error) {
+        console.error('Error inserting page:', error);
+        alert('Failed to insert page: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Remove selected pages
+    async function removeSelectedPages() {
+      if (!currentPDFDoc || selectedPages.length === 0) return;
+
+      showLoading('Removing selected pages...');
+      
+      try {
+        const doc = currentPDFDoc;
+        const newDoc = await PDFLib.PDFDocument.create();
+        
+        for (let i = 0; i < doc.getPageCount(); i++) {
+          if (!selectedPages.includes(i)) {
+            const [page] = await newDoc.copyPages(doc, [i]);
+            newDoc.addPage(page);
+          }
+        }
+        
+        currentPDFDoc = newDoc;
+        loadedPDFs[0].doc = newDoc;
+        pdfContainer.innerHTML = '';
+        selectedPages = [];
+        totalPages = newDoc.getPageCount();
+        await renderPDF(newDoc, 0);
+        updateUI();
+      } catch (error) {
+        console.error('Error removing pages:', error);
+        alert('Failed to remove pages: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Download current PDF
+    async function downloadPDF() {
+      if (!currentPDFDoc) return;
+
+      showLoading('Preparing download...');
+      
+      try {
+        const bytes = await currentPDFDoc.save();
+        saveAs(new Blob([bytes], { type: 'application/pdf' }), `edited_${new Date().toISOString().slice(0,10)}.pdf`);
+      } catch (error) {
+        console.error('Error downloading PDF:', error);
+        alert('Failed to download PDF: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Show edit page modal
+    function showEditPageModal() {
+      if (!currentPDFDoc) return;
+      document.getElementById('editPageNumber').max = currentPDFDoc.getPageCount();
+      document.getElementById('editPageNumber').value = 1;
+      showModal('editPageModal');
+    }
+
+    // Show add text modal
+    function showAddTextModal() {
+      hideModal('editPageModal');
+      showModal('addTextModal');
+    }
+
+    // Add text to a specific page
+    async function addTextToPage() {
+      if (!currentPDFDoc) return;
+
+      const pageNumber = parseInt(document.getElementById('editPageNumber').value) - 1;
+      if (isNaN(pageNumber) || pageNumber < 0 || pageNumber >= currentPDFDoc.getPageCount()) {
+        alert('Please enter a valid page number');
+        return;
+      }
+
+      const text = document.getElementById('textContent').value;
+      if (!text) {
+        alert('Please enter some text');
+        return;
+      }
+
+      const x = parseInt(document.getElementById('textX').value);
+      const y = parseInt(document.getElementById('textY').value);
+      const size = parseInt(document.getElementById('textSize').value);
+      const color = document.getElementById('textColor').value;
+      const font = document.getElementById('textFont').value;
+
+      showLoading('Adding text to page...');
+      hideModal('addTextModal');
+      
+      try {
+        // Convert hex color to RGB
+        const r = parseInt(color.substr(1, 2), 16) / 255;
+        const g = parseInt(color.substr(3, 2), 16) / 255;
+        const b = parseInt(color.substr(5, 2), 16) / 255;
+
+        // Create a new document with the modified page
+        const newDoc = await PDFLib.PDFDocument.create();
+        const pageCount = currentPDFDoc.getPageCount();
+        
+        // Copy all pages
+        for (let i = 0; i < pageCount; i++) {
+          const [page] = await newDoc.copyPages(currentPDFDoc, [i]);
+          newDoc.addPage(page);
+        }
+        
+        // Get the page we want to edit
+        const pages = newDoc.getPages();
+        const page = pages[pageNumber];
+        
+        // Draw the text
+        page.drawText(text, {
+          x: x,
+          y: y,
+          size: size,
+          color: PDFLib.rgb(r, g, b),
+          font: await newDoc.embedFont(font),
+        });
+        
+        currentPDFDoc = newDoc;
+        loadedPDFs[0].doc = newDoc;
+        pdfContainer.innerHTML = '';
+        selectedPages = [];
+        await renderPDF(newDoc, 0);
+        updateUI();
+      } catch (error) {
+        console.error('Error adding text:', error);
+        alert('Failed to add text: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Show edit text modal
+    function showEditTextModal() {
+      if (!currentPDFDoc) return;
+      
+      const pageNumber = parseInt(document.getElementById('editPageNumber').value) - 1;
+      if (isNaN(pageNumber)) {
+        alert('Please enter a valid page number');
+        return;
+      }
+      
+      // In a real implementation, you would need to extract existing text from the page
+      // This is a simplified version that just shows the modal
+      document.getElementById('editTextContent').value = '';
+      document.getElementById('editTextX').value = 50;
+      document.getElementById('editTextY').value = 50;
+      document.getElementById('editTextSize').value = 12;
+      document.getElementById('editTextColor').value = '#000000';
+      document.getElementById('editTextFont').value = 'Helvetica';
+      
+      hideModal('editPageModal');
+      showModal('editTextModal');
+    }
+
+    // Update text on a page
+    async function updateTextOnPage() {
+      if (!currentPDFDoc) return;
+
+      const pageNumber = parseInt(document.getElementById('editPageNumber').value) - 1;
+      if (isNaN(pageNumber)) {
+        alert('Please enter a valid page number');
+        return;
+      }
+
+      const text = document.getElementById('editTextContent').value;
+      if (!text) {
+        alert('Please enter some text');
+        return;
+      }
+
+      const x = parseInt(document.getElementById('editTextX').value);
+      const y = parseInt(document.getElementById('editTextY').value);
+      const size = parseInt(document.getElementById('editTextSize').value);
+      const color = document.getElementById('editTextColor').value;
+      const font = document.getElementById('editTextFont').value;
+
+      showLoading('Updating text on page...');
+      hideModal('editTextModal');
+      
+      try {
+        // Convert hex color to RGB
+        const r = parseInt(color.substr(1, 2), 16) / 255;
+        const g = parseInt(color.substr(3, 2), 16) / 255;
+        const b = parseInt(color.substr(5, 2), 16) / 255;
+
+        // Create a new document with the modified page
+        const newDoc = await PDFLib.PDFDocument.create();
+        const pageCount = currentPDFDoc.getPageCount();
+        
+        // Copy all pages
+        for (let i = 0; i < pageCount; i++) {
+          const [page] = await newDoc.copyPages(currentPDFDoc, [i]);
+          newDoc.addPage(page);
+        }
+        
+        // Get the page we want to edit
+        const pages = newDoc.getPages();
+        const page = pages[pageNumber];
+        
+        // Draw the text (this would replace existing text in a real implementation)
+        page.drawText(text, {
+          x: x,
+          y: y,
+          size: size,
+          color: PDFLib.rgb(r, g, b),
+          font: await newDoc.embedFont(font),
+        });
+        
+        currentPDFDoc = newDoc;
+        loadedPDFs[0].doc = newDoc;
+        pdfContainer.innerHTML = '';
+        selectedPages = [];
+        await renderPDF(newDoc, 0);
+        updateUI();
+      } catch (error) {
+        console.error('Error updating text:', error);
+        alert('Failed to update text: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Show add image modal
+    function showAddImageModal() {
+      hideModal('editPageModal');
+      showModal('addImageModal');
+    }
+
+    // Add image to a specific page
+    async function addImageToPage() {
+      if (!currentPDFDoc) return;
+
+      const pageNumber = parseInt(document.getElementById('editPageNumber').value) - 1;
+      if (isNaN(pageNumber) || pageNumber < 0 || pageNumber >= currentPDFDoc.getPageCount()) {
+        alert('Please enter a valid page number');
+        return;
+      }
+
+      const imageFile = document.getElementById('imageUpload').files[0];
+      if (!imageFile) {
+        alert('Please select an image file');
+        return;
+      }
+
+      const x = parseInt(document.getElementById('imageX').value);
+      const y = parseInt(document.getElementById('imageY').value);
+      const width = parseInt(document.getElementById('imageWidth').value);
+      const height = parseInt(document.getElementById('imageHeight').value);
+
+      showLoading('Adding image to page...');
+      hideModal('addImageModal');
+      
+      try {
+        // Read the image file
+        const arrayBuffer = await imageFile.arrayBuffer();
+        
+        // Create a new document with the modified page
+        const newDoc = await PDFLib.PDFDocument.create();
+        const pageCount = currentPDFDoc.getPageCount();
+        
+        // Copy all pages
+        for (let i = 0; i < pageCount; i++) {
+          const [page] = await newDoc.copyPages(currentPDFDoc, [i]);
+          newDoc.addPage(page);
+        }
+        
+        // Get the page we want to edit
+        const pages = newDoc.getPages();
+        const page = pages[pageNumber];
+        
+        // Embed the image
+        let image;
+        if (imageFile.type === 'image/jpeg' || imageFile.type === 'image/jpg') {
+          image = await newDoc.embedJpg(arrayBuffer);
+        } else if (imageFile.type === 'image/png') {
+          image = await newDoc.embedPng(arrayBuffer);
+        } else {
+          throw new Error('Unsupported image format. Please use JPEG or PNG.');
+        }
+        
+        // Draw the image
+        page.drawImage(image, {
+          x: x,
+          y: y,
+          width: width,
+          height: height,
+        });
+        
+        currentPDFDoc = newDoc;
+        loadedPDFs[0].doc = newDoc;
+        pdfContainer.innerHTML = '';
+        selectedPages = [];
+        await renderPDF(newDoc, 0);
+        updateUI();
+      } catch (error) {
+        console.error('Error adding image:', error);
+        alert('Failed to add image: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Show rotate modal
+    function showRotateModal() {
+      if (!currentPDFDoc) return;
+      document.getElementById('rotatePageNumber').max = currentPDFDoc.getPageCount();
+      document.getElementById('rotatePageNumber').value = 1;
+      showModal('rotateModal');
+    }
+
+    // Rotate a page
+    async function rotatePage() {
+      if (!currentPDFDoc) return;
+
+      const pageNumber = parseInt(document.getElementById('rotatePageNumber').value) - 1;
+      if (isNaN(pageNumber) || pageNumber < 0 || pageNumber >= currentPDFDoc.getPageCount()) {
+        alert('Please enter a valid page number');
+        return;
+      }
+
+      const degrees = parseInt(document.getElementById('rotateDegrees').value);
+      if (isNaN(degrees)) {
+        alert('Please select a valid rotation angle');
+        return;
+      }
+
+      showLoading('Rotating page...');
+      hideModal('rotateModal');
+      
+      try {
+        // Create a new document with the rotated page
+        const newDoc = await PDFLib.PDFDocument.create();
+        const pageCount = currentPDFDoc.getPageCount();
+        
+        // Copy all pages
+        for (let i = 0; i < pageCount; i++) {
+          const [page] = await newDoc.copyPages(currentPDFDoc, [i]);
+          if (i === pageNumber) {
+            page.setRotation(page.getRotation().angle + degrees);
+          }
+          newDoc.addPage(page);
+        }
+        
+        currentPDFDoc = newDoc;
+        loadedPDFs[0].doc = newDoc;
+        pdfContainer.innerHTML = '';
+        selectedPages = [];
+        await renderPDF(newDoc, 0);
+        updateUI();
+      } catch (error) {
+        console.error('Error rotating page:', error);
+        alert('Failed to rotate page: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Show watermark modal
+    function showWatermarkModal() {
+      if (!currentPDFDoc) return;
+      showModal('watermarkModal');
+    }
+
+    // Add watermark to pages
+    async function addWatermark() {
+      if (!currentPDFDoc) return;
+
+      showLoading('Adding watermark...');
+      hideModal('watermarkModal');
+      
+      try {
+        const watermarkType = document.querySelector('.modal.active .tab.active').id;
+        const applyTo = document.getElementById('watermarkPages').value;
+        let pageRange = [];
+        
+        if (applyTo === 'selected') {
+          pageRange = selectedPages;
+        } else if (applyTo === 'range') {
+          const rangeText = document.getElementById('watermarkRange').value;
+          pageRange = parsePageRange(rangeText);
+        } else {
+          // All pages
+          pageRange = Array.from({length: currentPDFDoc.getPageCount()}, (_, i) => i);
+        }
+        
+        // Create a new document with watermarked pages
+        const newDoc = await PDFLib.PDFDocument.create();
+        const pageCount = currentPDFDoc.getPageCount();
+        
+        // Copy all pages
+        for (let i = 0; i < pageCount; i++) {
+          const [page] = await newDoc.copyPages(currentPDFDoc, [i]);
+          newDoc.addPage(page);
+        }
+        
+        // Get all pages
+        const pages = newDoc.getPages();
+        
+        // Apply watermark to selected pages
+        for (const pageNum of pageRange) {
+          if (pageNum >= 0 && pageNum < pages.length) {
+            const page = pages[pageNum];
+            const {width, height} = page.getSize();
+            
+            if (watermarkType === 'watermarkTextTab') {
+              // Text watermark
+              const text = document.getElementById('watermarkText').value;
+              const fontSize = parseInt(document.getElementById('watermarkFontSize').value);
+              const color = document.getElementById('watermarkColor').value;
+              const opacity = parseFloat(document.getElementById('watermarkOpacity').value);
+              const angle = parseInt(document.getElementById('watermarkAngle').value);
+              
+              // Convert hex color to RGB
+              const r = parseInt(color.substr(1, 2), 16) / 255;
+              const g = parseInt(color.substr(3, 2), 16) / 255;
+              const b = parseInt(color.substr(5, 2), 16) / 255;
+              
+              // Calculate center position
+              const centerX = width / 2;
+              const centerY = height / 2;
+              
+              // Draw watermark text
+              page.drawText(text, {
+                x: centerX,
+                y: centerY,
+                size: fontSize,
+                color: PDFLib.rgb(r, g, b),
+                opacity: opacity,
+                rotate: PDFLib.degrees(angle),
+                font: await newDoc.embedFont('Helvetica'),
+              });
+            } else {
+              // Image watermark
+              const imageFile = document.getElementById('watermarkImageUpload').files[0];
+              if (!imageFile) {
+                throw new Error('Please select an image file for watermark');
+              }
+              
+              const scale = parseInt(document.getElementById('watermarkImageScale').value) / 100;
+              const opacity = parseFloat(document.getElementById('watermarkImageOpacity').value);
+              
+              // Read the image file
+              const arrayBuffer = await imageFile.arrayBuffer();
+              
+              // Embed the image
+              let image;
+              if (imageFile.type === 'image/jpeg' || imageFile.type === 'image/jpg') {
+                image = await newDoc.embedJpg(arrayBuffer);
+              } else if (imageFile.type === 'image/png') {
+                image = await newDoc.embedPng(arrayBuffer);
+              } else {
+                throw new Error('Unsupported image format. Please use JPEG or PNG.');
+              }
+              
+              // Calculate position (center of page)
+              const imgWidth = image.width * scale;
+              const imgHeight = image.height * scale;
+              const x = (width - imgWidth) / 2;
+              const y = (height - imgHeight) / 2;
+              
+              // Draw watermark image
+              page.drawImage(image, {
+                x: x,
+                y: y,
+                width: imgWidth,
+                height: imgHeight,
+                opacity: opacity,
+              });
+            }
+          }
+        }
+        
+        currentPDFDoc = newDoc;
+        loadedPDFs[0].doc = newDoc;
+        pdfContainer.innerHTML = '';
+        selectedPages = [];
+        await renderPDF(newDoc, 0);
+        updateUI();
+      } catch (error) {
+        console.error('Error adding watermark:', error);
+        alert('Failed to add watermark: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Parse page range string (e.g., "1-5,8,10-12")
+    function parsePageRange(rangeText) {
+      const pages = new Set();
+      const parts = rangeText.split(',');
+      
+      for (const part of parts) {
+        if (part.includes('-')) {
+          const [start, end] = part.split('-').map(Number);
+          for (let i = start; i <= end; i++) {
+            pages.add(i - 1); // Convert to 0-based index
+          }
+        } else {
+          pages.add(parseInt(part) - 1); // Convert to 0-based index
+        }
+      }
+      
+      return Array.from(pages).filter(p => !isNaN(p));
+    }
+
+    // Start highlighting text
+    function startHighlighting() {
+      alert('Highlighting mode activated. Click and drag to highlight text on the PDF.');
+      // In a real implementation, you would add event listeners to capture the selection
+    }
+
+    // Start underlining text
+    function startUnderlining() {
+      alert('Underline mode activated. Click and drag to underline text on the PDF.');
+      // In a real implementation, you would add event listeners to capture the selection
+    }
+
+    // Start striking through text
+    function startStriking() {
+      alert('Strikethrough mode activated. Click and drag to strike through text on the PDF.');
+      // In a real implementation, you would add event listeners to capture the selection
+    }
+
+    // Add comment to page
+    function addComment() {
+      const pageNumber = parseInt(document.getElementById('editPageNumber').value) - 1;
+      if (isNaN(pageNumber) || pageNumber < 0 || pageNumber >= currentPDFDoc.getPageCount()) {
+        alert('Please select a valid page first');
+        return;
+      }
+      
+      const commentText = prompt('Enter your comment:');
+      if (commentText) {
+        alert(`Comment added to page ${pageNumber + 1}: ${commentText}`);
+        // In a real implementation, you would add the comment to the PDF
+      }
+    }
+
+    // Show shape modal
+    function showShapeModal() {
+      showModal('shapeModal');
+    }
+
+    // Add shape to page
+    async function addShapeToPage() {
+      if (!currentPDFDoc) return;
+
+      const pageNumber = parseInt(document.getElementById('editPageNumber').value) - 1;
+      if (isNaN(pageNumber) || pageNumber < 0 || pageNumber >= currentPDFDoc.getPageCount()) {
+        alert('Please enter a valid page number');
+        return;
+      }
+
+      const shapeType = document.getElementById('shapeType').value;
+      const x = parseInt(document.getElementById('shapeX').value);
+      const y = parseInt(document.getElementById('shapeY').value);
+      const borderColor = document.getElementById('shapeBorderColor').value;
+      const fillColor = document.getElementById('shapeFillColor').value;
+      const borderWidth = parseInt(document.getElementById('shapeBorderWidth').value);
+      const opacity = parseFloat(document.getElementById('shapeOpacity').value);
+
+      showLoading('Adding shape to page...');
+      hideModal('shapeModal');
+      
+      try {
+        // Convert hex colors to RGB
+        const borderR = parseInt(borderColor.substr(1, 2), 16) / 255;
+        const borderG = parseInt(borderColor.substr(3, 2), 16) / 255;
+        const borderB = parseInt(borderColor.substr(5, 2), 16) / 255;
+        
+        const fillR = parseInt(fillColor.substr(1, 2), 16) / 255;
+        const fillG = parseInt(fillColor.substr(3, 2), 16) / 255;
+        const fillB = parseInt(fillColor.substr(5, 2), 16) / 255;
+
+        // Create a new document with the modified page
+        const newDoc = await PDFLib.PDFDocument.create();
+        const pageCount = currentPDFDoc.getPageCount();
+        
+        // Copy all pages
+        for (let i = 0; i < pageCount; i++) {
+          const [page] = await newDoc.copyPages(currentPDFDoc, [i]);
+          newDoc.addPage(page);
+        }
+        
+        // Get the page we want to edit
+        const pages = newDoc.getPages();
+        const page = pages[pageNumber];
+        
+        // Draw the shape based on type
+        switch(shapeType) {
+          case 'rectangle':
+            page.drawRectangle({
+              x: x,
+              y: y,
+              width: parseInt(document.getElementById('shapeWidth').value),
+              height: parseInt(document.getElementById('shapeHeight').value),
+              borderColor: PDFLib.rgb(borderR, borderG, borderB),
+              borderWidth: borderWidth,
+              color: PDFLib.rgb(fillR, fillG, fillB),
+              opacity: opacity,
+            });
+            break;
+            
+          case 'circle':
+            const radius = parseInt(document.getElementById('shapeWidth').value) / 2;
+            page.drawCircle({
+              x: x + radius,
+              y: y + radius,
+              size: radius,
+              borderColor: PDFLib.rgb(borderR, borderG, borderB),
+              borderWidth: borderWidth,
+              color: PDFLib.rgb(fillR, fillG, fillB),
+              opacity: opacity,
+            });
+            break;
+            
+          case 'line':
+          case 'arrow':
+            const endX = parseInt(document.getElementById('shapeEndX').value);
+            const endY = parseInt(document.getElementById('shapeEndY').value);
+            
+            page.drawLine({
+              start: { x: x, y: y },
+              end: { x: endX, y: endY },
+              thickness: borderWidth,
+              color: PDFLib.rgb(borderR, borderG, borderB),
+              opacity: opacity,
+            });
+            
+            if (shapeType === 'arrow') {
+              // Draw arrowhead (simplified)
+              const headSize = borderWidth * 3;
+              const angle = Math.atan2(endY - y, endX - x);
+              
+              page.drawLine({
+                start: { x: endX, y: endY },
+                end: { 
+                  x: endX - headSize * Math.cos(angle - Math.PI/6),
+                  y: endY - headSize * Math.sin(angle - Math.PI/6)
+                },
+                thickness: borderWidth,
+                color: PDFLib.rgb(borderR, borderG, borderB),
+                opacity: opacity,
+              });
+              
+              page.drawLine({
+                start: { x: endX, y: endY },
+                end: { 
+                  x: endX - headSize * Math.cos(angle + Math.PI/6),
+                  y: endY - headSize * Math.sin(angle + Math.PI/6)
+                },
+                thickness: borderWidth,
+                color: PDFLib.rgb(borderR, borderG, borderB),
+                opacity: opacity,
+              });
+            }
+            break;
+        }
+        
+        currentPDFDoc = newDoc;
+        loadedPDFs[0].doc = newDoc;
+        pdfContainer.innerHTML = '';
+        selectedPages = [];
+        await renderPDF(newDoc, 0);
+        updateUI();
+      } catch (error) {
+        console.error('Error adding shape:', error);
+        alert('Failed to add shape: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Show signature modal
+    function showSignatureModal() {
+      showModal('signatureModal');
+    }
+
+    // Signature drawing functions
+    function startDrawing(e) {
+      isDrawing = true;
+      const rect = signatureCanvas.getBoundingClientRect();
+      lastX = e.clientX - rect.left;
+      lastY = e.clientY - rect.top;
+    }
+
+    function draw(e) {
+      if (!isDrawing) return;
+      
+      const rect = signatureCanvas.getBoundingClientRect();
+      const currentX = e.clientX - rect.left;
+      const currentY = e.clientY - rect.top;
+      
+      signatureCtx.beginPath();
+      signatureCtx.moveTo(lastX, lastY);
+      signatureCtx.lineTo(currentX, currentY);
+      signatureCtx.stroke();
+      
+      lastX = currentX;
+      lastY = currentY;
+    }
+
+    function stopDrawing() {
+      isDrawing = false;
+    }
+
+    function handleTouch(e) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const mouseEvent = new MouseEvent(
+        e.type === 'touchstart' ? 'mousedown' : 'mousemove',
+        {
+          clientX: touch.clientX,
+          clientY: touch.clientY
+        }
+      );
+      signatureCanvas.dispatchEvent(mouseEvent);
+    }
+
+    function clearSignature() {
+      signatureCtx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
+    }
+
+    // Add signature to page
+    async function addSignatureToPage() {
+      if (!currentPDFDoc) return;
+
+      const pageNumber = parseInt(document.getElementById('editPageNumber').value) - 1;
+      if (isNaN(pageNumber) || pageNumber < 0 || pageNumber >= currentPDFDoc.getPageCount()) {
+        alert('Please enter a valid page number');
+        return;
+      }
+
+      const x = parseInt(document.getElementById('signatureX').value);
+      const y = parseInt(document.getElementById('signatureY').value);
+      const width = parseInt(document.getElementById('signatureWidth').value);
+
+      showLoading('Adding signature to page...');
+      hideModal('signatureModal');
+      
+      try {
+        // Create a new document with the modified page
+        const newDoc = await PDFLib.PDFDocument.create();
+        const pageCount = currentPDFDoc.getPageCount();
+        
+        // Copy all pages
+        for (let i = 0; i < pageCount; i++) {
+          const [page] = await newDoc.copyPages(currentPDFDoc, [i]);
+          newDoc.addPage(page);
+        }
+        
+        // Get the page we want to edit
+        const pages = newDoc.getPages();
+        const page = pages[pageNumber];
+        
+        // Get signature based on active tab
+        const activeTab = document.querySelector('#signatureModal .tab.active').id;
+        
+        if (activeTab === 'drawTab') {
+          // Get signature from canvas
+          const imageData = signatureCanvas.toDataURL('image/png');
+          const pngImage = await newDoc.embedPng(imageData);
+          
+          // Calculate height to maintain aspect ratio
+          const height = (pngImage.height / pngImage.width) * width;
+          
+          page.drawImage(pngImage, {
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+          });
+        } else if (activeTab === 'uploadTab') {
+          // Get signature from uploaded image
+          const imageFile = document.getElementById('signatureUpload').files[0];
+          if (!imageFile) {
+            throw new Error('Please select an image file for signature');
+          }
+          
+          const arrayBuffer = await imageFile.arrayBuffer();
+          let image;
+          
+          if (imageFile.type === 'image/jpeg' || imageFile.type === 'image/jpg') {
+            image = await newDoc.embedJpg(arrayBuffer);
+          } else if (imageFile.type === 'image/png') {
+            image = await newDoc.embedPng(arrayBuffer);
+          } else {
+            throw new Error('Unsupported image format. Please use JPEG or PNG.');
+          }
+          
+          // Calculate height to maintain aspect ratio
+          const height = (image.height / image.width) * width;
+          
+          page.drawImage(image, {
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+          });
+        } else if (activeTab === 'typeTab') {
+          // Typed signature
+          const text = document.getElementById('typedSignature').value;
+          if (!text) {
+            throw new Error('Please enter signature text');
+          }
+          
+          const fontSize = parseInt(document.getElementById('signatureSize').value);
+          const color = document.getElementById('signatureColor').value;
+          const font = document.getElementById('signatureFont').value;
+          
+          // Convert hex color to RGB
+          const r = parseInt(color.substr(1, 2), 16) / 255;
+          const g = parseInt(color.substr(3, 2), 16) / 255;
+          const b = parseInt(color.substr(5, 2), 16) / 255;
+          
+          page.drawText(text, {
+            x: x,
+            y: y,
+            size: fontSize,
+            color: PDFLib.rgb(r, g, b),
+            font: await newDoc.embedFont(font),
+          });
+        }
+        
+        currentPDFDoc = newDoc;
+        loadedPDFs[0].doc = newDoc;
+        pdfContainer.innerHTML = '';
+        selectedPages = [];
+        await renderPDF(newDoc, 0);
+        updateUI();
+      } catch (error) {
+        console.error('Error adding signature:', error);
+        alert('Failed to add signature: ' + error.message);
+      } finally {
+        hideLoading();
+        clearSignature();
+      }
+    }
+
+    // Show form modal
+    function showFormModal() {
+      showModal('formModal');
+    }
+
+    // Add form field to page
+    async function addFormFieldToPage() {
+      if (!currentPDFDoc) return;
+
+      const pageNumber = parseInt(document.getElementById('editPageNumber').value) - 1;
+      if (isNaN(pageNumber) || pageNumber < 0 || pageNumber >= currentPDFDoc.getPageCount()) {
+        alert('Please enter a valid page number');
+        return;
+      }
+
+      const fieldType = document.getElementById('formFieldType').value;
+      const fieldName = document.getElementById('formFieldName').value;
+      const fieldLabel = document.getElementById('formFieldLabel').value;
+      const x = parseInt(document.getElementById('formFieldX').value);
+      const y = parseInt(document.getElementById('formFieldY').value);
+      const width = parseInt(document.getElementById('formFieldWidth').value);
+      const height = parseInt(document.getElementById('formFieldHeight').value);
+      const required = document.getElementById('formFieldRequired').checked;
+
+      showLoading('Adding form field to page...');
+      hideModal('formModal');
+      
+      try {
+        // Create a new document with the modified page
+        const newDoc = await PDFLib.PDFDocument.create();
+        const pageCount = currentPDFDoc.getPageCount();
+        
+        // Copy all pages
+        for (let i = 0; i < pageCount; i++) {
+          const [page] = await newDoc.copyPages(currentPDFDoc, [i]);
+          newDoc.addPage(page);
+        }
+        
+        // Get the page we want to edit
+        const pages = newDoc.getPages();
+        const page = pages[pageNumber];
+        
+        // Create form field based on type
+        const form = newDoc.getForm();
+        
+        switch(fieldType) {
+          case 'text':
+            const textField = form.createTextField(fieldName);
+            textField.setText(fieldLabel);
+            textField.addToPage(page, {
+              x: x,
+              y: y,
+              width: width,
+              height: height,
+            });
+            if (required) textField.enableRequired();
+            break;
+            
+          case 'checkbox':
+            const checkbox = form.createCheckbox(fieldName);
+            checkbox.addToPage(page, {
+              x: x,
+              y: y,
+              width: width,
+              height: height,
+            });
+            if (required) checkbox.enableRequired();
+            break;
+            
+          case 'radio':
+            const options = document.getElementById('formFieldOptions').value
+              .split(',')
+              .map(opt => opt.trim())
+              .filter(opt => opt);
+              
+            if (options.length === 0) {
+              throw new Error('Please enter at least one option for radio buttons');
+            }
+            
+            const radioGroup = form.createRadioGroup(fieldName);
+            options.forEach((opt, i) => {
+              radioGroup.addOptionToPage(opt, page, {
+                x: x + (i * (width + 10)),
+                y: y,
+                width: width,
+                height: height,
+              });
+            });
+            if (required) radioGroup.enableRequired();
+            break;
+            
+          case 'dropdown':
+            const dropdownOptions = document.getElementById('formFieldOptions').value
+              .split(',')
+              .map(opt => opt.trim())
+              .filter(opt => opt);
+              
+            if (dropdownOptions.length === 0) {
+              throw new Error('Please enter at least one option for dropdown');
+            }
+            
+            const dropdown = form.createDropdown(fieldName);
+            dropdown.addToPage(page, {
+              x: x,
+              y: y,
+              width: width,
+              height: height,
+            });
+            dropdownOptions.forEach(opt => dropdown.addOption(opt));
+            if (required) dropdown.enableRequired();
+            break;
+            
+          case 'button':
+            const button = form.createButton(fieldName);
+            button.setText(fieldLabel);
+            button.addToPage(page, {
+              x: x,
+              y: y,
+              width: width,
+              height: height,
+            });
+            break;
+        }
+        
+        currentPDFDoc = newDoc;
+        loadedPDFs[0].doc = newDoc;
+        pdfContainer.innerHTML = '';
+        selectedPages = [];
+        await renderPDF(newDoc, 0);
+        updateUI();
+      } catch (error) {
+        console.error('Error adding form field:', error);
+        alert('Failed to add form field: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Show OCR modal
+    function showOCRModal() {
+      showModal('ocrModal');
+    }
+
+    // Perform OCR on selected pages
+    async function performOCR() {
+      if (!currentPDFDoc) return;
+
+      const language = document.getElementById('ocrLanguage').value;
+      const applyTo = document.getElementById('ocrPages').value;
+      const preserveLayout = document.getElementById('ocrPreserveLayout').checked;
+      let pageRange = [];
+      
+      if (applyTo === 'selected') {
+        pageRange = selectedPages;
+      } else if (applyTo === 'range') {
+        const rangeText = document.getElementById('ocrRange').value;
+        pageRange = parsePageRange(rangeText);
+      } else {
+        // All pages
+        pageRange = Array.from({length: currentPDFDoc.getPageCount()}, (_, i) => i);
+      }
+
+      showLoading('Performing OCR...');
+      hideModal('ocrModal');
+      
+      try {
+        // Create a new document with OCR results
+        const newDoc = await PDFLib.PDFDocument.create();
+        const pageCount = currentPDFDoc.getPageCount();
+        
+        // Copy all pages
+        for (let i = 0; i < pageCount; i++) {
+          const [page] = await newDoc.copyPages(currentPDFDoc, [i]);
+          newDoc.addPage(page);
+        }
+        
+        // Get all pages
+        const pages = newDoc.getPages();
+        
+        // Process each selected page with OCR
+        for (const pageNum of pageRange) {
+          if (pageNum >= 0 && pageNum < pages.length) {
+            const page = pages[pageNum];
+            
+            // In a real implementation, you would:
+            // 1. Extract the page image
+            // 2. Send to Tesseract.js for OCR
+            // 3. Add the recognized text to the PDF
+            
+            // This is a simplified version that just simulates OCR
+            loadingText.textContent = `Processing page ${pageNum + 1} with OCR...`;
+            
+            // Simulate OCR delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Add a text layer with OCR results (simulated)
+            if (!preserveLayout) {
+              page.drawText(`OCR Results for Page ${pageNum + 1}\n\n[This is where the recognized text would appear]`, {
+                x: 50,
+                y: page.getHeight() - 100,
+                size: 12,
+              });
+            }
+          }
+        }
+        
+        currentPDFDoc = newDoc;
+        loadedPDFs[0].doc = newDoc;
+        pdfContainer.innerHTML = '';
+        selectedPages = [];
+        await renderPDF(newDoc, 0);
+        updateUI();
+        
+        alert('OCR processing completed successfully!');
+      } catch (error) {
+        console.error('Error performing OCR:', error);
+        alert('Failed to perform OCR: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Show convert modal
+    function showConvertModal() {
+      showModal('convertModal');
+    }
+
+    // Convert PDF to another format
+    async function convertPDF() {
+      if (!currentPDFDoc) return;
+
+      const format = document.getElementById('convertFormat').value;
+      const applyTo = document.getElementById('convertPages').value;
+      let pageRange = [];
+      
+      if (applyTo === 'selected') {
+        pageRange = selectedPages;
+      } else if (applyTo === 'range') {
+        const rangeText = document.getElementById('convertRange').value;
+        pageRange = parsePageRange(rangeText);
+      } else {
+        // All pages
+        pageRange = Array.from({length: currentPDFDoc.getPageCount()}, (_, i) => i);
+      }
+
+      showLoading(`Converting to ${format.toUpperCase()}...`);
+      hideModal('convertModal');
+      
+      try {
+        // In a real implementation, you would use appropriate libraries to convert
+        // For this example, we'll simulate conversion by creating a new file
+        
+        let blob;
+        let extension;
+        
+        switch(format) {
+          case 'docx':
+            // Simulate DOCX conversion
+            extension = 'docx';
+            blob = new Blob(['Simulated Word document content'], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            break;
+            
+          case 'xlsx':
+            // Simulate XLSX conversion
+            extension = 'xlsx';
+            blob = new Blob(['Simulated Excel spreadsheet content'], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            break;
+            
+          case 'pptx':
+            // Simulate PPTX conversion
+            extension = 'pptx';
+            blob = new Blob(['Simulated PowerPoint presentation content'], { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' });
+            break;
+            
+          case 'jpg':
+          case 'png':
+            // Simulate image conversion
+            extension = format;
+            const quality = parseInt(document.getElementById('imageQuality').value) / 100;
+            
+            // Create a simple canvas with text
+            const canvas = document.createElement('canvas');
+            canvas.width = 800;
+            canvas.height = 600;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'black';
+            ctx.font = '30px Arial';
+            ctx.fillText(`Simulated ${format.toUpperCase()} conversion`, 50, 50);
+            ctx.fillText(`Pages: ${pageRange.map(p => p + 1).join(', ')}`, 50, 100);
+            
+            // Convert canvas to blob
+            if (format === 'jpg') {
+              blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+            } else {
+              blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+            }
+            break;
+            
+          case 'html':
+            // Simulate HTML conversion
+            extension = 'html';
+            const htmlContent = `
+              <!DOCTYPE html>
+              <html>
+              <head>
+                <title>Converted PDF</title>
+              </head>
+              <body>
+                <h1>Simulated HTML Conversion</h1>
+                <p>Pages: ${pageRange.map(p => p + 1).join(', ')}</p>
+              </body>
+              </html>
+            `;
+            blob = new Blob([htmlContent], { type: 'text/html' });
+            break;
+            
+          case 'txt':
+            // Simulate text conversion
+            extension = 'txt';
+            blob = new Blob([`Simulated text conversion\nPages: ${pageRange.map(p => p + 1).join(', ')}`], { type: 'text/plain' });
+            break;
+        }
+        
+        saveAs(blob, `converted_${new Date().toISOString().slice(0,10)}.${extension}`);
+      } catch (error) {
+        console.error('Error converting PDF:', error);
+        alert('Failed to convert PDF: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // Toggle settings panel
+    function toggleSettings() {
+      settingsPanel.classList.toggle('open');
+    }
+
+    // Load settings from localStorage
+    function loadSettings() {
+      const savedSettings = localStorage.getItem('pdfEditorSettings');
+      if (savedSettings) {
+        try {
+          settings = JSON.parse(savedSettings);
+          
+          // Apply settings to UI
+          document.getElementById('darkModeToggle').checked = settings.darkMode;
+          document.getElementById('defaultFont').value = settings.defaultFont;
+          document.getElementById('defaultFontSize').value = settings.defaultFontSize;
+          document.getElementById('defaultTextColor').value = settings.defaultTextColor;
+          document.getElementById('defaultHighlightColor').value = settings.defaultHighlightColor;
+          document.getElementById('defaultPageSize').value = settings.defaultPageSize;
+          document.getElementById('autoSaveInterval').value = settings.autoSaveInterval;
+          document.getElementById('defaultExportQuality').value = settings.defaultExportQuality;
+          
+          // Update color previews
+          document.getElementById('textColorPreview').style.backgroundColor = settings.defaultTextColor;
+          document.getElementById('highlightColorPreview').style.backgroundColor = settings.defaultHighlightColor;
+          
+          // Apply dark mode if enabled
+          if (settings.darkMode) {
+            document.body.classList.add('dark-mode');
+          }
+        } catch (e) {
+          console.error('Error loading settings:', e);
+        }
+      }
+    }
+
+    // Save settings to localStorage
+    function saveSettings() {
+      settings.darkMode = document.getElementById('darkModeToggle').checked;
+      settings.defaultFont = document.getElementById('defaultFont').value;
+      settings.defaultFontSize = parseInt(document.getElementById('defaultFontSize').value);
+      settings.defaultTextColor = document.getElementById('defaultTextColor').value;
+      settings.defaultHighlightColor = document.getElementById('defaultHighlightColor').value;
+      settings.defaultPageSize = document.getElementById('defaultPageSize').value;
+      settings.autoSaveInterval = parseInt(document.getElementById('autoSaveInterval').value);
+      settings.defaultExportQuality = document.getElementById('defaultExportQuality').value;
+      
+      // Update color previews
+      document.getElementById('textColorPreview').style.backgroundColor = settings.defaultTextColor;
+      document.getElementById('highlightColorPreview').style.backgroundColor = settings.defaultHighlightColor;
+      
+      // Apply dark mode
+      if (settings.darkMode) {
+        document.body.classList.add('dark-mode');
+      } else {
+        document.body.classList.remove('dark-mode');
+      }
+      
+      // Save to localStorage
+      localStorage.setItem('pdfEditorSettings', JSON.stringify(settings));
+      
+      alert('Settings saved successfully!');
+    }
+
+    // Initialize the application
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

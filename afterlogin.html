@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard-Whizan</title>
   <link rel="icon" type="image/png" href="Smart Study.jpeg">
+  <!-- Before closing </body> tag -->
+  <script src="fluid-cursor.js"></script>
+
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
     :root {
@@ -1510,6 +1513,11 @@
 </head>
 
 <body>
+  <!-- Place this right after your <body> tag -->
+  <div style="position: fixed; top: 0; left: 0; z-index: 50; pointer-events: none;">
+    <canvas id="fluid-canvas" style="width: 100vw; height: 100vh;"></canvas>
+  </div>
+
 
   <!-- Add this right after the <body> tag -->
   <div id="welcome-screen">
@@ -3389,8 +3397,16 @@
     });
   </script>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const canvas = document.getElementById('fluid-canvas');
+      const fluidCursor = new FluidCursor(canvas);
+    });
+  </script>
 
-  <script></script>
+
+
+  ]
 </body>
 
 </html>

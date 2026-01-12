@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whizan - API Formatter</title>
+    <link rel="icon" href="smart%20study.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #0f0a1a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 15px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: rgba(30, 15, 50, 0.8);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(150, 65, 255, 0.2);
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(102, 51, 153, 0.3);
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #ff3366, #9933ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(255, 51, 102, 0.3);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .logo img {
+            height: 50px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .format-selector {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .format-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(150, 65, 255, 0.2);
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            flex: 1;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .format-btn:hover {
+            background: rgba(150, 65, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .format-btn.active {
+            background: linear-gradient(45deg, #ff3366, #9933ff);
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 51, 102, 0.3);
+        }
+
+        .action-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(45deg, #ff3366, #9933ff);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 51, 102, 0.3);
+            width: 100%;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 51, 102, 0.4);
+        }
+
+        .input-section, .output-section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: #9933ff;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .input-area, .output-area {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid rgba(150, 65, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(10, 5, 20, 0.5);
+            color: #e0e0e0;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .input-area:focus {
+            outline: none;
+            border-color: #9933ff;
+            box-shadow: 0 0 15px rgba(153, 51, 255, 0.2);
+        }
+
+        .output-area {
+            background: rgba(10, 5, 20, 0.7);
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .status {
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .status.success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid #28a745;
+            color: #28a745;
+        }
+
+        .status.error {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid #dc3545;
+            color: #dc3545;
+        }
+
+        .status.hidden {
+            display: none;
+        }
+
+        .test-section {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(150, 65, 255, 0.2);
+        }
+
+        .test-cases {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .test-case {
+            background: rgba(150, 65, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(150, 65, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            transform: scale(1);
+        }
+
+        .test-case:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(102, 51, 153, 0.3);
+            border-color: #9933ff;
+        }
+
+        .test-case h4 {
+            color: #ff3366;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .test-case p {
+            color: #b0b0b0;
+            font-size: 0.8rem;
+            margin-bottom: 12px;
+        }
+
+        .test-preview {
+            background: rgba(10, 5, 20, 0.5);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Syntax highlighting */
+        .json-key { color: #ff6b6b; }
+        .json-string { color: #4ecdc4; }
+        .json-number { color: #ffe66d; }
+        .json-boolean { color: #ff8b94; }
+        .json-null { color: #95e1d3; }
+        .xml-tag { color: #ff6b6b; }
+        .xml-attr-name { color: #ffe66d; }
+        .xml-attr-value { color: #4ecdc4; }
+        .xml-text { color: #e0e0e0; }
+
+        /* Mobile animations */
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .container > * {
+            animation: slideIn 0.5s ease forwards;
+        }
+
+        .container > *:nth-child(1) { animation-delay: 0.1s; }
+        .container > *:nth-child(2) { animation-delay: 0.2s; }
+        .container > *:nth-child(3) { animation-delay: 0.3s; }
+        .container > *:nth-child(4) { animation-delay: 0.4s; }
+        .container > *:nth-child(5) { animation-delay: 0.5s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="smart%20study.png" alt="Whizan Logo">
+        </div>
+        <h1>API Response Formatter</h1>
+        
+        <div class="controls">
+            <div class="format-selector">
+                <button class="format-btn active" data-format="json">JSON</button>
+                <button class="format-btn" data-format="xml">XML</button>
+            </div>
+            <button class="action-btn" onclick="formatResponse()">✨ Format & Validate</button>
+            <button class="action-btn" onclick="clearAll()">🗑️ Clear</button>
+        </div>
+
+        <div class="status hidden" id="status"></div>
+
+        <div class="input-section">
+            <h3 class="section-title">📥 Raw Response</h3>
+            <textarea class="input-area" id="inputArea" placeholder="Paste your JSON or XML response here..."></textarea>
+        </div>
+
+        <div class="output-section">
+            <h3 class="section-title">✨ Formatted Output</h3>
+            <div class="output-area" id="outputArea"></div>
+        </div>
+
+        <div class="test-section">
+            <h3 class="section-title">🧪 Test Cases</h3>
+            <div class="test-cases">
+                <div class="test-case" onclick="loadTestCase('json-simple')">
+                    <h4>Simple JSON</h4>
+                    <p>Basic JSON object with various data types</p>
+                    <div class="test-preview">{"name": "John", "age": 30, "active": true}</div>
+                </div>
+                
+                <div class="test-case" onclick="loadTestCase('json-complex')">
+                    <h4>Complex JSON</h4>
+                    <p>Nested objects and arrays with API response structure</p>
+                    <div class="test-preview">{"users": [{"id": 1, "profile": {...}}], "meta": {...}}</div>
+                </div>
+                
+                <div class="test-case" onclick="loadTestCase('json-invalid')">
+                    <h4>Invalid JSON</h4>
+                    <p>Malformed JSON to test validation</p>
+                    <div class="test-preview">{"name": "John", "age": 30,}</div>
+                </div>
+                
+                <div class="test-case" onclick="loadTestCase('xml-simple')">
+                    <h4>Simple XML</h4>
+                    <p>Basic XML structure with attributes</p>
+                    <div class="test-preview">&lt;user id="1"&gt;&lt;name&gt;John&lt;/name&gt;&lt;/user&gt;</div>
+                </div>
+                
+                <div class="test-case" onclick="loadTestCase('xml-complex')">
+                    <h4>Complex XML</h4>
+                    <p>Nested XML with namespaces and CDATA</p>
+                    <div class="test-preview">&lt;api:response xmlns:api="..."&gt;...&lt;/api:response&gt;</div>
+                </div>
+                
+                <div class="test-case" onclick="loadTestCase('xml-invalid')">
+                    <h4>Invalid XML</h4>
+                    <p>Malformed XML to test validation</p>
+                    <div class="test-preview">&lt;user&gt;&lt;name&gt;John&lt;/user&gt;</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentFormat = 'json';
+
+        const testCases = {
+            'json-simple': {
+                format: 'json',
+                data: '{"name":"John Doe","age":30,"email":"john@example.com","active":true,"score":null}'
+            },
+            'json-complex': {
+                format: 'json',
+                data: '{"users":[{"id":1,"name":"John Doe","profile":{"avatar":"https://example.com/avatar1.jpg","bio":"Software Developer","skills":["JavaScript","Python","React"],"contact":{"email":"john@example.com","phone":"+1234567890"}},"metadata":{"created":"2024-01-15T10:30:00Z","lastLogin":"2024-06-25T15:45:30Z","loginCount":127}},{"id":2,"name":"Jane Smith","profile":{"avatar":"https://example.com/avatar2.jpg","bio":"UX Designer","skills":["Figma","Sketch","Adobe XD"],"contact":{"email":"jane@example.com","phone":"+0987654321"}},"metadata":{"created":"2024-02-20T09:15:00Z","lastLogin":"2024-06-26T08:20:45Z","loginCount":89}}],"pagination":{"page":1,"limit":10,"total":156,"hasNext":true},"meta":{"timestamp":"2024-06-26T12:00:00Z","version":"1.2.3","requestId":"req_abc123xyz"}}'
+            },
+            'json-invalid': {
+                format: 'json',
+                data: '{"name":"John Doe","age":30,"email":"john@example.com","active":true,}'
+            },
+            'xml-simple': {
+                format: 'xml',
+                data: '<user id="1"><name>John Doe</name><email>john@example.com</email><active>true</active></user>'
+            },
+            'xml-complex': {
+                format: 'xml',
+                data: '<?xml version="1.0" encoding="UTF-8"?><api:response xmlns:api="http://api.example.com/v1" xmlns:user="http://api.example.com/user"><api:metadata><api:timestamp>2024-06-26T12:00:00Z</api:timestamp><api:version>1.2.3</api:version><api:requestId>req_abc123xyz</api:requestId></api:metadata><api:data><user:list><user:item id="1"><user:name><![CDATA[John Doe]]></user:name><user:profile><user:bio>Software Developer with 5+ years experience</user:bio><user:skills><user:skill level="expert">JavaScript</user:skill><user:skill level="intermediate">Python</user:skill><user:skill level="expert">React</user:skill></user:skills><user:contact type="primary"><user:email verified="true">john@example.com</user:email><user:phone country="US">+1234567890</user:phone></user:contact></user:profile></user:item></user:list></api:data></api:response>'
+            },
+            'xml-invalid': {
+                format: 'xml',
+                data: '<user id="1"><name>John Doe</name><email>john@example.com</user>'
+            }
+        };
+
+        // Format selector
+        document.querySelectorAll('.format-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFormat = btn.dataset.format;
+            });
+        });
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+
+        function hideStatus() {
+            document.getElementById('status').className = 'status hidden';
+        }
+
+        function formatResponse() {
+            const input = document.getElementById('inputArea').value.trim();
+            const output = document.getElementById('outputArea');
+            
+            if (!input) {
+                showStatus('Please enter some data to format', 'error');
+                return;
+            }
+
+            try {
+                if (currentFormat === 'json') {
+                    formatJSON(input, output);
+                } else {
+                    formatXML(input, output);
+                }
+            } catch (error) {
+                showStatus(`Invalid ${currentFormat.toUpperCase()}: ${error.message}`, 'error');
+                output.innerHTML = `<span style="color: #f44336;">Error: ${error.message}</span>`;
+            }
+        }
+
+        function formatJSON(input, output) {
+            const parsed = JSON.parse(input);
+            const formatted = JSON.stringify(parsed, null, 2);
+            const highlighted = highlightJSON(formatted);
+            output.innerHTML = highlighted;
+            showStatus('JSON formatted and validated successfully!', 'success');
+        }
+
+        function formatXML(input, output) {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(input, 'text/xml');
+            
+            const parseError = xmlDoc.querySelector('parsererror');
+            if (parseError) {
+                throw new Error('Invalid XML structure');
+            }
+            
+            const formatted = formatXMLString(input);
+            const highlighted = highlightXML(formatted);
+            output.innerHTML = highlighted;
+            showStatus('XML formatted and validated successfully!', 'success');
+        }
+
+        function formatXMLString(xml) {
+            let formatted = '';
+            let indent = 0;
+            const tab = '  ';
+            
+            xml = xml.replace(/>\s*</g, '><');
+            
+            const tokens = xml.split(/(<[^>]*>)/);
+            
+            tokens.forEach(token => {
+                if (token.match(/^<\/\w/)) {
+                    indent--;
+                    formatted += tab.repeat(indent) + token + '\n';
+                } else if (token.match(/^<\w[^>]*[^\/]>$/)) {
+                    formatted += tab.repeat(indent) + token + '\n';
+                    indent++;
+                } else if (token.match(/^<\w[^>]*\/>/)) {
+                    formatted += tab.repeat(indent) + token + '\n';
+                } else if (token.trim()) {
+                    formatted += tab.repeat(indent) + token.trim() + '\n';
+                }
+            });
+            
+            return formatted.trim();
+        }
+
+        function highlightJSON(json) {
+            return json
+                .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+                    let cls = 'json-number';
+                    if (/^"/.test(match)) {
+                        if (/:$/.test(match)) {
+                            cls = 'json-key';
+                            match = match.slice(0, -1);
+                        } else {
+                            cls = 'json-string';
+                        }
+                    } else if (/true|false/.test(match)) {
+                        cls = 'json-boolean';
+                    } else if (/null/.test(match)) {
+                        cls = 'json-null';
+                    }
+                    return `<span class="${cls}">${match}</span>`;
+                });
+        }
+
+        function highlightXML(xml) {
+            return xml
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/(&lt;\/?)(\w+)(.*?)(&gt;)/g, (match, open, tag, attrs, close) => {
+                    const highlightedAttrs = attrs.replace(/(\w+)(=)(".*?")/g, 
+                        '<span class="xml-attr-name">$1</span>$2<span class="xml-attr-value">$3</span>');
+                    return `${open}<span class="xml-tag">${tag}</span>${highlightedAttrs}${close}`;
+                })
+                .replace(/(&lt;!\[CDATA\[)(.*?)(\]\]&gt;)/g, 
+                    '<span class="xml-text">$1$2$3</span>');
+        }
+
+        function loadTestCase(caseId) {
+            const testCase = testCases[caseId];
+            if (!testCase) return;
+            
+            // Set format
+            currentFormat = testCase.format;
+            document.querySelectorAll('.format-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.format === testCase.format);
+            });
+            
+            // Load data
+            document.getElementById('inputArea').value = testCase.data;
+            hideStatus();
+            document.getElementById('outputArea').innerHTML = '';
+            
+            // Auto-format after a short delay
+            setTimeout(() => {
+                formatResponse();
+            }, 100);
+        }
+
+        function clearAll() {
+            document.getElementById('inputArea').value = '';
+            document.getElementById('outputArea').innerHTML = '';
+            hideStatus();
+        }
+
+        // Auto-hide status after 5 seconds
+        let statusTimeout;
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            
+            clearTimeout(statusTimeout);
+            statusTimeout = setTimeout(hideStatus, 5000);
+        }
+    </script>
+</body>
+</html>

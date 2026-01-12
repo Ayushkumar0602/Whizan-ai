@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Dashboard</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --accent-color: #4fc3f7;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --danger-color: #dc3545;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: var(--dark-color);
+            color: white;
+            padding: 20px 0;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-header h3 {
+            color: var(--accent-color);
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-item.active {
+            background-color: var(--primary-color);
+        }
+        
+        .menu-item i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .header h2 {
+            color: var(--secondary-color);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .logout-btn {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 15px;
+        }
+        
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .card-icon.users {
+            background-color: var(--primary-color);
+        }
+        
+        .card-icon.data {
+            background-color: var(--success-color);
+        }
+        
+        .card-icon.storage {
+            background-color: var(--warning-color);
+        }
+        
+        .card-icon.activity {
+            background-color: var(--danger-color);
+        }
+        
+        .card-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .card-title {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* Content Sections */
+        .content-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .section-header h3 {
+            color: var(--secondary-color);
+        }
+        
+        .action-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th, .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .data-table th {
+            background-color: #f8f9fa;
+            color: #555;
+            font-weight: 600;
+        }
+        
+        .data-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge.admin {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+        
+        .badge.user {
+            background-color: #fff3cd;
+            color: #664d03;
+        }
+        
+        .badge.suspended {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+        
+        .action-btns {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .btn {
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            border: none;
+        }
+        
+        .btn-edit {
+            background-color: var(--warning-color);
+            color: #000;
+        }
+        
+        .btn-delete {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-suspend {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        /* Forms */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 500px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-header h3 {
+            color: var(--secondary-color);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>Super Admin</h3>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-item active" data-section="dashboard">
+                    <i>📊</i> Dashboard
+                </div>
+                <div class="menu-item" data-section="users">
+                    <i>👥</i> User Management
+                </div>
+                <div class="menu-item" data-section="database">
+                    <i>🗃️</i> Database
+                </div>
+                <div class="menu-item" data-section="storage">
+                    <i>📁</i> Storage
+                </div>
+                <div class="menu-item" data-section="settings">
+                    <i>⚙️</i> Settings
+                </div>
+                <div class="menu-item" data-section="logs">
+                    <i>📝</i> Activity Logs
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h2 id="page-title">Dashboard</h2>
+                <div class="user-info">
+                    <img id="admin-photo" src="https://via.placeholder.com/40" alt="Admin">
+                    <span id="admin-name">Loading...</span>
+                    <button class="logout-btn" id="logout-btn">Logout</button>
+                </div>
+            </div>
+            
+            <!-- Dashboard Section -->
+            <div class="content-section active" id="dashboard-section">
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-value" id="total-users">0</div>
+                                <div class="card-title">Total Users</div>
+                            </div>
+                            <div class="card-icon users">👥</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-value" id="active-users">0</div>
+                                <div class="card-title">Active Today</div>
+                            </div>
+                            <div class="card-icon activity">🏃</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-value" id="storage-used">0 MB</div>
+                                <div class="card-title">Storage Used</div>
+                            </div>
+                            <div class="card-icon storage">💾</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-value" id="database-size">0 KB</div>
+                                <div class="card-title">Database Size</div>
+                            </div>
+                            <div class="card-icon data">🗄️</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="content-section">
+                    <div class="section-header">
+                        <h3>Recent Activity</h3>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>User</th>
+                                <th>Activity</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activity-log">
+                            <!-- Activity logs will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- User Management Section -->
+            <div class="content-section" id="users-section">
+                <div class="section-header">
+                    <h3>User Management</h3>
+                    <button class="action-btn" id="add-user-btn">Add New User</button>
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="all-users">All Users</div>
+                    <div class="tab" data-tab="admins">Admins</div>
+                    <div class="tab" data-tab="suspended">Suspended</div>
+                </div>
+                
+                <div class="tab-content active" id="all-users-tab">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Last Login</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table">
+                            <!-- Users will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="tab-content" id="admins-tab">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Last Login</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admins-table">
+                            <!-- Admins will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="tab-content" id="suspended-tab">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Last Login</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="suspended-table">
+                            <!-- Suspended users will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Database Section -->
+            <div class="content-section" id="database-section">
+                <div class="section-header">
+                    <h3>Database Management</h3>
+                    <button class="action-btn" id="export-db-btn">Export Data</button>
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="collections">Collections</div>
+                    <div class="tab" data-tab="queries">Queries</div>
+                    <div class="tab" data-tab="backups">Backups</div>
+                </div>
+                
+                <div class="tab-content active" id="collections-tab">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Collection</th>
+                                <th>Documents</th>
+                                <th>Size</th>
+                                <th>Last Updated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="collections-table">
+                            <!-- Collections will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="tab-content" id="queries-tab">
+                    <div class="form-group">
+                        <label for="query-input">Run Query</label>
+                        <textarea id="query-input" class="form-control" rows="4" placeholder="Enter your Firestore query (JSON format)"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-edit" id="run-query-btn">Run Query</button>
+                    </div>
+                    <div id="query-results" style="margin-top: 20px;">
+                        <!-- Query results will be displayed here -->
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="backups-tab">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Backup Name</th>
+                                <th>Date</th>
+                                <th>Size</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="backups-table">
+                            <!-- Backups will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Storage Section -->
+            <div class="content-section" id="storage-section">
+                <div class="section-header">
+                    <h3>Storage Management</h3>
+                    <button class="action-btn" id="upload-file-btn">Upload File</button>
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="files">All Files</div>
+                    <div class="tab" data-tab="images">Images</div>
+                    <div class="tab" data-tab="large-files">Large Files</div>
+                </div>
+                
+                <div class="tab-content active" id="files-tab">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Size</th>
+                                <th>Uploaded</th>
+                                <th>Owner</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="files-table">
+                            <!-- Files will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="tab-content" id="images-tab">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Preview</th>
+                                <th>Name</th>
+                                <th>Size</th>
+                                <th>Uploaded</th>
+                                <th>Owner</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="images-table">
+                            <!-- Images will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="tab-content" id="large-files-tab">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Size</th>
+                                <th>Uploaded</th>
+                                <th>Owner</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="large-files-table">
+                            <!-- Large files will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Settings Section -->
+            <div class="content-section" id="settings-section">
+                <div class="section-header">
+                    <h3>System Settings</h3>
+                </div>
+                
+                <form id="settings-form">
+                    <div class="form-group">
+                        <label for="app-name">Application Name</label>
+                        <input type="text" id="app-name" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="admin-email">Admin Email</label>
+                        <input type="email" id="admin-email" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="storage-limit">Storage Limit (MB)</label>
+                        <input type="number" id="storage-limit" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="user-registration">User Registration</label>
+                        <select id="user-registration" class="form-control">
+                            <option value="enabled">Enabled</option>
+                            <option value="disabled">Disabled</option>
+                            <option value="invite-only">Invite Only</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="backup-frequency">Backup Frequency</label>
+                        <select id="backup-frequency" class="form-control">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="manual">Manual Only</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-edit" id="cancel-settings-btn">Cancel</button>
+                        <button type="submit" class="action-btn">Save Settings</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Activity Logs Section -->
+            <div class="content-section" id="logs-section">
+                <div class="section-header">
+                    <h3>Activity Logs</h3>
+                    <button class="action-btn" id="clear-logs-btn">Clear Old Logs</button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="log-filter">Filter Logs</label>
+                    <select id="log-filter" class="form-control">
+                        <option value="all">All Activities</option>
+                        <option value="login">User Logins</option>
+                        <option value="create">Content Creation</option>
+                        <option value="update">Content Updates</option>
+                        <option value="delete">Content Deletion</option>
+                        <option value="security">Security Events</option>
+                    </select>
+                </div>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                            <th>IP Address</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logs-table">
+                        <!-- Logs will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add User Modal -->
+    <div class="modal" id="add-user-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New User</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="add-user-form">
+                <div class="form-group">
+                    <label for="new-user-name">Full Name</label>
+                    <input type="text" id="new-user-name" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="new-user-email">Email</label>
+                    <input type="email" id="new-user-email" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="new-user-password">Password</label>
+                    <input type="password" id="new-user-password" class="form-control" required minlength="6">
+                </div>
+                
+                <div class="form-group">
+                    <label for="new-user-role">Role</label>
+                    <select id="new-user-role" class="form-control" required>
+                        <option value="user">Regular User</option>
+                        <option value="admin">Administrator</option>
+                        <option value="super-admin">Super Admin</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-edit" id="cancel-add-user">Cancel</button>
+                    <button type="submit" class="action-btn">Create User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Edit User Modal -->
+    <div class="modal" id="edit-user-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit User</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="edit-user-form">
+                <input type="hidden" id="edit-user-id">
+                
+                <div class="form-group">
+                    <label for="edit-user-name">Full Name</label>
+                    <input type="text" id="edit-user-name" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-user-email">Email</label>
+                    <input type="email" id="edit-user-email" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-user-role">Role</label>
+                    <select id="edit-user-role" class="form-control" required>
+                        <option value="user">Regular User</option>
+                        <option value="admin">Administrator</option>
+                        <option value="super-admin">Super Admin</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-user-status">Status</label>
+                    <select id="edit-user-status" class="form-control" required>
+                        <option value="active">Active</option>
+                        <option value="suspended">Suspended</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-user-custom-claims">Custom Claims (JSON)</label>
+                    <textarea id="edit-user-custom-claims" class="form-control" rows="3"></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-edit" id="cancel-edit-user">Cancel</button>
+                    <button type="submit" class="action-btn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Upload File Modal -->
+    <div class="modal" id="upload-file-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Upload File</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="upload-file-form">
+                <div class="form-group">
+                    <label for="file-upload">Select File</label>
+                    <input type="file" id="file-upload" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="file-path">Storage Path (optional)</label>
+                    <input type="text" id="file-path" class="form-control" placeholder="e.g., images/profile/">
+                </div>
+                
+                <div class="form-group">
+                    <label for="file-public">Access Control</label>
+                    <select id="file-public" class="form-control">
+                        <option value="true">Public Read</option>
+                        <option value="false">Private</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="file-metadata">Custom Metadata (JSON)</label>
+                    <textarea id="file-metadata" class="form-control" rows="3" placeholder='{"owner": "user123", "description": "..."}'></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-edit" id="cancel-upload">Cancel</button>
+                    <button type="submit" class="action-btn">Upload File</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirm-modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 id="confirm-title">Confirm Action</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-message">Are you sure you want to perform this action?</p>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-edit" id="confirm-cancel">Cancel</button>
+                <button type="button" class="btn btn-delete" id="confirm-action">Confirm</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Firebase configuration - REPLACE WITH YOUR ACTUAL CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVYdfql5aqHrChlA1v3nxRLkIbYyWMvUg",
+            authDomain: "study2-7bdc7.firebaseapp.com",
+            databaseURL: "https://study2-7bdc7-default-rtdb.firebaseio.com",
+            projectId: "study2-7bdc7",
+            storageBucket: "study2-7bdc7.appspot.com",
+            messagingSenderId: "320617984870",
+            appId: "1:320617984870:web:04b61ea4ee88ae057e4ea7",
+            measurementId: "G-VRM14GRNWG"
+        };
+        
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+        const functions = firebase.functions();
+        
+        // DOM Elements
+        const menuItems = document.querySelectorAll('.menu-item');
+        const contentSections = document.querySelectorAll('.content-section');
+        const logoutBtn = document.getElementById('logout-btn');
+        const pageTitle = document.getElementById('page-title');
+        const adminName = document.getElementById('admin-name');
+        const adminPhoto = document.getElementById('admin-photo');
+        
+        // Dashboard elements
+        const totalUsersEl = document.getElementById('total-users');
+        const activeUsersEl = document.getElementById('active-users');
+        const storageUsedEl = document.getElementById('storage-used');
+        const databaseSizeEl = document.getElementById('database-size');
+        const activityLogEl = document.getElementById('activity-log');
+        
+        // User management elements
+        const addUserBtn = document.getElementById('add-user-btn');
+        const usersTable = document.getElementById('users-table');
+        const adminsTable = document.getElementById('admins-table');
+        const suspendedTable = document.getElementById('suspended-table');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        // Modals
+        const addUserModal = document.getElementById('add-user-modal');
+        const editUserModal = document.getElementById('edit-user-modal');
+        const uploadFileModal = document.getElementById('upload-file-modal');
+        const confirmModal = document.getElementById('confirm-modal');
+        const closeBtns = document.querySelectorAll('.close-btn, .btn-edit[id^="cancel"]');
+        
+        // Forms
+        const addUserForm = document.getElementById('add-user-form');
+        const editUserForm = document.getElementById('edit-user-form');
+        const uploadFileForm = document.getElementById('upload-file-form');
+        const settingsForm = document.getElementById('settings-form');
+        
+        // State
+        let currentUser = null;
+        let users = [];
+        let collections = [];
+        let files = [];
+        let logs = [];
+        let confirmCallback = null;
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check auth state
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    currentUser = user;
+                    setupUI(user);
+                    loadInitialData();
+                } else {
+                    // Not logged in, redirect to login page
+                    window.location.href = 'auth.html';
+                }
+            });
+            
+            // Setup event listeners
+            setupEventListeners();
+        });
+        
+        function setupUI(user) {
+            // Set admin info
+            adminName.textContent = user.displayName || user.email;
+            adminPhoto.src = user.photoURL || 'https://via.placeholder.com/40';
+            
+            // Set page title based on active section
+            const activeSection = document.querySelector('.content-section.active');
+            if (activeSection) {
+                pageTitle.textContent = activeSection.querySelector('h3').textContent;
+            }
+        }
+        
+        function setupEventListeners() {
+            // Menu items click
+            menuItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    // Remove active class from all items
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    
+                    // Add active to clicked item
+                    item.classList.add('active');
+                    
+                    // Hide all sections
+                    contentSections.forEach(section => section.classList.remove('active'));
+                    
+                    // Show the selected section
+                    const sectionId = `${item.dataset.section}-section`;
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        section.classList.add('active');
+                        pageTitle.textContent = section.querySelector('h3').textContent;
+                        
+                        // Load data for the section if needed
+                        switch(item.dataset.section) {
+                            case 'users':
+                                loadUsers();
+                                break;
+                            case 'database':
+                                loadCollections();
+                                break;
+                            case 'storage':
+                                loadFiles();
+                                break;
+                            case 'logs':
+                                loadLogs();
+                                break;
+                        }
+                    }
+                });
+            });
+            
+            // Tabs click
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    
+                    // Add active to clicked tab
+                    tab.classList.add('active');
+                    
+                    // Hide all tab contents
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Show the selected tab content
+                    const tabId = `${tab.dataset.tab}-tab`;
+                    const tabContent = document.getElementById(tabId);
+                    if (tabContent) {
+                        tabContent.classList.add('active');
+                    }
+                });
+            });
+            
+            // Logout button
+            logoutBtn.addEventListener('click', () => {
+                auth.signOut().then(() => {
+                    window.location.href = 'login.html';
+                }).catch(error => {
+                    showError('Logout failed', error.message);
+                });
+            });
+            
+            // Add user button
+            addUserBtn.addEventListener('click', () => {
+                addUserModal.style.display = 'flex';
+            });
+            
+            // Close modals
+            closeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    addUserModal.style.display = 'none';
+                    editUserModal.style.display = 'none';
+                    uploadFileModal.style.display = 'none';
+                    confirmModal.style.display = 'none';
+                });
+            });
+            
+            // Add user form
+            addUserForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const name = document.getElementById('new-user-name').value;
+                const email = document.getElementById('new-user-email').value;
+                const password = document.getElementById('new-user-password').value;
+                const role = document.getElementById('new-user-role').value;
+                
+                try {
+                    // Create user in Firebase Auth
+                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                    
+                    // Set display name
+                    await userCredential.user.updateProfile({
+                        displayName: name
+                    });
+                    
+                    // Add custom claims for role
+                    if (role !== 'user') {
+                        await setCustomUserClaims(userCredential.user.uid, { role });
+                    }
+                    
+                    // Create user document in Firestore
+                    await db.collection('users').doc(userCredential.user.uid).set({
+                        name,
+                        email,
+                        role,
+                        status: 'active',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastLogin: null
+                    });
+                    
+                    // Close modal and refresh users
+                    addUserModal.style.display = 'none';
+                    addUserForm.reset();
+                    loadUsers();
+                    
+                    showSuccess('User created successfully');
+                } catch (error) {
+                    showError('Error creating user', error.message);
+                }
+            });
+            
+            // Upload file button
+            document.getElementById('upload-file-btn').addEventListener('click', () => {
+                uploadFileModal.style.display = 'flex';
+            });
+            
+            // Upload file form
+            uploadFileForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const file = document.getElementById('file-upload').files[0];
+                const path = document.getElementById('file-path').value || 'uploads/';
+                const isPublic = document.getElementById('file-public').value === 'true';
+                let metadata = {};
+                
+                try {
+                    // Parse custom metadata if provided
+                    const metadataText = document.getElementById('file-metadata').value;
+                    if (metadataText) {
+                        metadata = JSON.parse(metadataText);
+                    }
+                    
+                    // Add standard metadata
+                    metadata.customMetadata = {
+                        uploadedBy: currentUser.uid,
+                        uploadedAt: new Date().toISOString(),
+                        isPublic: isPublic.toString()
+                    };
+                    
+                    // Create storage reference
+                    const storageRef = storage.ref();
+                    const fileRef = storageRef.child(`${path}${file.name}`);
+                    
+                    // Upload file
+                    const uploadTask = fileRef.put(file, { metadata });
+                    
+                    // Show upload progress
+                    uploadTask.on('state_changed', 
+                        (snapshot) => {
+                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            console.log(`Upload is ${progress}% done`);
+                        },
+                        (error) => {
+                            showError('Upload failed', error.message);
+                        },
+                        async () => {
+                            // Upload complete
+                            const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                            
+                            // Save file metadata to Firestore
+                            await db.collection('files').add({
+                                name: file.name,
+                                path: fileRef.fullPath,
+                                size: file.size,
+                                type: file.type,
+                                downloadURL,
+                                isPublic,
+                                metadata,
+                                uploadedBy: currentUser.uid,
+                                uploadedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                            
+                            // Close modal and refresh files
+                            uploadFileModal.style.display = 'none';
+                            uploadFileForm.reset();
+                            loadFiles();
+                            
+                            showSuccess('File uploaded successfully');
+                        }
+                    );
+                } catch (error) {
+                    showError('Error uploading file', error.message);
+                }
+            });
+            
+            // Confirm modal actions
+            document.getElementById('confirm-action').addEventListener('click', () => {
+                if (confirmCallback) {
+                    confirmCallback();
+                }
+                confirmModal.style.display = 'none';
+            });
+        }
+        
+        async function loadInitialData() {
+            // Load dashboard stats
+            loadDashboardStats();
+            
+            // Load recent activity
+            loadRecentActivity();
+        }
+        
+        async function loadDashboardStats() {
+            try {
+                // Get total users count
+                const usersSnapshot = await db.collection('users').get();
+                totalUsersEl.textContent = usersSnapshot.size;
+                
+                // Get active users count (logged in today)
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                const activeUsersSnapshot = await db.collection('users')
+                    .where('lastLogin', '>=', today)
+                    .get();
+                
+                activeUsersEl.textContent = activeUsersSnapshot.size;
+                
+                // Get storage usage (this would typically use a Cloud Function)
+                // For demo purposes, we'll simulate it
+                const storageUsage = await estimateStorageUsage();
+                storageUsedEl.textContent = `${(storageUsage / 1024 / 1024).toFixed(2)} MB`;
+                
+                // Get database size (this would typically use a Cloud Function)
+                // For demo purposes, we'll simulate it
+                const dbSize = await estimateDatabaseSize();
+                databaseSizeEl.textContent = `${(dbSize / 1024).toFixed(2)} KB`;
+                
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+            }
+        }
+        
+        async function loadRecentActivity() {
+            try {
+                const snapshot = await db.collection('activityLogs')
+                    .orderBy('timestamp', 'desc')
+                    .limit(10)
+                    .get();
+                
+                activityLogEl.innerHTML = '';
+                
+                snapshot.forEach(doc => {
+                    const log = doc.data();
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td>${formatDate(log.timestamp?.toDate())}</td>
+                        <td>${log.userName || log.userId}</td>
+                        <td>${log.action}</td>
+                        <td>${log.details || ''}</td>
+                    `;
+                    
+                    activityLogEl.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading activity logs:', error);
+            }
+        }
+        
+        async function loadUsers() {
+            try {
+                const snapshot = await db.collection('users').get();
+                users = [];
+                
+                usersTable.innerHTML = '';
+                adminsTable.innerHTML = '';
+                suspendedTable.innerHTML = '';
+                
+                snapshot.forEach(doc => {
+                    const user = { id: doc.id, ...doc.data() };
+                    users.push(user);
+                    
+                    const row = createUserRow(user);
+                    
+                    // Add to appropriate tables
+                    usersTable.appendChild(row.cloneNode(true));
+                    
+                    if (user.role === 'admin' || user.role === 'super-admin') {
+                        adminsTable.appendChild(row.cloneNode(true));
+                    }
+                    
+                    if (user.status === 'suspended') {
+                        suspendedTable.appendChild(row.cloneNode(true));
+                    }
+                });
+            } catch (error) {
+                showError('Error loading users', error.message);
+            }
+        }
+        
+        function createUserRow(user) {
+            const row = document.createElement('tr');
+            
+            row.innerHTML = `
+                <td>${user.id.substring(0, 8)}...</td>
+                <td>${user.name}</td>
+                <td>${user.email}</td>
+                <td><span class="badge ${user.role === 'admin' || user.role === 'super-admin' ? 'admin' : 'user'}">${user.role}</span></td>
+                <td><span class="badge ${user.status === 'suspended' ? 'suspended' : 'user'}">${user.status}</span></td>
+                <td>${user.lastLogin ? formatDate(user.lastLogin.toDate()) : 'Never'}</td>
+                <td class="action-btns">
+                    <button class="btn btn-edit edit-user" data-id="${user.id}">Edit</button>
+                    ${user.status === 'suspended' ? 
+                        `<button class="btn btn-edit unsuspend-user" data-id="${user.id}">Unsuspend</button>` : 
+                        `<button class="btn btn-suspend suspend-user" data-id="${user.id}">Suspend</button>`}
+                    <button class="btn btn-delete delete-user" data-id="${user.id}">Delete</button>
+                </td>
+            `;
+            
+            // Add event listeners to buttons
+            row.querySelector('.edit-user').addEventListener('click', () => openEditUserModal(user.id));
+            if (row.querySelector('.suspend-user')) {
+                row.querySelector('.suspend-user').addEventListener('click', () => confirmSuspendUser(user.id));
+            }
+            if (row.querySelector('.unsuspend-user')) {
+                row.querySelector('.unsuspend-user').addEventListener('click', () => confirmUnsuspendUser(user.id));
+            }
+            row.querySelector('.delete-user').addEventListener('click', () => confirmDeleteUser(user.id));
+            
+            return row;
+        }
+        
+        async function openEditUserModal(userId) {
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                if (!userDoc.exists) {
+                    throw new Error('User not found');
+                }
+                
+                const user = userDoc.data();
+                
+                // Populate form
+                document.getElementById('edit-user-id').value = userId;
+                document.getElementById('edit-user-name').value = user.name;
+                document.getElementById('edit-user-email').value = user.email;
+                document.getElementById('edit-user-role').value = user.role;
+                document.getElementById('edit-user-status').value = user.status;
+                
+                // Get custom claims
+                const idToken = await auth.currentUser.getIdTokenResult();
+                if (idToken.claims.admin) {
+                    const customClaims = await getUserCustomClaims(userId);
+                    document.getElementById('edit-user-custom-claims').value = JSON.stringify(customClaims, null, 2);
+                }
+                
+                // Show modal
+                editUserModal.style.display = 'flex';
+            } catch (error) {
+                showError('Error opening user editor', error.message);
+            }
+        }
+        
+        editUserForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const userId = document.getElementById('edit-user-id').value;
+            const name = document.getElementById('edit-user-name').value;
+            const email = document.getElementById('edit-user-email').value;
+            const role = document.getElementById('edit-user-role').value;
+            const status = document.getElementById('edit-user-status').value;
+            const customClaims = document.getElementById('edit-user-custom-claims').value;
+            
+            try {
+                // Update user document in Firestore
+                await db.collection('users').doc(userId).update({
+                    name,
+                    email,
+                    role,
+                    status
+                });
+                
+                // Update custom claims if changed
+                if (customClaims) {
+                    try {
+                        const claims = JSON.parse(customClaims);
+                        await setCustomUserClaims(userId, claims);
+                    } catch (error) {
+                        console.error('Error parsing custom claims:', error);
+                    }
+                }
+                
+                // Close modal and refresh users
+                editUserModal.style.display = 'none';
+                loadUsers();
+                
+                showSuccess('User updated successfully');
+            } catch (error) {
+                showError('Error updating user', error.message);
+            }
+        });
+        
+        function confirmSuspendUser(userId) {
+            showConfirmation(
+                'Suspend User',
+                'Are you sure you want to suspend this user? They will not be able to log in until unsuspended.',
+                () => suspendUser(userId)
+            );
+        }
+        
+        function confirmUnsuspendUser(userId) {
+            showConfirmation(
+                'Unsuspend User',
+                'Are you sure you want to unsuspend this user? They will be able to log in again.',
+                () => unsuspendUser(userId)
+            );
+        }
+        
+        function confirmDeleteUser(userId) {
+            showConfirmation(
+                'Delete User',
+                'Are you sure you want to permanently delete this user? This action cannot be undone.',
+                () => deleteUser(userId)
+            );
+        }
+        
+        async function suspendUser(userId) {
+            try {
+                // Update user status in Firestore
+                await db.collection('users').doc(userId).update({
+                    status: 'suspended'
+                });
+                
+                // Revoke user's sessions
+                await revokeUserSessions(userId);
+                
+                loadUsers();
+                showSuccess('User suspended successfully');
+            } catch (error) {
+                showError('Error suspending user', error.message);
+            }
+        }
+        
+        async function unsuspendUser(userId) {
+            try {
+                // Update user status in Firestore
+                await db.collection('users').doc(userId).update({
+                    status: 'active'
+                });
+                
+                loadUsers();
+                showSuccess('User unsuspended successfully');
+            } catch (error) {
+                showError('Error unsuspending user', error.message);
+            }
+        }
+        
+        async function deleteUser(userId) {
+            try {
+                // Delete user document from Firestore
+                await db.collection('users').doc(userId).delete();
+                
+                // Delete user from Auth
+                await deleteAuthUser(userId);
+                
+                loadUsers();
+                showSuccess('User deleted successfully');
+            } catch (error) {
+                showError('Error deleting user', error.message);
+            }
+        }
+        
+        async function loadCollections() {
+            try {
+                // In a real app, you would list collections from Firestore
+                // This is a simulation since Firestore doesn't have a direct way to list all collections
+                const snapshot = await db.collection('_collections').get();
+                collections = [];
+                
+                const collectionsTable = document.getElementById('collections-table');
+                collectionsTable.innerHTML = '';
+                
+                snapshot.forEach(doc => {
+                    const collection = doc.data();
+                    collections.push(collection);
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${collection.name}</td>
+                        <td>${collection.count}</td>
+                        <td>${(collection.size / 1024).toFixed(2)} KB</td>
+                        <td>${formatDate(collection.updatedAt.toDate())}</td>
+                        <td class="action-btns">
+                            <button class="btn btn-edit view-collection" data-name="${collection.name}">View</button>
+                            <button class="btn btn-delete delete-collection" data-name="${collection.name}">Delete</button>
+                        </td>
+                    `;
+                    
+                    collectionsTable.appendChild(row);
+                });
+            } catch (error) {
+                showError('Error loading collections', error.message);
+            }
+        }
+        
+        async function loadFiles() {
+            try {
+                const snapshot = await db.collection('files')
+                    .orderBy('uploadedAt', 'desc')
+                    .get();
+                
+                files = [];
+                
+                const filesTable = document.getElementById('files-table');
+                const imagesTable = document.getElementById('images-table');
+                const largeFilesTable = document.getElementById('large-files-table');
+                
+                filesTable.innerHTML = '';
+                imagesTable.innerHTML = '';
+                largeFilesTable.innerHTML = '';
+                
+                snapshot.forEach(doc => {
+                    const file = { id: doc.id, ...doc.data() };
+                    files.push(file);
+                    
+                    // Create row for all files table
+                    const filesRow = createFileRow(file);
+                    filesTable.appendChild(filesRow);
+                    
+                    // Add to images table if it's an image
+                    if (file.type.startsWith('image/')) {
+                        const imagesRow = createImageRow(file);
+                        imagesTable.appendChild(imagesRow);
+                    }
+                    
+                    // Add to large files table if > 1MB
+                    if (file.size > 1024 * 1024) {
+                        const largeFilesRow = createFileRow(file);
+                        largeFilesTable.appendChild(largeFilesRow);
+                    }
+                });
+            } catch (error) {
+                showError('Error loading files', error.message);
+            }
+        }
+        
+        function createFileRow(file) {
+            const row = document.createElement('tr');
+            
+            row.innerHTML = `
+                <td>${file.name}</td>
+                <td>${file.type}</td>
+                <td>${formatFileSize(file.size)}</td>
+                <td>${formatDate(file.uploadedAt.toDate())}</td>
+                <td>${file.uploadedBy}</td>
+                <td class="action-btns">
+                    <button class="btn btn-edit download-file" data-id="${file.id}">Download</button>
+                    <button class="btn btn-delete delete-file" data-id="${file.id}">Delete</button>
+                </td>
+            `;
+            
+            // Add event listeners
+            row.querySelector('.download-file').addEventListener('click', () => downloadFile(file));
+            row.querySelector('.delete-file').addEventListener('click', () => confirmDeleteFile(file.id, file.name));
+            
+            return row;
+        }
+        
+        function createImageRow(file) {
+            const row = document.createElement('tr');
+            
+            row.innerHTML = `
+                <td><img src="${file.downloadURL}" alt="${file.name}" style="width: 50px; height: 50px; object-fit: cover;"></td>
+                <td>${file.name}</td>
+                <td>${formatFileSize(file.size)}</td>
+                <td>${formatDate(file.uploadedAt.toDate())}</td>
+                <td>${file.uploadedBy}</td>
+                <td class="action-btns">
+                    <button class="btn btn-edit download-file" data-id="${file.id}">Download</button>
+                    <button class="btn btn-delete delete-file" data-id="${file.id}">Delete</button>
+                </td>
+            `;
+            
+            // Add event listeners
+            row.querySelector('.download-file').addEventListener('click', () => downloadFile(file));
+            row.querySelector('.delete-file').addEventListener('click', () => confirmDeleteFile(file.id, file.name));
+            
+            return row;
+        }
+        
+        function downloadFile(file) {
+            window.open(file.downloadURL, '_blank');
+        }
+        
+        function confirmDeleteFile(fileId, fileName) {
+            showConfirmation(
+                'Delete File',
+                `Are you sure you want to delete "${fileName}"? This action cannot be undone.`,
+                () => deleteFile(fileId)
+            );
+        }
+        
+        async function deleteFile(fileId) {
+            try {
+                // Get file document
+                const fileDoc = await db.collection('files').doc(fileId).get();
+                if (!fileDoc.exists) {
+                    throw new Error('File not found');
+                }
+                
+                const file = fileDoc.data();
+                
+                // Delete from Storage
+                const fileRef = storage.refFromURL(file.downloadURL);
+                await fileRef.delete();
+                
+                // Delete from Firestore
+                await db.collection('files').doc(fileId).delete();
+                
+                // Refresh files
+                loadFiles();
+                
+                showSuccess('File deleted successfully');
+            } catch (error) {
+                showError('Error deleting file', error.message);
+            }
+        }
+        
+        async function loadLogs() {
+            try {
+                const snapshot = await db.collection('activityLogs')
+                    .orderBy('timestamp', 'desc')
+                    .limit(100)
+                    .get();
+                
+                logs = [];
+                const logsTable = document.getElementById('logs-table');
+                logsTable.innerHTML = '';
+                
+                snapshot.forEach(doc => {
+                    const log = { id: doc.id, ...doc.data() };
+                    logs.push(log);
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${formatDate(log.timestamp.toDate(), true)}</td>
+                        <td>${log.userName || log.userId}</td>
+                        <td>${log.action}</td>
+                        <td>${log.details || ''}</td>
+                        <td>${log.ipAddress || ''}</td>
+                    `;
+                    
+                    logsTable.appendChild(row);
+                });
+            } catch (error) {
+                showError('Error loading logs', error.message);
+            }
+        }
+        
+        // Helper functions
+        function formatDate(date, includeTime = false) {
+            if (!date) return '';
+            
+            const options = { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            };
+            
+            if (includeTime) {
+                options.hour = '2-digit';
+                options.minute = '2-digit';
+            }
+            
+            return date.toLocaleDateString(undefined, options);
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return `${bytes} B`;
+            if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;
+            if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+            return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+        }
+        
+        function showConfirmation(title, message, callback) {
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-message').textContent = message;
+            confirmCallback = callback;
+            confirmModal.style.display = 'flex';
+        }
+        
+        function showSuccess(message) {
+            alert(`Success: ${message}`); // In a real app, use a toast notification
+        }
+        
+        function showError(title, message) {
+            alert(`Error: ${title}\n${message}`); // In a real app, use a modal or toast
+        }
+        
+        // Firebase helper functions
+        async function setCustomUserClaims(uid, claims) {
+            // In a real app, you would call a Cloud Function to set custom claims
+            // This is because custom claims can only be set from a privileged server environment
+            const setClaims = functions.httpsCallable('setCustomClaims');
+            await setClaims({ uid, claims });
+        }
+        
+        async function getUserCustomClaims(uid) {
+            // In a real app, you would call a Cloud Function to get custom claims
+            const getClaims = functions.httpsCallable('getCustomClaims');
+            const result = await getClaims({ uid });
+            return result.data;
+        }
+        
+        async function revokeUserSessions(uid) {
+            // In a real app, you would call a Cloud Function to revoke tokens
+            const revokeTokens = functions.httpsCallable('revokeUserTokens');
+            await revokeTokens({ uid });
+        }
+        
+        async function deleteAuthUser(uid) {
+            // In a real app, you would call a Cloud Function to delete auth user
+            const deleteUser = functions.httpsCallable('deleteAuthUser');
+            await deleteUser({ uid });
+        }
+        
+        async function estimateStorageUsage() {
+            // In a real app, you would call a Cloud Function to estimate storage usage
+            // This is a simulation
+            return Math.floor(Math.random() * 100 * 1024 * 1024); // Random up to 100MB
+        }
+        
+        async function estimateDatabaseSize() {
+            // In a real app, you would call a Cloud Function to estimate database size
+            // This is a simulation
+            return Math.floor(Math.random() * 10 * 1024); // Random up to 10KB
+        }
+    </script>
+</body>
+</html>

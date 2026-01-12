@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced GitHub Stats Visualizer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/date-fns/2.29.3/index.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow-light: 0 10px 30px rgba(0,0,0,0.1);
+            --shadow-heavy: 0 20px 40px rgba(0,0,0,0.15);
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #fff, #f8f9fa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.9);
+            font-weight: 300;
+        }
+
+        .search-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 1px solid var(--glass-border);
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .input-group {
+            position: relative;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.9);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-light);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(238, 90, 36, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(238, 90, 36, 0.6);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .filter-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid var(--glass-border);
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .filter-group select {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.9);
+            font-size: 0.9rem;
+        }
+
+        .overview-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .profile-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow-light);
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid var(--accent-color);
+            box-shadow: var(--shadow-light);
+        }
+
+        .profile-info h2 {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .profile-info .username {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .profile-info .bio {
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .profile-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .quick-stats {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow-light);
+            animation: fadeInUp 1s ease-out 0.5s both;
+        }
+
+        .quick-stats h3 {
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: var(--shadow-light);
+            transition: all 0.3s ease;
+            border: 1px solid var(--glass-border);
+            animation: fadeInUp 1s ease-out both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-color), var(--success-color));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+        .stat-card:nth-child(5) { animation-delay: 0.5s; }
+        .stat-card:nth-child(6) { animation-delay: 0.6s; }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-change {
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .stat-change.positive {
+            color: var(--success-color);
+        }
+
+        .stat-change.negative {
+            color: var(--danger-color);
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow-light);
+            animation: fadeInUp 1s ease-out both;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-container h3 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+        }
+
+        .chart-toggle {
+            display: flex;
+            gap: 10px;
+        }
+
+        .toggle-btn {
+            padding: 5px 12px;
+            border: 1px solid var(--text-secondary);
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 15px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .detailed-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .repo-analytics {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow-light);
+            animation: fadeInUp 1s ease-out 0.7s both;
+        }
+
+        .repo-analytics h3 {
+            margin-bottom: 25px;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .repo-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+            margin-bottom: 5px;
+        }
+
+        .repo-item:hover {
+            background: rgba(52, 152, 219, 0.1);
+            transform: translateX(5px);
+        }
+
+        .repo-info {
+            flex: 1;
+        }
+
+        .repo-name {
+            font-weight: 600;
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
+
+        .repo-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .repo-stats {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .repo-stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .language-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .activity-heatmap {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow-light);
+            animation: fadeInUp 1s ease-out 0.8s both;
+        }
+
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(53, 1fr);
+            gap: 2px;
+            margin-top: 20px;
+        }
+
+        .heatmap-cell {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            background: #ebedf0;
+            transition: all 0.2s ease;
+        }
+
+        .heatmap-cell:hover {
+            transform: scale(1.2);
+        }
+
+        .heatmap-cell.level-1 { background: #9be9a8; }
+        .heatmap-cell.level-2 { background: #40c463; }
+        .heatmap-cell.level-3 { background: #30a14e; }
+        .heatmap-cell.level-4 { background: #216e39; }
+
+        .insights-section {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow-light);
+            animation: fadeInUp 1s ease-out 0.9s both;
+            margin-bottom: 40px;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .insight-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .insight-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .insight-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+        }
+
+        .insight-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        .error {
+            background: rgba(231, 76, 60, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .page-btn {
+            padding: 8px 15px;
+            border: 1px solid var(--text-secondary);
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover, .page-btn.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @media (max-width: 1200px) {
+            .overview-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .detailed-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .input-group {
+                min-width: 100%;
+            }
+            
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Advanced GitHub Analytics</h1>
+            <p>Comprehensive analysis and insights for GitHub profiles and repositories</p>
+        </div>
+
+        <div class="search-section">
+            <div class="search-form">
+                <div class="input-group">
+                    <input type="text" id="username" placeholder="Enter GitHub username..." value="">
+                </div>
+                <button class="btn" onclick="fetchGitHubStats()" id="searchBtn">
+                    🔍 Analyze Profile
+                </button>
+            </div>
+        </div>
+
+        <div class="filter-section" id="filterSection" style="display: none;">
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label>Sort Repositories By:</label>
+                    <select id="sortBy" onchange="updateRepoDisplay()">
+                        <option value="stars">Stars</option>
+                        <option value="forks">Forks</option>
+                        <option value="updated">Last Updated</option>
+                        <option value="created">Created Date</option>
+                        <option value="size">Size</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Language Filter:</label>
+                    <select id="languageFilter" onchange="updateRepoDisplay()">
+                        <option value="all">All Languages</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Repository Type:</label>
+                    <select id="repoType" onchange="updateRepoDisplay()">
+                        <option value="all">All Repositories</option>
+                        <option value="original">Original Only</option>
+                        <option value="forked">Forked Only</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="results" style="display: none;">
+            <div class="overview-section">
+                <div class="profile-card" id="profileCard">
+                    <!-- Profile information will be populated here -->
+                </div>
+                <div class="quick-stats">
+                    <h3>📊 Quick Stats</h3>
+                    <div id="quickStats">
+                        <!-- Quick stats will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-grid" id="statsGrid">
+                <!-- Detailed stats will be populated here -->
+            </div>
+
+            <div class="charts-section">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>📈 Language Distribution</h3>
+                        <div class="chart-toggle">
+                            <button class="toggle-btn active" onclick="toggleChart('language', 'doughnut')">Doughnut</button>
+                            <button class="toggle-btn" onclick="toggleChart('language', 'bar')">Bar</button>
+                        </div>
+                    </div>
+                    <canvas id="languageChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>⭐ Repository Performance</h3>
+                        <div class="chart-toggle">
+                            <button class="toggle-btn active" onclick="toggleChart('stars', 'bar')">Stars</button>
+                            <button class="toggle-btn" onclick="toggleChart('stars', 'forks')">Forks</button>
+                        </div>
+                    </div>
+                    <canvas id="starsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>📅 Repository Timeline</h3>
+                    </div>
+                    <canvas id="timelineChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>📊 Repository Sizes</h3>
+                    </div>
+                    <canvas id="sizeChart"></canvas>
+                </div>
+            </div>
+
+            <div class="insights-section">
+                <h3>🔍 Profile Insights</h3>
+                <div class="insights-grid" id="insightsGrid">
+                    <!-- Insights will be populated here -->
+                </div>
+            </div>
+
+            <div class="detailed-section">
+                <div class="repo-analytics">
+                    <h3>🏆 Repository Analytics</h3>
+                    <div id="repoList">
+                        <!-- Repository list will be populated here -->
+                    </div>
+                    <div class="pagination" id="repoPagination">
+                        <!-- Pagination will be populated here -->
+                    </div>
+                </div>
+
+                <div class="activity-heatmap">
+                    <h3>🔥 Contribution Activity</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;">
+                        Repository creation and update activity over the past year
+                    </p>
+                    <div class="heatmap-grid" id="heatmapGrid">
+                        <!-- Heatmap will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            <div class="loading-spinner"></div>
+            <div class="pulse">🔍 Analyzing GitHub profile...</div>
+            <p style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">This may take a moment for profiles with many repositories</p>
+        </div>
+
+        <div id="error" class="error" style="display: none;">
+            <!-- Error messages will appear here -->
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let allRepos = [];
+        let userData = null;
+        let charts = {};
+        let currentPage = 1;
+        const reposPerPage = 10;
+
+        // Language colors for consistency
+        const languageColors = {
+            'JavaScript': '#f1e05a',
+            'TypeScript': '#2b7489',
+            'Python': '#3572A5',
+            'Java': '#b07219',
+            'C++': '#f34b7d',
+            'C': '#555555',
+            'C#': '#239120',
+            'PHP': '#4F5D95',
+            'Ruby': '#701516',
+            'Go': '#00ADD8',
+            'Rust': '#dea584',
+            'Swift': '#ffac45',
+            'Kotlin': '#F18E33',
+            'HTML': '#e34c26',
+            'CSS': '#1572B6',
+            'Shell': '#89e051',
+            'Vue': '#2c3e50',
+            'React': '#61dafb',
+            'Other': '#888888'
+        };
+
+        async function fetchGitHubStats() {
+            const username = document.getElementById('username').value.trim();
+            if (!username) {
+                showError('Please enter a GitHub username');
+                return;
+            }
+
+            showLoading();
+            hideError();
+            hideResults();
+            document.getElementById('searchBtn').disabled = true;
+
+            try {
+                // Fetch user data
+                const userResponse = await fetch(`https://api.github.com/users/${username}`);
+                if (!userResponse.ok) {
+                    throw new Error(`User not found: ${userResponse.status}`);
+                }
+                userData = await userResponse.json();
+
+                // Fetch all repositories with pagination
+                allRepos = await fetchAllRepositories(username);
+
+                if (allRepos.length === 0) {
+                    throw new Error('No repositories found for this user');
+                }
+
+                displayResults();
+                hideLoading();
+                showResults();
+                document.getElementById('filterSection').style.display = 'block';
+
+            } catch (error) {
+                hideLoading();
+                handleError(error, username);
+            } finally {
+                document.getElementById('searchBtn').disabled = false;
+            }
+        }
+
+        async function fetchAllRepositories(username) {
+            const repos = [];
+            let page = 1;
+            const perPage = 100;
+
+            while (true) {
+                const response = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=${perPage}&page=${page}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch repositories');
+                }
+                
+                const pageRepos = await response.json();
+                if (pageRepos.length === 0) break;
+                
+                repos.push(...pageRepos);
+                page++;
+                
+                // Prevent infinite loops for users with many repos
+                if (page > 10) break;
+            }
+
+            return repos;
+        }
+
+        function displayResults() {
+            displayProfile();
+            displayQuickStats();
+            displayDetailedStats();
+            displayCharts();
+            displayInsights();
+            setupFilters();
+            displayRepositories();
+            displayActivityHeatmap();
+        }
+
+        function displayProfile() {
+            const joinDate = new Date(userData.created_at);
+            const yearsActive = new Date().getFullYear() - joinDate.getFullYear();
+            
+            document.getElementById('profileCard').innerHTML = `
+                <div class="profile-header">
+                    <img src="${userData.avatar_url}" alt="${userData.name || userData.login}" class="profile-avatar">
+                    <div class="profile-info">
+                        <h2>${userData.name || userData.login}</h2>
+                        <div class="username">@${userData.login}</div>
+                        ${userData.bio ? `<div class="bio">${userData.bio}</div>` : ''}
+                        <div class="profile-meta">
+                            ${userData.location ? `<div class="meta-item">📍 ${userData.location}</div>` : ''}
+                            ${userData.company ? `<div class="meta-item">🏢 ${userData.company}</div>` : ''}
+                            ${userData.blog ? `<div class="meta-item">🔗 <a href="${userData.blog}" target="_blank">${userData.blog}</a></div>` : ''}
+                            <div class="meta-item">📅 Joined ${joinDate.toLocaleDateString()}</div>
+                            <div class="meta-item">⏱️ ${yearsActive} years active</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayQuickStats() {
+            const originalRepos = allRepos.filter(repo => !repo.fork);
+            const totalStars = originalRepos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
+            const totalForks = originalRepos.reduce((sum, repo) => sum + repo.forks_count, 0);
+            
+            document.getElementById('quickStats').innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 15px; color: white;">
+                        <div style="font-size: 1.8rem; font-weight: 700;">${userData.followers.toLocaleString()}</div>
+                        <div style="font-size: 0.9rem;">Followers</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, #f093fb, #f5576c); border-radius: 15px; color: white;">
+                        <div style="font-size: 1.8rem; font-weight: 700;">${userData.following.toLocaleString()}</div>
+                        <div style="font-size: 0.9rem;">Following</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, #4facfe, #00f2fe); border-radius: 15px; color: white;">
+                        <div style="font-size: 1.8rem; font-weight: 700;">${totalStars.toLocaleString()}</div>
+                        <div style="font-size: 0.9rem;">Total Stars</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, #43e97b, #38f9d7); border-radius: 15px; color: white;">
+                        <div style="font-size: 1.8rem; font-weight: 700;">${totalForks.toLocaleString()}</div>
+                        <div style="font-size: 0.9rem;">Total Forks</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayDetailedStats() {
+            const originalRepos = allRepos.filter(repo => !repo.fork);
+            const forkedRepos = allRepos.filter(repo => repo.fork);
+            const totalStars = originalRepos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
+            const totalForks = originalRepos.reduce((sum, repo) => sum + repo.forks_count, 0);
+            const totalSize = originalRepos.reduce((sum, repo) => sum + repo.size, 0);
+            const avgStars = originalRepos.length > 0 ? Math.round(totalStars / originalRepos.length) : 0;
+            const reposWithIssues = originalRepos.filter(repo => repo.has_issues && repo.open_issues_count > 0).length;
+            
+            // Calculate recent activity (repos updated in last 30 days)
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            const recentlyActive = allRepos.filter(repo => new Date(repo.updated_at) > thirtyDaysAgo).length;
+            
+            const statsGrid = document.getElementById('statsGrid');
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <span class="stat-icon">📚</span>
+                    <div class="stat-value">${userData.public_repos}</div>
+                    <div class="stat-label">Total Repositories</div>
+                    <div class="stat-change">
+                        ${originalRepos.length} original • ${forkedRepos.length} forked
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">⭐</span>
+                    <div class="stat-value">${totalStars.toLocaleString()}</div>
+                    <div class="stat-label">Total Stars Earned</div>
+                    <div class="stat-change">
+                        ${avgStars} average per repo
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🍴</span>
+                    <div class="stat-value">${totalForks.toLocaleString()}</div>
+                    <div class="stat-label">Total Forks</div>
+                    <div class="stat-change">
+                        ${originalRepos.length > 0 ? Math.round(totalForks / originalRepos.length) : 0} average per repo
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">💾</span>
+                    <div class="stat-value">${(totalSize / 1024).toFixed(1)}MB</div>
+                    <div class="stat-label">Total Repository Size</div>
+                    <div class="stat-change">
+                        ${originalRepos.length > 0 ? Math.round(totalSize / originalRepos.length) : 0}KB average
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🔥</span>
+                    <div class="stat-value">${recentlyActive}</div>
+                    <div class="stat-label">Recently Active</div>
+                    <div class="stat-change">
+                        Updated in last 30 days
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🐛</span>
+                    <div class="stat-value">${reposWithIssues}</div>
+                    <div class="stat-label">Repos with Issues</div>
+                    <div class="stat-change">
+                        ${originalRepos.reduce((sum, repo) => sum + repo.open_issues_count, 0)} total open issues
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayCharts() {
+            displayLanguageChart();
+            displayStarsChart();
+            displayTimelineChart();
+            displaySizeChart();
+        }
+
+        function displayLanguageChart() {
+            const originalRepos = allRepos.filter(repo => !repo.fork);
+            const languages = {};
+            let totalRepos = 0;
+            
+            originalRepos.forEach(repo => {
+                if (repo.language) {
+                    languages[repo.language] = (languages[repo.language] || 0) + 1;
+                    totalRepos++;
+                }
+            });
+
+            const languageContainer = document.querySelector('#languageChart').parentElement;
+            if (Object.keys(languages).length === 0) {
+                languageContainer.innerHTML = '<h3>📈 Language Distribution</h3><div style="text-align: center; color: #7f8c8d; padding: 40px;">No language data available</div>';
+                return;
+            }
+
+            // Sort by usage and take top 10
+            const sortedLanguages = Object.entries(languages)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 10);
+
+            const languageData = {
+                labels: sortedLanguages.map(([lang]) => lang),
+                datasets: [{
+                    data: sortedLanguages.map(([,count]) => count),
+                    backgroundColor: sortedLanguages.map(([lang]) => languageColors[lang] || languageColors['Other']),
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            };
+
+            if (charts.language) charts.language.destroy();
+            const langCtx = document.getElementById('languageChart').getContext('2d');
+            charts.language = new Chart(langCtx, {
+                type: 'doughnut',
+                data: languageData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    return data.labels.map((label, i) => ({
+                                        text: `${label} (${data.datasets[0].data[i]})`,
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        pointStyle: 'circle'
+                                    }));
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const percentage = ((context.parsed / totalRepos) * 100).toFixed(1);
+                                    return `${context.label}: ${context.parsed} repos (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function displayStarsChart() {
+            const originalRepos = allRepos.filter(repo => !repo.fork);
+            const topRepos = originalRepos
+                .sort((a, b) => b.stargazers_count - a.stargazers_count)
+                .slice(0, 10)
+                .filter(repo => repo.stargazers_count > 0);
+
+            const starsContainer = document.querySelector('#starsChart').parentElement;
+            if (topRepos.length === 0) {
+                starsContainer.innerHTML = '<h3>⭐ Repository Performance</h3><div style="text-align: center; color: #7f8c8d; padding: 40px;">No starred repositories found</div>';
+                return;
+            }
+
+            const starsData = {
+                labels: topRepos.map(repo => repo.name.length > 15 ? repo.name.substring(0, 15) + '...' : repo.name),
+                datasets: [{
+                    label: 'Stars',
+                    data: topRepos.map(repo => repo.stargazers_count),
+                    backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false,
+                }]
+            };
+
+            if (charts.stars) charts.stars.destroy();
+            const starsCtx = document.getElementById('starsChart').getContext('2d');
+            charts.stars = new Chart(starsCtx, {
+                type: 'bar',
+                data: starsData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    const repo = topRepos[context.dataIndex];
+                                    return [
+                                        `Forks: ${repo.forks_count}`,
+                                        `Language: ${repo.language || 'N/A'}`,
+                                        `Size: ${repo.size}KB`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Stars'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function displayTimelineChart() {
+            const reposByYear = {};
+            allRepos.forEach(repo => {
+                const year = new Date(repo.created_at).getFullYear();
+                reposByYear[year] = (reposByYear[year] || 0) + 1;
+            });
+
+            const years = Object.keys(reposByYear).sort();
+            const timelineData = {
+                labels: years,
+                datasets: [{
+                    label: 'Repositories Created',
+                    data: years.map(year => reposByYear[year]),
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            };
+
+            if (charts.timeline) charts.timeline.destroy();
+            const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+            charts.timeline = new Chart(timelineCtx, {
+                type: 'line',
+                data: timelineData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Repositories'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Year'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function displaySizeChart() {
+            const originalRepos = allRepos.filter(repo => !repo.fork && repo.size > 0);
+            const sizeRanges = {
+                'Small (< 100KB)': 0,
+                'Medium (100KB - 1MB)': 0,
+                'Large (1MB - 10MB)': 0,
+                'Very Large (> 10MB)': 0
+            };
+
+            originalRepos.forEach(repo => {
+                if (repo.size < 100) {
+                    sizeRanges['Small (< 100KB)']++;
+                } else if (repo.size < 1024) {
+                    sizeRanges['Medium (100KB - 1MB)']++;
+                } else if (repo.size < 10240) {
+                    sizeRanges['Large (1MB - 10MB)']++;
+                } else {
+                    sizeRanges['Very Large (> 10MB)']++;
+                }
+            });
+
+            const sizeData = {
+                labels: Object.keys(sizeRanges),
+                datasets: [{
+                    data: Object.values(sizeRanges),
+                    backgroundColor: [
+                        'rgba(255, 206, 84, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(153, 102, 255, 0.8)'
+                    ],
+                    borderWidth: 2
+                }]
+            };
+
+            if (charts.size) charts.size.destroy();
+            const sizeCtx = document.getElementById('sizeChart').getContext('2d');
+            charts.size = new Chart(sizeCtx, {
+                type: 'pie',
+                data: sizeData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function displayInsights() {
+            const originalRepos = allRepos.filter(repo => !repo.fork);
+            const totalStars = originalRepos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
+            const mostStarredRepo = originalRepos.reduce((max, repo) => 
+                repo.stargazers_count > (max?.stargazers_count || 0) ? repo : max, null);
+            
+            const languages = {};
+            originalRepos.forEach(repo => {
+                if (repo.language) {
+                    languages[repo.language] = (languages[repo.language] || 0) + 1;
+                }
+            });
+            const topLanguage = Object.entries(languages).sort(([,a], [,b]) => b - a)[0];
+            
+            const avgRepoAge = originalRepos.reduce((sum, repo) => {
+                const age = (new Date() - new Date(repo.created_at)) / (1000 * 60 * 60 * 24 * 365);
+                return sum + age;
+            }, 0) / originalRepos.length;
+
+            const activeRepos = originalRepos.filter(repo => {
+                const lastUpdate = new Date(repo.updated_at);
+                const sixMonthsAgo = new Date();
+                sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+                return lastUpdate > sixMonthsAgo;
+            }).length;
+
+            document.getElementById('insightsGrid').innerHTML = `
+                <div class="insight-card">
+                    <div class="insight-title">🌟 Most Starred Repository</div>
+                    <div class="insight-value">${mostStarredRepo ? mostStarredRepo.name : 'N/A'}</div>
+                    <div class="insight-description">
+                        ${mostStarredRepo ? `${mostStarredRepo.stargazers_count} stars` : 'No starred repositories'}
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">💻 Primary Language</div>
+                    <div class="insight-value">${topLanguage ? topLanguage[0] : 'N/A'}</div>
+                    <div class="insight-description">
+                        ${topLanguage ? `Used in ${topLanguage[1]} repositories` : 'No language data'}
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">📊 Development Activity</div>
+                    <div class="insight-value">${activeRepos}</div>
+                    <div class="insight-description">
+                        Repositories active in last 6 months
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">⏱️ Average Repository Age</div>
+                    <div class="insight-value">${avgRepoAge.toFixed(1)} years</div>
+                    <div class="insight-description">
+                        Average age of all repositories
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">🎯 Star Rate</div>
+                    <div class="insight-value">${((totalStars / Math.max(originalRepos.length, 1)) * 100).toFixed(1)}%</div>
+                    <div class="insight-description">
+                        Stars per repository ratio
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">👥 Community Engagement</div>
+                    <div class="insight-value">${userData.followers > userData.following ? 'High' : userData.followers > 10 ? 'Medium' : 'Low'}</div>
+                    <div class="insight-description">
+                        Based on follower/following ratio
+                    </div>
+                </div>
+            `;
+        }
+
+        function setupFilters() {
+            // Populate language filter
+            const languages = new Set(['all']);
+            allRepos.forEach(repo => {
+                if (repo.language) languages.add(repo.language);
+            });
+            
+            const languageFilter = document.getElementById('languageFilter');
+            languageFilter.innerHTML = Array.from(languages).sort().map(lang => 
+                `<option value="${lang}">${lang === 'all' ? 'All Languages' : lang}</option>`
+            ).join('');
+        }
+
+        function displayRepositories() {
+            const filteredRepos = getFilteredRepos();
+            const startIndex = (currentPage - 1) * reposPerPage;
+            const endIndex = startIndex + reposPerPage;
+            const pageRepos = filteredRepos.slice(startIndex, endIndex);
+
+            document.getElementById('repoList').innerHTML = pageRepos.map(repo => `
+                <div class="repo-item">
+                    <div class="repo-info">
+                        <a href="${repo.html_url}" class="repo-name" target="_blank">
+                            ${repo.name}
+                            ${repo.fork ? '<span style="color: #95a5a6; font-size: 0.8em; margin-left: 5px;">🍴</span>' : ''}
+                        </a>
+                        ${repo.description ? `<div class="repo-description">${repo.description}</div>` : ''}
+                        <div style="margin-top: 8px; display: flex; gap: 15px; align-items: center;">
+                            ${repo.language ? `
+                                <span style="display: flex; align-items: center; gap: 5px; font-size: 0.85rem; color: var(--text-secondary);">
+                                    <span class="language-indicator" style="background-color: ${languageColors[repo.language] || languageColors['Other']};"></span>
+                                    ${repo.language}
+                                </span>
+                            ` : ''}
+                            <span style="font-size: 0.85rem; color: var(--text-secondary);">
+                                Updated ${new Date(repo.updated_at).toLocaleDateString()}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="repo-stats">
+                        <div class="repo-stat">
+                            <span>⭐</span>
+                            ${repo.stargazers_count}
+                        </div>
+                        <div class="repo-stat">
+                            <span>🍴</span>
+                            ${repo.forks_count}
+                        </div>
+                        <div class="repo-stat">
+                            <span>📦</span>
+                            ${repo.size}KB
+                        </div>
+                        ${repo.open_issues_count > 0 ? `
+                            <div class="repo-stat">
+                                <span>🐛</span>
+                                ${repo.open_issues_count}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            // Display pagination
+            displayPagination(filteredRepos.length);
+        }
+
+        function displayPagination(totalRepos) {
+            const totalPages = Math.ceil(totalRepos / reposPerPage);
+            if (totalPages <= 1) {
+                document.getElementById('repoPagination').innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = '';
+            
+            // Previous button
+            if (currentPage > 1) {
+                paginationHTML += `<button class="page-btn" onclick="changePage(${currentPage - 1})">← Previous</button>`;
+            }
+            
+            // Page numbers
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+            
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHTML += `
+                    <button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
+                        ${i}
+                    </button>
+                `;
+            }
+            
+            // Next button
+            if (currentPage < totalPages) {
+                paginationHTML += `<button class="page-btn" onclick="changePage(${currentPage + 1})">Next →</button>`;
+            }
+
+            document.getElementById('repoPagination').innerHTML = paginationHTML;
+        }
+
+        function displayActivityHeatmap() {
+            const heatmapGrid = document.getElementById('heatmapGrid');
+            const today = new Date();
+            const oneYearAgo = new Date(today);
+            oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+            // Create activity map based on repository updates
+            const activityMap = {};
+            allRepos.forEach(repo => {
+                const updateDate = new Date(repo.updated_at);
+                if (updateDate >= oneYearAgo) {
+                    const dateKey = updateDate.toISOString().split('T')[0];
+                    activityMap[dateKey] = (activityMap[dateKey] || 0) + 1;
+                }
+            });
+
+            // Generate heatmap cells for the past year (365 days)
+            let heatmapHTML = '';
+            for (let i = 365; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateKey = date.toISOString().split('T')[0];
+                const activity = activityMap[dateKey] || 0;
+                
+                let levelClass = '';
+                if (activity > 0) {
+                    if (activity === 1) levelClass = 'level-1';
+                    else if (activity === 2) levelClass = 'level-2';
+                    else if (activity === 3) levelClass = 'level-3';
+                    else levelClass = 'level-4';
+                }
+                
+                heatmapHTML += `
+                    <div class="heatmap-cell ${levelClass}" 
+                         title="${date.toLocaleDateString()}: ${activity} updates"
+                         data-date="${dateKey}"
+                         data-activity="${activity}">
+                    </div>
+                `;
+            }
+            
+            heatmapGrid.innerHTML = heatmapHTML;
+        }
+
+        function getFilteredRepos() {
+            let filtered = [...allRepos];
+            
+            // Apply language filter
+            const languageFilter = document.getElementById('languageFilter').value;
+            if (languageFilter !== 'all') {
+                filtered = filtered.filter(repo => repo.language === languageFilter);
+            }
+            
+            // Apply repository type filter
+            const repoType = document.getElementById('repoType').value;
+            if (repoType === 'original') {
+                filtered = filtered.filter(repo => !repo.fork);
+            } else if (repoType === 'forked') {
+                filtered = filtered.filter(repo => repo.fork);
+            }
+            
+            // Apply sorting
+            const sortBy = document.getElementById('sortBy').value;
+            filtered.sort((a, b) => {
+                switch (sortBy) {
+                    case 'stars':
+                        return b.stargazers_count - a.stargazers_count;
+                    case 'forks':
+                        return b.forks_count - a.forks_count;
+                    case 'updated':
+                        return new Date(b.updated_at) - new Date(a.updated_at);
+                    case 'created':
+                        return new Date(b.created_at) - new Date(a.created_at);
+                    case 'size':
+                        return b.size - a.size;
+                    default:
+                        return 0;
+                }
+            });
+            
+            return filtered;
+        }
+
+        function updateRepoDisplay() {
+            currentPage = 1; // Reset to first page when filters change
+            displayRepositories();
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            displayRepositories();
+        }
+
+        function toggleChart(chartType, newType) {
+            // Update button states
+            const container = document.querySelector(`#${chartType}Chart`).closest('.chart-container');
+            const buttons = container.querySelectorAll('.toggle-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Redraw chart with new type
+            if (chartType === 'language') {
+                displayLanguageChart(newType);
+            } else if (chartType === 'stars') {
+                displayStarsChart(newType);
+            }
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showResults() {
+            document.getElementById('results').style.display = 'block';
+        }
+
+        function hideResults() {
+            document.getElementById('results').style.display = 'none';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('error').style.display = 'none';
+        }
+
+        function handleError(error, username) {
+            console.error('Error fetching GitHub data:', error);
+            
+            if (error.message.includes('User not found')) {
+                showError(`GitHub user "${username}" not found. Please check the username and try again.`);
+            } else if (error.message.includes('rate limit')) {
+                showError('GitHub API rate limit exceeded. Please try again in a few minutes.');
+            } else if (error.message.includes('Failed to fetch')) {
+                showError('Network error. Please check your internet connection and try again.');
+            } else {
+                showError(`An error occurred: ${error.message}. Please try again.`);
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('username').focus();
+        });
+
+        document.getElementById('username').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                fetchGitHubStats();
+            }
+        });
+    </script>
+</body>
+</html>

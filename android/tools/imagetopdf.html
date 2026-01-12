@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Image to PDF Converter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .main-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .upload-zone {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #f8f9ff, #e8eeff);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-zone:hover {
+            border-color: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .upload-zone.drag-over {
+            border-color: #4c51bf;
+            background: linear-gradient(45deg, #e8eeff, #ddd6fe);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .upload-hint {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f56565, #e53e3e);
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .control-group {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+        }
+
+        .control-group h3 {
+            margin-bottom: 15px;
+            color: #495057;
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .image-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            border: 2px solid transparent;
+        }
+
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .image-card.selected {
+            border-color: #667eea;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .image-controls {
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+        }
+
+        .image-index {
+            background: #667eea;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .image-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            border-radius: 15px;
+            min-width: auto;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .image-editor {
+            text-align: center;
+        }
+
+        .editor-image {
+            max-width: 100%;
+            max-height: 400px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .editor-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            backdrop-filter: blur(2px);
+        }
+
+        .loading-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .drag-handle {
+            cursor: move;
+            padding: 5px;
+            color: #666;
+        }
+
+        .sortable-ghost {
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .images-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                padding: 15px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🖼️ Advanced Image to PDF Converter</h1>
+            <p>Convert, edit, and organize your images into professional PDFs</p>
+        </div>
+
+        <div class="main-panel">
+            <!-- Upload Zone -->
+            <div class="upload-zone" id="uploadZone">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">Drop images here or click to browse</div>
+                <div class="upload-hint">Supports: JPG, PNG, GIF, WebP, BMP | Max: 50 images</div>
+                <input type="file" id="fileInput" class="file-input" multiple accept="image/*">
+            </div>
+
+            <!-- Stats -->
+            <div class="stats" id="stats" style="display: none;">
+                <div class="stat-card">
+                    <div class="stat-number" id="imageCount">0</div>
+                    <div class="stat-label">Images</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalSize">0 MB</div>
+                    <div class="stat-label">Total Size</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="selectedCount">0</div>
+                    <div class="stat-label">Selected</div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls" id="controls" style="display: none;">
+                <div class="control-group">
+                    <h3>📄 Page Settings</h3>
+                    <div class="form-group">
+                        <label>Page Size:</label>
+                        <select class="form-control" id="pageSize">
+                            <option value="a4">A4 (210×297mm)</option>
+                            <option value="letter">Letter (8.5×11")</option>
+                            <option value="legal">Legal (8.5×14")</option>
+                            <option value="a3">A3 (297×420mm)</option>
+                            <option value="a5">A5 (148×210mm)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Orientation:</label>
+                        <select class="form-control" id="orientation">
+                            <option value="portrait">Portrait</option>
+                            <option value="landscape">Landscape</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Margin (mm):</label>
+                        <input type="number" class="form-control" id="margin" value="10" min="0" max="50">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>🖼️ Image Layout</h3>
+                    <div class="form-group">
+                        <label>Images per page:</label>
+                        <select class="form-control" id="imagesPerPage">
+                            <option value="1">1 image per page</option>
+                            <option value="2">2 images per page</option>
+                            <option value="4">4 images per page</option>
+                            <option value="6">6 images per page</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Image fit:</label>
+                        <select class="form-control" id="imageFit">
+                            <option value="contain">Fit to page</option>
+                            <option value="cover">Fill page</option>
+                            <option value="stretch">Stretch to fit</option>
+                        </select>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="maintainAspectRatio" checked>
+                        <label for="maintainAspectRatio">Maintain aspect ratio</label>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>⚙️ PDF Options</h3>
+                    <div class="form-group">
+                        <label>Quality:</label>
+                        <input type="range" class="form-control" id="quality" min="0.1" max="1" step="0.1" value="0.8">
+                        <small>Current: <span id="qualityValue">0.8</span></small>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="addWatermark">
+                        <label for="addWatermark">Add watermark</label>
+                    </div>
+                    <div class="form-group">
+                        <label>Watermark text:</label>
+                        <input type="text" class="form-control" id="watermarkText" placeholder="Your watermark">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>📋 Metadata</h3>
+                    <div class="form-group">
+                        <label>Title:</label>
+                        <input type="text" class="form-control" id="pdfTitle" placeholder="PDF Title">
+                    </div>
+                    <div class="form-group">
+                        <label>Author:</label>
+                        <input type="text" class="form-control" id="pdfAuthor" placeholder="Author Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Subject:</label>
+                        <input type="text" class="form-control" id="pdfSubject" placeholder="Subject">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-bar" id="progressBar" style="display: none;">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <!-- Images Grid -->
+            <div class="images-grid" id="imagesGrid"></div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons" id="actionButtons" style="display: none;">
+                <button class="btn" onclick="selectAllImages()">✅ Select All</button>
+                <button class="btn" onclick="deselectAllImages()">❌ Deselect All</button>
+                <button class="btn btn-secondary" onclick="sortImages()">🔄 Sort by Name</button>
+                <button class="btn btn-secondary" onclick="reverseImages()">↕️ Reverse Order</button>
+                <button class="btn btn-danger" onclick="removeSelected()">🗑️ Remove Selected</button>
+                <button class="btn" onclick="generatePDF()" id="generateBtn">📄 Generate PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Editor Modal -->
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🎨 Image Editor</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="image-editor">
+                <img id="editorImage" class="editor-image">
+                <div class="editor-controls">
+                    <div class="form-group">
+                        <label>Brightness:</label>
+                        <input type="range" id="brightness" min="0" max="200" value="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Contrast:</label>
+                        <input type="range" id="contrast" min="0" max="200" value="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Saturation:</label>
+                        <input type="range" id="saturation" min="0" max="200" value="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Rotation:</label>
+                        <input type="range" id="rotation" min="0" max="360" value="0">
+                    </div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <button class="btn" onclick="applyEdits()">✅ Apply Changes</button>
+                    <button class="btn btn-secondary" onclick="resetEdits()">🔄 Reset</button>
+                    <button class="btn btn-danger" onclick="closeModal()">❌ Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>Generating PDF...</h3>
+            <p>Please wait while we create your PDF</p>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let images = [];
+        let selectedImages = new Set();
+        let currentEditingIndex = -1;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            updateQualityDisplay();
+        });
+
+        function setupEventListeners() {
+            const uploadZone = document.getElementById('uploadZone');
+            const fileInput = document.getElementById('fileInput');
+
+            // Upload zone events
+            uploadZone.addEventListener('click', () => fileInput.click());
+            uploadZone.addEventListener('dragover', handleDragOver);
+            uploadZone.addEventListener('dragleave', handleDragLeave);
+            uploadZone.addEventListener('drop', handleDrop);
+
+            // File input
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Quality slider
+            document.getElementById('quality').addEventListener('input', updateQualityDisplay);
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', handleKeyboard);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            const files = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
+            processFiles(files);
+        }
+
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            processFiles(files);
+        }
+
+        function processFiles(files) {
+            if (images.length + files.length > 50) {
+                showToast('Maximum 50 images allowed!', 'error');
+                return;
+            }
+
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = {
+                            id: Date.now() + Math.random(),
+                            file: file,
+                            src: e.target.result,
+                            name: file.name,
+                            size: file.size,
+                            edits: {
+                                brightness: 100,
+                                contrast: 100,
+                                saturation: 100,
+                                rotation: 0
+                            }
+                        };
+                        images.push(img);
+                        renderImages();
+                        updateStats();
+                        showControls();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function renderImages() {
+            const grid = document.getElementById('imagesGrid');
+            grid.innerHTML = '';
+
+            images.forEach((img, index) => {
+                const card = document.createElement('div');
+                card.className = `image-card ${selectedImages.has(img.id) ? 'selected' : ''}`;
+                card.innerHTML = `
+                    <img src="${img.src}" class="image-preview" onclick="toggleSelection('${img.id}')" style="filter: brightness(${img.edits.brightness}%) contrast(${img.edits.contrast}%) saturate(${img.edits.saturation}%) rotate(${img.edits.rotation}deg)">
+                    <div class="image-controls">
+                        <div class="image-index">${index + 1}</div>
+                        <div class="image-actions">
+                            <button class="btn btn-small" onclick="editImage(${index})">✏️</button>
+                            <button class="btn btn-small" onclick="moveUp(${index})">↑</button>
+                            <button class="btn btn-small" onclick="moveDown(${index})">↓</button>
+                            <button class="btn btn-small btn-danger" onclick="removeImage(${index})">🗑️</button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function toggleSelection(id) {
+            if (selectedImages.has(id)) {
+                selectedImages.delete(id);
+            } else {
+                selectedImages.add(id);
+            }
+            renderImages();
+            updateStats();
+        }
+
+        function selectAllImages() {
+            images.forEach(img => selectedImages.add(img.id));
+            renderImages();
+            updateStats();
+        }
+
+        function deselectAllImages() {
+            selectedImages.clear();
+            renderImages();
+            updateStats();
+        }
+
+        function removeImage(index) {
+            const img = images[index];
+            selectedImages.delete(img.id);
+            images.splice(index, 1);
+            renderImages();
+            updateStats();
+            if (images.length === 0) {
+                hideControls();
+            }
+        }
+
+        function removeSelected() {
+            if (selectedImages.size === 0) {
+                showToast('No images selected!', 'error');
+                return;
+            }
+
+            images = images.filter(img => !selectedImages.has(img.id));
+            selectedImages.clear();
+            renderImages();
+            updateStats();
+
+            if (images.length === 0) {
+                hideControls();
+            }
+            showToast(`Removed ${selectedImages.size} images`);
+        }
+
+        function moveUp(index) {
+            if (index > 0) {
+                [images[index], images[index - 1]] = [images[index - 1], images[index]];
+                renderImages();
+            }
+        }
+
+        function moveDown(index) {
+            if (index < images.length - 1) {
+                [images[index], images[index + 1]] = [images[index + 1], images[index]];
+                renderImages();
+            }
+        }
+
+        function sortImages() {
+            images.sort((a, b) => a.name.localeCompare(b.name));
+            renderImages();
+            showToast('Images sorted alphabetically');
+        }
+
+        function reverseImages() {
+            images.reverse();
+            renderImages();
+            showToast('Image order reversed');
+        }
+
+        function editImage(index) {
+            currentEditingIndex = index;
+            const img = images[index];
+            const modal = document.getElementById('imageModal');
+            const editorImage = document.getElementById('editorImage');
+
+            editorImage.src = img.src;
+            
+            // Set current values
+            document.getElementById('brightness').value = img.edits.brightness;
+            document.getElementById('contrast').value = img.edits.contrast;
+            document.getElementById('saturation').value = img.edits.saturation;
+            document.getElementById('rotation').value = img.edits.rotation;
+
+            updateImagePreview();
+            modal.style.display = 'block';
+
+            // Add real-time preview
+            ['brightness', 'contrast', 'saturation', 'rotation'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateImagePreview);
+            });
+        }
+
+        function updateImagePreview() {
+            const editorImage = document.getElementById('editorImage');
+            const brightness = document.getElementById('brightness').value;
+            const contrast = document.getElementById('contrast').value;
+            const saturation = document.getElementById('saturation').value;
+            const rotation = document.getElementById('rotation').value;
+
+            editorImage.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) rotate(${rotation}deg)`;
+        }
+
+        function applyEdits() {
+            if (currentEditingIndex >= 0) {
+                const img = images[currentEditingIndex];
+                img.edits.brightness = document.getElementById('brightness').value;
+                img.edits.contrast = document.getElementById('contrast').value;
+                img.edits.saturation = document.getElementById('saturation').value;
+                img.edits.rotation = document.getElementById('rotation').value;
+
+                renderImages();
+                closeModal();
+                showToast('Image edits applied');
+            }
+        }
+
+        function resetEdits() {
+            document.getElementById('brightness').value = 100;
+            document.getElementById('contrast').value = 100;
+            document.getElementById('saturation').value = 100;
+            document.getElementById('rotation').value = 0;
+            updateImagePreview();
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+            currentEditingIndex = -1;
+        }
+
+        function updateStats() {
+            const totalSize = images.reduce((sum, img) => sum + img.size, 0);
+            document.getElementById('imageCount').textContent = images.length;
+            document.getElementById('totalSize').textContent = (totalSize / 1024 / 1024).toFixed(1) + ' MB';
+            document.getElementById('selectedCount').textContent = selectedImages.size;
+        }
+
+        function updateQualityDisplay() {
+            const quality = document.getElementById('quality').value;
+            document.getElementById('qualityValue').textContent = quality;
+        }
+
+        function showControls() {
+            document.getElementById('stats').style.display = 'grid';
+            document.getElementById('controls').style.display = 'grid';
+            document.getElementById('actionButtons').style.display = 'flex';
+        }
+
+        function hideControls() {
+            document.getElementById('stats').style.display = 'none';
+            document.getElementById('controls').style.display = 'none';
+            document.getElementById('actionButtons').style.display = 'none';
+        }
+
+        async function generatePDF() {
+            if (images.length === 0) {
+                showToast('No images to convert!', 'error');
+                return;
+            }
+
+            const loading = document.getElementById('loading');
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+
+            try {
+                loading.style.display = 'block';
+                progressBar.style.display = 'block';
+
+                // Get settings
+                const pageSize = document.getElementById('pageSize').value;
+                const orientation = document.getElementById('orientation').value;
+                const margin = parseInt(document.getElementById('margin').value);
+                const imagesPerPage = parseInt(document.getElementById('imagesPerPage').value);
+                const imageFit = document.getElementById('imageFit').value;
+                const maintainAspectRatio = document.getElementById('maintainAspectRatio').checked;
+                const quality = parseFloat(document.getElementById('quality').value);
+                const addWatermark = document.getElementById('addWatermark').checked;
+                const watermarkText = document.getElementById('watermarkText').value;
+
+                // PDF metadata
+                const title = document.getElementById('pdfTitle').value || 'Image Collection';
+                const author = document.getElementById('pdfAuthor').value || 'Image to PDF Converter';
+                const subject = document.getElementById('pdfSubject').value || 'Converted Images';
+
+                // Initialize jsPDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: orientation,
+                    unit: 'mm',
+                    format: pageSize
+                });
+
+                // Set metadata
+                pdf.setProperties({
+                    title: title,
+                    author: author,
+                    subject: subject,
+                    creator: 'Advanced Image to PDF Converter',
+                    keywords: 'images, pdf, conversion'
+                });
+
+                // Get page dimensions
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const contentWidth = pageWidth - (margin * 2);
+                const contentHeight = pageHeight - (margin * 2);
+
+                // Calculate image positions for multi-image layouts
+                const layouts = {
+                    1: [[0, 0, 1, 1]],
+                    2: [[0, 0, 1, 0.5], [0, 0.5, 1, 0.5]],
+                    4: [[0, 0, 0.5, 0.5], [0.5, 0, 0.5, 0.5], [0, 0.5, 0.5, 0.5], [0.5, 0.5, 0.5, 0.5]],
+                    6: [[0, 0, 0.33, 0.5], [0.33, 0, 0.33, 0.5], [0.66, 0, 0.34, 0.5], 
+                        [0, 0.5, 0.33, 0.5], [0.33, 0.5, 0.33, 0.5], [0.66, 0.5, 0.34, 0.5]]
+                };
+
+                const layout = layouts[imagesPerPage];
+                let pageCount = 0;
+                let imageIndex = 0;
+
+                // Process images
+                for (let i = 0; i < images.length; i += imagesPerPage) {
+                    if (pageCount > 0) {
+                        pdf.addPage();
+                    }
+
+                    const pageImages = images.slice(i, i + imagesPerPage);
+                    
+                    // Process each image on this page
+                    for (let j = 0; j < pageImages.length; j++) {
+                        const img = pageImages[j];
+                        const pos = layout[j];
+
+                        // Calculate position and size
+                        const x = margin + (pos[0] * contentWidth);
+                        const y = margin + (pos[1] * contentHeight);
+                        const maxWidth = pos[2] * contentWidth;
+                        const maxHeight = pos[3] * contentHeight;
+
+                        // Create canvas for image processing
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const imgElement = new Image();
+
+                        await new Promise((resolve) => {
+                            imgElement.onload = () => {
+                                // Apply filters and transformations
+                                canvas.width = imgElement.width;
+                                canvas.height = imgElement.height;
+
+                                // Apply rotation
+                                if (img.edits.rotation !== 0) {
+                                    const centerX = canvas.width / 2;
+                                    const centerY = canvas.height / 2;
+                                    ctx.translate(centerX, centerY);
+                                    ctx.rotate((img.edits.rotation * Math.PI) / 180);
+                                    ctx.translate(-centerX, -centerY);
+                                }
+
+                                // Apply filters
+                                ctx.filter = `brightness(${img.edits.brightness}%) contrast(${img.edits.contrast}%) saturate(${img.edits.saturation}%)`;
+                                ctx.drawImage(imgElement, 0, 0);
+
+                                // Calculate dimensions
+                                let imgWidth = maxWidth;
+                                let imgHeight = maxHeight;
+
+                                if (maintainAspectRatio) {
+                                    const aspectRatio = canvas.width / canvas.height;
+                                    if (imageFit === 'contain') {
+                                        if (maxWidth / maxHeight > aspectRatio) {
+                                            imgWidth = maxHeight * aspectRatio;
+                                        } else {
+                                            imgHeight = maxWidth / aspectRatio;
+                                        }
+                                    } else if (imageFit === 'cover') {
+                                        if (maxWidth / maxHeight < aspectRatio) {
+                                            imgWidth = maxHeight * aspectRatio;
+                                        } else {
+                                            imgHeight = maxWidth / aspectRatio;
+                                        }
+                                    }
+                                }
+
+                                // Center image in its area
+                                const finalX = x + (maxWidth - imgWidth) / 2;
+                                const finalY = y + (maxHeight - imgHeight) / 2;
+
+                                // Add image to PDF
+                                const imageData = canvas.toDataURL('image/jpeg', quality);
+                                pdf.addImage(imageData, 'JPEG', finalX, finalY, imgWidth, imgHeight);
+
+                                resolve();
+                            };
+                            imgElement.src = img.src;
+                        });
+
+                        // Update progress
+                        const progress = ((i + j + 1) / images.length) * 100;
+                        progressFill.style.width = `${progress}%`;
+                    }
+
+                    // Add watermark if enabled
+                    if (addWatermark && watermarkText.trim()) {
+                        pdf.setFontSize(20);
+                        pdf.setTextColor(200, 200, 200);
+                        pdf.text(watermarkText, pageWidth / 2, pageHeight / 2, {
+                            angle: 45,
+                            align: 'center'
+                        });
+                    }
+
+                    // Add page number
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(100, 100, 100);
+                    pdf.text(`Page ${pageCount + 1}`, pageWidth - margin, pageHeight - 5, {
+                        align: 'right'
+                    });
+
+                    pageCount++;
+                }
+
+                // Generate filename
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+                const filename = `${title.replace(/[^a-zA-Z0-9]/g, '_')}_${timestamp}.pdf`;
+
+                // Save PDF
+                pdf.save(filename);
+
+                showToast(`PDF generated successfully! ${images.length} images converted.`);
+
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                showToast('Error generating PDF. Please try again.', 'error');
+            } finally {
+                loading.style.display = 'none';
+                progressBar.style.display = 'none';
+                progressFill.style.width = '0%';
+            }
+        }
+
+        function handleKeyboard(e) {
+            // Ctrl+A - Select all
+            if (e.ctrlKey && e.key === 'a') {
+                e.preventDefault();
+                selectAllImages();
+            }
+            // Delete - Remove selected
+            else if (e.key === 'Delete') {
+                removeSelected();
+            }
+            // Escape - Close modal
+            else if (e.key === 'Escape') {
+                closeModal();
+            }
+            // Ctrl+Enter - Generate PDF
+            else if (e.ctrlKey && e.key === 'Enter') {
+                generatePDF();
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Advanced features
+        function exportSettings() {
+            const settings = {
+                pageSize: document.getElementById('pageSize').value,
+                orientation: document.getElementById('orientation').value,
+                margin: document.getElementById('margin').value,
+                imagesPerPage: document.getElementById('imagesPerPage').value,
+                imageFit: document.getElementById('imageFit').value,
+                maintainAspectRatio: document.getElementById('maintainAspectRatio').checked,
+                quality: document.getElementById('quality').value,
+                addWatermark: document.getElementById('addWatermark').checked,
+                watermarkText: document.getElementById('watermarkText').value,
+                pdfTitle: document.getElementById('pdfTitle').value,
+                pdfAuthor: document.getElementById('pdfAuthor').value,
+                pdfSubject: document.getElementById('pdfSubject').value
+            };
+
+            const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'pdf_converter_settings.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Settings exported successfully!');
+        }
+
+        function importSettings() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const settings = JSON.parse(e.target.result);
+                            Object.keys(settings).forEach(key => {
+                                const element = document.getElementById(key);
+                                if (element) {
+                                    if (element.type === 'checkbox') {
+                                        element.checked = settings[key];
+                                    } else {
+                                        element.value = settings[key];
+                                    }
+                                }
+                            });
+                            updateQualityDisplay();
+                            showToast('Settings imported successfully!');
+                        } catch (error) {
+                            showToast('Error importing settings!', 'error');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        // Add batch processing
+        function batchResize() {
+            if (selectedImages.size === 0) {
+                showToast('No images selected for batch processing!', 'error');
+                return;
+            }
+
+            const width = prompt('Enter target width (pixels):');
+            const height = prompt('Enter target height (pixels):');
+
+            if (width && height) {
+                selectedImages.forEach(id => {
+                    const imgIndex = images.findIndex(img => img.id === id);
+                    if (imgIndex >= 0) {
+                        // This would require more complex canvas manipulation
+                        // For now, just show the concept
+                        showToast(`Batch resize feature coming soon!`);
+                    }
+                });
+            }
+        }
+
+        // Add more advanced features
+        function addTextOverlay() {
+            const text = prompt('Enter text to overlay:');
+            if (text && selectedImages.size > 0) {
+                showToast('Text overlay feature coming soon!');
+            }
+        }
+
+        function createCollage() {
+            if (selectedImages.size < 2) {
+                showToast('Select at least 2 images for collage!', 'error');
+                return;
+            }
+            showToast('Collage feature coming soon!');
+        }
+
+        // Initialize advanced features
+        function initAdvancedFeatures() {
+            // Add advanced buttons
+            const advancedButtons = `
+                <button class="btn btn-secondary" onclick="exportSettings()">💾 Export Settings</button>
+                <button class="btn btn-secondary" onclick="importSettings()">📁 Import Settings</button>
+                <button class="btn btn-secondary" onclick="batchResize()">📐 Batch Resize</button>
+                <button class="btn btn-secondary" onclick="addTextOverlay()">📝 Add Text</button>
+                <button class="btn btn-secondary" onclick="createCollage()">🖼️ Create Collage</button>
+            `;
+            
+            const actionButtons = document.getElementById('actionButtons');
+            if (actionButtons) {
+                actionButtons.innerHTML += advancedButtons;
+            }
+        }
+
+        // Initialize advanced features after DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initAdvancedFeatures, 100);
+        });
+
+        // Add drag and drop reordering
+        let draggedElement = null;
+        let draggedIndex = null;
+
+        function makeDraggable() {
+            const imageCards = document.querySelectorAll('.image-card');
+            imageCards.forEach((card, index) => {
+                card.draggable = true;
+                card.addEventListener('dragstart', function(e) {
+                    draggedElement = this;
+                    draggedIndex = index;
+                    this.style.opacity = '0.5';
+                });
+
+                card.addEventListener('dragend', function(e) {
+                    this.style.opacity = '';
+                    draggedElement = null;
+                    draggedIndex = null;
+                });
+
+                card.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                });
+
+                card.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    if (draggedElement && draggedElement !== this) {
+                        const dropIndex = index;
+                        
+                        // Reorder images array
+                        const draggedImg = images[draggedIndex];
+                        images.splice(draggedIndex, 1);
+                        images.splice(dropIndex, 0, draggedImg);
+                        
+                        renderImages();
+                        makeDraggable(); // Re-enable dragging
+                    }
+                });
+            });
+        }
+
+        // Update renderImages to include dragging
+        const originalRenderImages = renderImages;
+        renderImages = function() {
+            originalRenderImages();
+            makeDraggable();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Splash Screen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body, html {
+      height: 100%;
+      width: 100%;
+      background: radial-gradient(circle at center, #0a0a0a, #000);
+      overflow: hidden;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+    }
+    .container {
+      position: relative;
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .logo {
+      width: 250px;
+      height: 250px;
+      animation: float 4s ease-in-out infinite, glow 2s alternate infinite;
+      transform: scale(1.3);
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1.3); }
+      50% { transform: translateY(-20px) scale(1.3); }
+    }
+    @keyframes glow {
+      0% { filter: drop-shadow(0 0 10px #0ff); }
+      100% { filter: drop-shadow(0 0 30px #0ff); }
+    }
+    h1 {
+      margin-top: 20px;
+      font-size: 2em;
+      background: linear-gradient(90deg, #0ff, #00f, #0ff);
+      background-size: 200% auto;
+      color: #fff;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shine 3s linear infinite;
+    }
+    @keyframes shine {
+      to { background-position: 200% center; }
+    }
+    .btn {
+      margin-top: 30px;
+      padding: 14px 30px;
+      font-size: 1em;
+      background: #0ff;
+      color: #000;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 15px #0ff, 0 0 40px #00f;
+      font-weight: bold;
+    }
+    .btn:hover {
+      transform: scale(1.1);
+      background: #00f;
+      color: #fff;
+      box-shadow: 0 0 20px #00f, 0 0 60px #0ff;
+    }
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .particle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #0ff;
+      border-radius: 50%;
+      animation: drift 10s infinite linear;
+      opacity: 0.6;
+    }
+    @keyframes drift {
+      0% {
+        transform: translateY(100vh) scale(0.5);
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-10vh) scale(1.2);
+        opacity: 0;
+      }
+    }
+    
+    /* Video player styles */
+    .video-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: none;
+      z-index: 1000;
+      overflow: hidden;
+    }
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .video-border {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      border: 2px solid rgba(0, 255, 255, 0.3);
+      border-radius: 10px;
+      box-shadow: 0 0 20px #0ff, 0 0 40px rgba(0, 255, 255, 0.5);
+      pointer-events: none;
+      z-index: 1002;
+    }
+    #fullscreen-video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+    .loading {
+      position: absolute;
+      color: #0ff;
+      font-size: 1.5em;
+      text-shadow: 0 0 10px #0ff;
+      z-index: 1001;
+    }
+  </style>
+</head>
+<body>
+  <div class="particles" id="particles"></div>
+  <div class="container">
+    <img src="image.png" alt="Logo" class="logo" />
+    <button class="btn" onclick="playVideo()">Continue</button>
+  </div>
+  
+  <!-- Video Player -->
+  <div class="video-container" id="video-container">
+    <div class="video-wrapper">
+      <div class="video-border"></div>
+      <div class="loading" id="loading-text">Loading...</div>
+      <video id="fullscreen-video" playsinline webkit-playsinline controls="false">
+        <!-- Replace with your video source -->
+        <source src="Whizan.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  </div>
+
+  <script>
+    function playVideo() {
+      const videoContainer = document.getElementById('video-container');
+      const video = document.getElementById('fullscreen-video');
+      const loadingText = document.getElementById('loading-text');
+      
+      // Remove controls explicitly
+      video.removeAttribute('controls');
+      video.controls = false;
+      
+      // Show video container
+      videoContainer.style.display = 'block';
+      
+      // Try to force fullscreen (works on some mobile browsers)
+      if (video.requestFullscreen) {
+        video.requestFullscreen();
+      } else if (video.webkitRequestFullscreen) { /* Safari */
+        video.webkitRequestFullscreen();
+      } else if (video.msRequestFullscreen) { /* IE11 */
+        video.msRequestFullscreen();
+      }
+      
+      // Load and play video
+      video.load();
+      
+      video.oncanplay = function() {
+        loadingText.style.display = 'none';
+        video.play().catch(e => {
+          loadingText.textContent = 'Tap to play';
+          loadingText.style.display = 'block';
+          loadingText.onclick = function() {
+            video.play();
+            loadingText.style.display = 'none';
+          };
+        });
+      };
+      
+      video.onended = function() {
+        // Redirect after video ends
+        window.location.href = 'auth.html';
+      };
+      
+      // Fallback in case video fails to load
+      setTimeout(function() {
+        if (video.readyState < 3) { // HAVE_FUTURE_DATA
+          loadingText.textContent = 'Video loading failed. Redirecting...';
+          setTimeout(function() {
+            window.location.href = 'auth.html';
+          }, 2000);
+        }
+      }, 10000); // 10 second timeout
+    }
+    
+    const particleContainer = document.getElementById('particles');
+    const numParticles = 40;
+    for (let i = 0; i < numParticles; i++) {
+      const p = document.createElement('div');
+      p.classList.add('particle');
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.top = Math.random() * 100 + 'vh';
+      p.style.animationDelay = Math.random() * 10 + 's';
+      p.style.width = p.style.height = (Math.random() * 4 + 2) + 'px';
+      particleContainer.appendChild(p);
+    }
+  </script>
+</body>
+</html>

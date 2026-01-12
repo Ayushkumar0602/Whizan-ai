@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevHub Pro - Complete Developer Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .glass { backdrop-filter: blur(10px); background-color: rgba(255, 255, 255, 0.1); }
+        .dark .glass { background-color: rgba(0, 0, 0, 0.2); }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .code-block { background: #1e293b; color: #e2e8f0; border-radius: 8px; padding: 1rem; font-family: 'Courier New', monospace; }
+        .tool-card { transition: all 0.3s ease; transform: translateY(0); }
+        .tool-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .animate-pulse-slow { animation: pulse 3s infinite; }
+        .spinning { animation: spin 1s linear infinite; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        .terminal { background: #0d1117; color: #58a6ff; font-family: 'Courier New', monospace; }
+        .syntax-highlight { background: #f8f9fa; border-left: 4px solid #007bff; }
+        .dark .syntax-highlight { background: #1e293b; border-left-color: #3b82f6; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <button onclick="toggleSidebar()" class="p-2 rounded-md text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <i data-lucide="menu" class="w-5 h-5"></i>
+                    </button>
+                    <div class="ml-4 flex items-center">
+                        <i data-lucide="terminal" class="w-8 h-8 text-blue-600 dark:text-blue-400"></i>
+                        <h1 class="ml-2 text-xl font-bold text-gray-900 dark:text-white">DevHub Pro</h1>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                        <input type="text" id="searchInput" placeholder="Search tools..." 
+                               class="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                               oninput="searchTools(this.value)">
+                    </div>
+                    
+                    <div id="currentTime" class="text-sm text-gray-600 dark:text-gray-400"></div>
+                    
+                    <button onclick="toggleDarkMode()" class="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
+                        <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <div id="sidebar" class="w-64 bg-white dark:bg-gray-800 shadow-sm border-r border-gray-200 dark:border-gray-700 fixed inset-y-0 left-0 z-40 transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0">
+            <div class="flex flex-col h-full pt-16 lg:pt-0">
+                <div class="flex-1 overflow-y-auto p-4">
+                    <nav class="space-y-2" id="categoryNav">
+                        <!-- Categories will be populated by JavaScript -->
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 lg:ml-0">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Category Header -->
+                <div class="mb-8">
+                    <div class="flex items-center mb-4">
+                        <i id="categoryIcon" data-lucide="home" class="w-8 h-8 text-blue-600 dark:text-blue-400 mr-3"></i>
+                        <h2 id="categoryTitle" class="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h2>
+                    </div>
+                    <p id="categoryDescription" class="text-gray-600 dark:text-gray-400">Welcome to your developer workspace</p>
+                </div>
+
+                <!-- Tools Grid -->
+                <div id="toolsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <!-- Tools will be populated by JavaScript -->
+                </div>
+
+                <!-- Tool Content Area -->
+                <div id="toolContent" class="mt-8 hidden">
+                    <!-- Dynamic content area for tools -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Tools -->
+    <div id="toolModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 id="modalTitle" class="text-2xl font-bold text-gray-900 dark:text-white"></h3>
+                    <button onclick="closeModal()" class="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <div id="modalContent" class="space-y-6">
+                    <!-- Modal content will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Global state
+        let darkMode = localStorage.getItem('darkMode') === 'true';
+        let sidebarOpen = false;
+        let currentCategory = 'dashboard';
+        let currentTool = null;
+
+        // Categories and tools data
+        const categories = {
+            dashboard: { name: 'Dashboard', icon: 'home', color: 'bg-blue-500' },
+            'code-tools': { name: 'Code Tools', icon: 'code', color: 'bg-green-500' },
+            'api-tools': { name: 'API Tools', icon: 'server', color: 'bg-purple-500' },
+            'design-tools': { name: 'Design Tools', icon: 'palette', color: 'bg-pink-500' },
+            'text-tools': { name: 'Text Tools', icon: 'type', color: 'bg-orange-500' },
+            'crypto-tools': { name: 'Crypto Tools', icon: 'shield', color: 'bg-red-500' },
+            'utilities': { name: 'Utilities', icon: 'wrench', color: 'bg-teal-500' },
+            'productivity': { name: 'Productivity', icon: 'target', color: 'bg-indigo-500' },
+            'system': { name: 'System Info', icon: 'cpu', color: 'bg-gray-500' },
+            'widgets': { name: 'Widgets', icon: 'package', color: 'bg-yellow-500' }
+        };
+
+        const tools = [
+            // Dashboard
+            { id: 'overview', name: 'Overview', icon: 'activity', category: 'dashboard', description: 'System overview and statistics' },
+            
+            // Code Tools
+            { id: 'code-formatter', name: 'Code Formatter', icon: 'code', category: 'code-tools', description: 'Format and beautify code' },
+            { id: 'json-validator', name: 'JSON Validator', icon: 'file-text', category: 'code-tools', description: 'Validate and format JSON' },
+            { id: 'xml-formatter', name: 'XML Formatter', icon: 'file-code', category: 'code-tools', description: 'Format and validate XML' },
+            { id: 'sql-formatter', name: 'SQL Formatter', icon: 'database', category: 'code-tools', description: 'Format SQL queries' },
+            { id: 'regex-tester', name: 'Regex Tester', icon: 'search', category: 'code-tools', description: 'Test regular expressions' },
+            { id: 'minifier', name: 'Code Minifier', icon: 'minimize', category: 'code-tools', description: 'Minify CSS, JS, HTML' },
+            { id: 'base64-converter', name: 'Base64 Converter', icon: 'hash', category: 'code-tools', description: 'Encode/decode Base64' },
+            { id: 'url-encoder', name: 'URL Encoder', icon: 'globe', category: 'code-tools', description: 'Encode/decode URLs' },
+            { id: 'html-encoder', name: 'HTML Encoder', icon: 'code-2', category: 'code-tools', description: 'Encode/decode HTML entities' },
+            { id: 'jwt-decoder', name: 'JWT Decoder', icon: 'key', category: 'code-tools', description: 'Decode JWT tokens' },
+            { id: 'unicode-converter', name: 'Unicode Converter', icon: 'type', category: 'code-tools', description: 'Convert Unicode characters' },
+            
+            // API Tools
+            { id: 'api-tester', name: 'API Tester', icon: 'server', category: 'api-tools', description: 'Test REST API endpoints' },
+            { id: 'curl-converter', name: 'cURL Converter', icon: 'terminal', category: 'api-tools', description: 'Convert cURL to various formats' },
+            { id: 'postman-converter', name: 'Postman Converter', icon: 'download', category: 'api-tools', description: 'Convert Postman collections' },
+            { id: 'webhook-tester', name: 'Webhook Tester', icon: 'zap', category: 'api-tools', description: 'Test webhooks' },
+            { id: 'graphql-formatter', name: 'GraphQL Formatter', icon: 'layers', category: 'api-tools', description: 'Format GraphQL queries' },
+            { id: 'swagger-validator', name: 'Swagger Validator', icon: 'file-check', category: 'api-tools', description: 'Validate OpenAPI specs' },
+            
+            // Design Tools
+            { id: 'color-picker', name: 'Color Picker', icon: 'palette', category: 'design-tools', description: 'Pick and convert colors' },
+            { id: 'gradient-generator', name: 'Gradient Generator', icon: 'sunrise', category: 'design-tools', description: 'Generate CSS gradients' },
+            { id: 'shadow-generator', name: 'Shadow Generator', icon: 'square', category: 'design-tools', description: 'Generate CSS shadows' },
+            { id: 'border-radius', name: 'Border Radius', icon: 'corner-up-right', category: 'design-tools', description: 'Generate border radius' },
+            { id: 'css-generator', name: 'CSS Generator', icon: 'paintbrush', category: 'design-tools', description: 'Generate CSS snippets' },
+            { id: 'favicon-generator', name: 'Favicon Generator', icon: 'star', category: 'design-tools', description: 'Generate favicons' },
+            { id: 'image-optimizer', name: 'Image Optimizer', icon: 'image', category: 'design-tools', description: 'Optimize images' },
+            { id: 'svg-optimizer', name: 'SVG Optimizer', icon: 'vector', category: 'design-tools', description: 'Optimize SVG files' },
+            
+            // Text Tools
+            { id: 'text-case', name: 'Text Case Converter', icon: 'text-cursor', category: 'text-tools', description: 'Convert text case' },
+            { id: 'word-counter', name: 'Word Counter', icon: 'counter', category: 'text-tools', description: 'Count words and characters' },
+            { id: 'lorem-generator', name: 'Lorem Generator', icon: 'type', category: 'text-tools', description: 'Generate placeholder text' },
+            { id: 'markdown-converter', name: 'Markdown Converter', icon: 'markdown', category: 'text-tools', description: 'Convert Markdown to HTML' },
+            { id: 'text-diff', name: 'Text Diff', icon: 'diff', category: 'text-tools', description: 'Compare text differences' },
+            { id: 'string-utilities', name: 'String Utilities', icon: 'string', category: 'text-tools', description: 'Various string operations' },
+            
+            // Crypto Tools
+            { id: 'hash-generator', name: 'Hash Generator', icon: 'shield', category: 'crypto-tools', description: 'Generate MD5, SHA1, SHA256' },
+            { id: 'password-generator', name: 'Password Generator', icon: 'key', category: 'crypto-tools', description: 'Generate secure passwords' },
+            { id: 'uuid-generator', name: 'UUID Generator', icon: 'hash', category: 'crypto-tools', description: 'Generate UUIDs' },
+            { id: 'encryption', name: 'Text Encryption', icon: 'lock', category: 'crypto-tools', description: 'Encrypt/decrypt text' },
+            { id: 'digital-signature', name: 'Digital Signature', icon: 'pen-tool', category: 'crypto-tools', description: 'Sign and verify' },
+            { id: 'checksum', name: 'Checksum Validator', icon: 'check-circle', category: 'crypto-tools', description: 'Validate checksums' },
+            
+            // Utilities
+            { id: 'qr-generator', name: 'QR Generator', icon: 'qr-code', category: 'utilities', description: 'Generate QR codes' },
+            { id: 'calculator', name: 'Calculator', icon: 'calculator', category: 'utilities', description: 'Advanced calculator' },
+            { id: 'unit-converter', name: 'Unit Converter', icon: 'ruler', category: 'utilities', description: 'Convert between units' },
+            { id: 'timestamp-converter', name: 'Timestamp Converter', icon: 'clock', category: 'utilities', description: 'Convert timestamps' },
+            { id: 'ip-lookup', name: 'IP Lookup', icon: 'globe', category: 'utilities', description: 'IP address information' },
+            { id: 'url-shortener', name: 'URL Shortener', icon: 'link', category: 'utilities', description: 'Shorten URLs' },
+            { id: 'barcode-generator', name: 'Barcode Generator', icon: 'barcode', category: 'utilities', description: 'Generate barcodes' },
+            { id: 'image-converter', name: 'Image Converter', icon: 'image', category: 'utilities', description: 'Convert image formats' },
+            
+            // Productivity
+            { id: 'notes', name: 'Notes', icon: 'sticky-note', category: 'productivity', description: 'Quick notes and snippets' },
+            { id: 'todo', name: 'Todo List', icon: 'check-square', category: 'productivity', description: 'Task management' },
+            { id: 'pomodoro', name: 'Pomodoro Timer', icon: 'timer', category: 'productivity', description: 'Focus timer' },
+            { id: 'bookmarks', name: 'Bookmarks', icon: 'bookmark', category: 'productivity', description: 'Manage bookmarks' },
+            { id: 'calendar', name: 'Calendar', icon: 'calendar', category: 'productivity', description: 'Calendar and events' },
+            { id: 'habit-tracker', name: 'Habit Tracker', icon: 'trending-up', category: 'productivity', description: 'Track habits' },
+            
+            // System
+            { id: 'system-info', name: 'System Info', icon: 'monitor', category: 'system', description: 'Browser and system info' },
+            { id: 'performance', name: 'Performance', icon: 'gauge', category: 'system', description: 'Performance metrics' },
+            { id: 'network-info', name: 'Network Info', icon: 'wifi', category: 'system', description: 'Network information' },
+            { id: 'battery-info', name: 'Battery Info', icon: 'battery', category: 'system', description: 'Battery status' },
+            { id: 'screen-info', name: 'Screen Info', icon: 'screen', category: 'system', description: 'Screen information' },
+            { id: 'geolocation', name: 'Geolocation', icon: 'map-pin', category: 'system', description: 'Location information' },
+            
+            // Widgets
+            { id: 'weather', name: 'Weather', icon: 'thermometer-sun', category: 'widgets', description: 'Weather information' },
+            { id: 'news', name: 'News Feed', icon: 'newspaper', category: 'widgets', description: 'Latest tech news' },
+            { id: 'crypto-prices', name: 'Crypto Prices', icon: 'trending-up', category: 'widgets', description: 'Cryptocurrency prices' },
+            { id: 'github-stats', name: 'GitHub Stats', icon: 'github', category: 'widgets', description: 'GitHub statistics' },
+            { id: 'quotes', name: 'Quotes', icon: 'quote', category: 'widgets', description: 'Inspirational quotes' },
+            { id: 'random-joke', name: 'Random Joke', icon: 'smile', category: 'widgets', description: 'Programming jokes' }
+        ];
+
+        // Initialize the application
+        function init() {
+            updateTime();
+            setInterval(updateTime, 1000);
+            
+            if (darkMode) {
+                document.documentElement.classList.add('dark');
+            }
+            
+            renderCategories();
+            renderTools();
+            
+            // Show dashboard by default
+            showDashboard();
+        }
+
+        // Time update
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString();
+        }
+
+        // Dark mode toggle
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            localStorage.setItem('darkMode', darkMode);
+            document.documentElement.classList.toggle('dark');
+        }
+
+        // Sidebar toggle
+        function toggleSidebar() {
+            sidebarOpen = !sidebarOpen;
+            const sidebar = document.getElementById('sidebar');
+            if (sidebarOpen) {
+                sidebar.classList.remove('-translate-x-full');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+            }
+        }
+
+        // Render categories
+        function renderCategories() {
+            const nav = document.getElementById('categoryNav');
+            nav.innerHTML = '';
+            
+            Object.entries(categories).forEach(([key, category]) => {
+                const button = document.createElement('button');
+                button.className = `w-full flex items-center px-3 py-2 text-left rounded-lg transition-colors ${
+                    currentCategory === key 
+                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' 
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                }`;
+                button.onclick = () => switchCategory(key);
+                button.innerHTML = `
+                    <i data-lucide="${category.icon}" class="w-5 h-5 mr-3"></i>
+                    <span class="font-medium">${category.name}</span>
+                `;
+                nav.appendChild(button);
+            });
+            
+            lucide.createIcons();
+        }
+
+        // Switch category
+        function switchCategory(categoryKey) {
+            currentCategory = categoryKey;
+            renderCategories();
+            renderTools();
+            updateCategoryHeader();
+        }
+
+        // Update category header
+        function updateCategoryHeader() {
+            const category = categories[currentCategory];
+            document.getElementById('categoryIcon').setAttribute('data-lucide', category.icon);
+            document.getElementById('categoryTitle').textContent = category.name;
+            
+            const toolCount = tools.filter(tool => tool.category === currentCategory).length;
+            document.getElementById('categoryDescription').textContent = `${toolCount} tools available`;
+            
+            lucide.createIcons();
+        }
+
+        // Render tools
+        function renderTools() {
+            const grid = document.getElementById('toolsGrid');
+            grid.innerHTML = '';
+            
+            const categoryTools = tools.filter(tool => tool.category === currentCategory);
+            
+            categoryTools.forEach(tool => {
+                const card = document.createElement('div');
+                card.className = 'tool-card bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 cursor-pointer';
+                card.onclick = () => openTool(tool);
+                
+                const categoryColor = categories[tool.category].color;
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="p-3 rounded-lg ${categoryColor} bg-opacity-10">
+                            <i data-lucide="${tool.icon}" class="w-6 h-6 ${categoryColor.replace('bg-', 'text-')}"></i>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">${tool.name}</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">${tool.description}</p>
+                `;
+                grid.appendChild(card);
+            });
+            
+            lucide.createIcons();
+        }
+
+        // Search tools
+        function searchTools(query) {
+            const grid = document.getElementById('toolsGrid');
+            grid.innerHTML = '';
+            
+            const filteredTools = tools.filter(tool => 
+                tool.name.toLowerCase().includes(query.toLowerCase()) ||
+                tool.description.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            filteredTools.forEach(tool => {
+                const card = document.createElement('div');
+                card.className = 'tool-card bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 cursor-pointer';
+                card.onclick = () => openTool(tool);
+                
+                const categoryColor = categories[tool.category].color;
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="p-3 rounded-lg ${categoryColor} bg-opacity-10">
+                            <i data-lucide="${tool.icon}" class="w-6 h-6 ${categoryColor.replace('bg-', 'text-')}"></i>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">${tool.name}</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">${tool.description}</p>
+                    <div class="mt-2">
+                        <span class="inline-block bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded text-xs">
+                            ${categories[tool.category].name}
+                        </span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            
+            lucide.createIcons();
+        }
+
+        // Open tool
+        function openTool(tool) {
+            currentTool = tool;
+            document.getElementById('modalTitle').textContent = tool.name;
+            document.getElementById('toolModal').classList.remove('hidden');
+            
+            // Generate tool content based on tool type
+            generateToolContent(tool);
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('toolModal').classList.add('hidden');
+            currentTool = null;
+        }
+
+        // Generate tool content
+        function generateToolContent(tool) {
+            const content = document.getElementById('modalContent');
+            content.innerHTML = '';
+            
+            switch(tool.id) {
+                case 'code-formatter':
+                    content.innerHTML = `
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select Language</label>
+                                <select id="codeLanguage" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+                                    <option value="javascript">JavaScript</option>
+                                    <option value="css">CSS</option>
+                                    <option value="html">HTML</option>
+                                    <option value="json">JSON</option>
+                                    <option value="xml">XML</option>
+                                    <option value="sql">SQL</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Input Code</label>
+                                <textarea id="codeInput" rows="10" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white font-mono" placeholder="Paste your code here..."></textarea>
+                            </div>
+                            <button onclick="formatCode()" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                                Format Code
+                            </button>
+                            <div id="codeOutput" class="hidden">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Formatted Code</label>
+                                <pre class="code-block overflow-auto"><code id="formattedCode"></code></pre>
+                                <button onclick="copyCode()" class="mt-2 bg-green-600 text-white py-1 px-3 rounded text-sm hover:bg-green-700 transition-colors">
+                                    Copy to Clipboard
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                
+                case 'json-validator':
+                    content.innerHTML = `
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">JSON Input</label>
+                                <textarea id="jsonInput" rows="10" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white font-mono" placeholder='{"example": "Enter your JSON here..."}'></textarea>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="validateJSON()" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                                    Validate JSON
+                                </button>
+                                <button onclick="minifyJSON()" class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                                    Minify
+                                </button>
+                                <button onclick="prettifyJSON()" class="bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+                                    Prettify
+                                </button>
+                            </div>
+                            <div id="jsonResult" class="hidden">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Result</label>
+                                <pre class="code-block overflow-auto"><code id="jsonOutput"></code></pre>
+                            </div>
+                            <div id="jsonError" class="hidden p-3 bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 rounded-lg">
+                                <p class="text-red-700 dark:text-red-300" id="jsonErrorMessage"></p>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                
+                case 'password-generator':
+                    content.innerHTML = `
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Length</label>
+                                    <input type="number" id="passwordLength" value="12" min="4" max="128" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Count</label>
+                                    <input type="number" id="passwordCount" value="1" min="1" max="10" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="includeUppercase" checked class="mr-2">
+                                    <label for="includeUppercase" class="text-sm text-gray-700 dark:text-gray-300">Include Uppercase Letters</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="includeLowercase" checked class="mr-2">
+                                    <label for="includeLowercase" class="text-sm text-gray-700 dark:text-gray-300">Include Lowercase Letters</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="includeNumbers" checked class="mr-2">
+                                    <label for="includeNumbers" class="text-sm text-gray-700 dark:text-gray-300">Include Numbers</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="includeSymbols" checked class="mr-2">
+                                    <label for="includeSymbols" class="text-sm text-gray-700 dark:text-gray-300">Include Symbols</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="excludeAmbiguous" class="mr-2">
+                                    <label for="excludeAmbiguous" class="text-sm text-gray-700 dark:text-gray-300">Exclude Ambiguous Characters</label>
+                                </div>
+                            </div>
+                            <button onclick="generatePassword()" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                                Generate Password
+                            </button>
+                            <div id="passwordResult" class="hidden space-y-2">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Generated Passwords</label>
+                                <div id="passwordList" class="space-y-2"></div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                
+                case 'qr-generator':
+                    content.innerHTML = `
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Text or URL</label>
+                                <textarea id="qrInput" rows="4" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Enter text or URL to generate QR code"></textarea>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Size</label>
+                                    <select id="qrSize" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+                                        <option value="200">200x200</option>
+                                        <option value="300" selected>300x300</option>
+                                        <option value="400">400x400</option>
+                                        <option value="500">500x500</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Error Correction</label>
+                                    <select id="qrErrorCorrection" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+                                        <option value="L">Low</option>
+                                        <option value="M" selected>Medium</option>
+                                        <option value="Q">Quartile</option>
+                                        <option value="H">High</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button onclick="generateQR()" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                                Generate QR Code
+                            </button>
+                            <div id="qrResult" class="hidden text-center">
+                                <div id="qrCode" class="inline-block p-4 bg-white rounded-lg shadow-md"></div>
+                                <div class="mt-4">
+                                    <button onclick="downloadQR()" class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                                        Download QR Code
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                
+                case 'calculator':
+                    content.innerHTML = `
+                        <div class="space-y-4">
+                            <div>
+                                <input type="text" id="calculatorDisplay" readonly 
+                                       class="w-full p-4 text-right text-2xl font-mono border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+                            </div>
+                            <div class="grid grid-cols-4 gap-2">
+                                <button onclick="clearCalculator()" class="calc-btn bg-red-500 text-white">C</button>
+                                <button onclick="clearEntry()" class="calc-btn bg-yellow-500 text-white">CE</button>
+                                <button onclick="deleteLast()" class="calc-btn bg-gray-500 text-white">⌫</button>
+                                <button onclick="appendToCalculator('/')" class="calc-btn bg-blue-500 text-white">÷</button>
+                                
+                                <button onclick="appendToCalculator('7')" class="calc-btn">7</button>
+                                <button onclick="appendToCalculator('8')" class="calc-btn">8</button>
+                                <button onclick="appendToCalculator('9')" class="calc-btn">9</button>
+                                <button onclick="appendToCalculator('*')" class="calc-btn bg-blue-500 text-white">×</button>
+                                
+                                <button onclick="appendToCalculator('4')" class="calc-btn">4</button>
+                                <button onclick="appendToCalculator('5')" class="calc-btn">5</button>
+                                <button onclick="appendToCalculator('6')" class="calc-btn">6</button>
+                                <button onclick="appendToCalculator('-')" class="calc-btn bg-blue-500 text-white">-</button>
+                                
+                                <button onclick="appendToCalculator('1')" class="calc-btn">1</button>
+                                <button onclick="appendToCalculator('2')" class="calc-btn">2</button>
+                                <button onclick="appendToCalculator('3')" class="calc-btn">3</button>
+                                <button onclick="appendToCalculator('+')" class="calc-btn bg-blue-500 text-white">+</button>
+                                
+                                <button onclick="appendToCalculator('0')" class="calc-btn col-span-2">0</button>
+                                <button onclick="appendToCalculator('.')" class="calc-btn">.</button>
+                                <button onclick="calculateResult()" class="calc-btn bg-green-500 text-white">=</button>
+                            </div>
+                        </div>
+                        <style>
+                            .calc-btn {
+                                @apply py-3 px-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors text-lg font-semibold;
+                            }
+                        </style>
+                    `;
+                    break;
+                
+                case 'hash-generator':
+                    content.innerHTML = `
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Input Text</label>
+                                <textarea id="hashInput" rows="6" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white" placeholder="Enter text to hash"></textarea>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <button onclick="generateHash('md5')" class="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors">
+                                    Generate MD5
+                                </button>
+                                <button onclick="generateHash('sha1')" class="bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors">
+                                    Generate SHA1
+                                </button>
+                                <button onclick="generateHash('sha256')" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                                    Generate SHA256
+                                </button>
+                                <button onclick="generateHash('sha512')" class="bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+                                    Generate SHA512
+                                </button>
+                            </div>
+                            <div id="hashResults" class="space-y-3"></div>
+                        </div>
+                    `;
+                    break;
+                
+                case 'color-picker':
+                    content.innerHTML = `
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Color Picker</label>
+                                    <input type="color" id="colorPicker" value="#3b82f6" class="w-full h-20 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Hex Color</label>
+                                    <input type="text" id="hexInput" value="#3b82f6" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white font-mono">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">RGB</label>
+                                    <input type="text" id="rgbInput" readonly class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white font-mono">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">HSL</label>
+                                    <input type="text" id="hslInput" readonly class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white font-mono">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">HSV</label>
+                                    <input type="text" id="hsvInput" readonly class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white font-mono">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Color Palette</label>
+                                <div id="colorPalette" class="grid grid-cols-5 gap-2"></div>
+                            </div>
+                            <button onclick="generateRandomColor()" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                                Generate Random Color
+                            </button>
+                        </div>
+                    `;
+                    initializeColorPicker();
+                    break;
+                
+                case 'notes':
+                    content.innerHTML = `
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">My Notes</h3>
+                                <button onclick="addNote()" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                                    Add Note
+                                </button>
+                            </div>
+                            <div id="notesList" class="space-y-3">
+                                <!-- Notes will be loaded here -->
+                            </div>
+                        </div>
+                    `;
+                    loadNotes();
+                    break;
+                
+                case 'todo':
+                    content.innerHTML = `
+                        <div class="space-y-4">
+                            <div class="flex space-x-2">
+                                <input type="text" id="todoInput" placeholder="Add a new task..." 
+                                       class="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white">
+                                <button onclick="addTodo()" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                                    Add
+                                </button>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="filterTodos('all')" class="filter-btn bg-gray-500 text-white">All</button>
+                                <button onclick="filterTodos('active')" class="filter-btn bg-blue-500 text-white">Active</button>
+                                <button onclick="filterTodos('completed')" class="filter-btn bg-green-500 text-white">Completed</button>
+                            </div>
+                            <div id="todoList" class="space-y-2">
+                                <!-- Todos will be loaded here -->
+                            </div>
+                        </div>
+                        <style>
+                            .filter-btn {
+                                @apply py-1 px-3 rounded text-sm hover:opacity-80 transition-opacity;
+                            }
+                        </style>
+                    `;
+                    loadTodos();
+                    break;
+                
+                case 'system-info':
+                    content.innerHTML = `
+                        <div class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Browser Information</h4>
+                                    <div class="space-y-1 text-sm">
+                                        <p><span class="font-medium">User Agent:</span> <span id="userAgent"></span></p>
+                                        <p><span class="font-medium">Platform:</span> <span id="platform"></span></p>
+                                        <p><span class="font-medium">Language:</span> <span id="language"></span></p>
+                                        <p><span class="font-medium">Cookies:</span> <span id="cookieEnabled"></span></p>
+                                        <p><span class="font-medium">Online:</span> <span id="onlineStatus"></span></p>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                    <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Screen Information</h4>
+                                    <div class="space-y-1 text-sm">
+                                        <p><span class="font-medium">Screen Size:</span> <span id="screenSize"></span></p>
+                                        <p><span class="font-medium">Available Size:</span> <span id="availableSize"></span></p>
+                                        <p><span class="font-medium">Color Depth:</span> <span id="colorDepth"></span></p>
+                                        <p><span class="font-medium">Pixel Ratio:</span> <span id="pixelRatio"></span></p>
+                                        <p><span class="font-medium">Orientation:</span> <span id="orientation"></span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Additional Information</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <p><span class="font-medium">Time Zone:</span> <span id="timezone"></span></p>
+                                        <p><span class="font-medium">Local Time:</span> <span id="localTime"></span></p>
+                                        <p><span class="font-medium">Memory (approx):</span> <span id="memory"></span></p>
+                                    </div>
+                                    <div>
+                                        <p><span class="font-medium">Connection:</span> <span id="connection"></span></p>
+                                        <p><span class="font-medium">Hardware Concurrency:</span> <span id="hardwareConcurrency"></span></p>
+                                        <p><span class="font-medium">Max Touch Points:</span> <span id="maxTouchPoints"></span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    loadSystemInfo();
+                    break;
+                
+                default:
+                    content.innerHTML = `
+                        <div class="text-center py-8">
+                            <i data-lucide="${tool.icon}" class="w-16 h-16 text-gray-400 mx-auto mb-4"></i>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">${tool.name}</h3>
+                            <p class="text-gray-600 dark:text-gray-400">${tool.description}</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-500 mt-4">This tool is coming soon!</p>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            lucide.createIcons();
+        }
+
+        // Show dashboard
+        function showDashboard() {
+            const content = document.getElementById('toolContent');
+            content.classList.remove('hidden');
+            content.innerHTML = `
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Total Tools</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">${tools.length}</p>
+                                </div>
+                                <i data-lucide="wrench" class="w-8 h-8 text-blue-500"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Categories</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">${Object.keys(categories).length}</p>
+                                </div>
+                                <i data-lucide="folder" class="w-8 h-8 text-green-500"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Theme</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">${darkMode ? 'Dark' : 'Light'}</p>
+                                </div>
+                                <i data-lucide="${darkMode ? 'moon' : 'sun'}" class="w-8 h-8 text-yellow-500"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Status</p>
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">Online</p>
+                                </div>
+                                <i data-lucide="wifi" class="w-8 h-8 text-green-500"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <button onclick="quickAction('code-formatter')" class="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors">
+                                <i data-lucide="code" class="w-6 h-6 text-blue-600 dark:text-blue-400 mx-auto mb-2"></i>
+                                <p class="text-sm font-medium text-blue-900 dark:text-blue-100">Format Code</p>
+                            </button>
+                            <button onclick="quickAction('password-generator')" class="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors">
+                                <i data-lucide="key" class="w-6 h-6 text-red-600 dark:text-red-400 mx-auto mb-2"></i>
+                                <p class="text-sm font-medium text-red-900 dark:text-red-100">Generate Password</p>
+                            </button>
+                            <button onclick="quickAction('qr-generator')" class="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors">
+                                <i data-lucide="qr-code" class="w-6 h-6 text-green-600 dark:text-green-400 mx-auto mb-2"></i>
+                                <p class="text-sm font-medium text-green-900 dark:text-green-100">QR Code</p>
+                            </button>
+                            <button onclick="quickAction('color-picker')" class="p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/40 transition-colors">
+                                <i data-lucide="palette" class="w-6 h-6 text-purple-600 dark:text-purple-400 mx-auto mb-2"></i>
+                                <p class="text-sm font-medium text-purple-900 dark:text-purple-100">Color Picker</p>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // Quick actions
+        function quickAction(toolId) {
+            const tool = tools.find(t => t.id === toolId);
+            if (tool) {
+                openTool(tool);
+            }
+        }
+
+        // Tool-specific functions
+        function formatCode() {
+            const input = document.getElementById('codeInput').value;
+            const language = document.getElementById('codeLanguage').value;
+            
+            if (!input.trim()) {
+                alert('Please enter some code to format');
+                return;
+            }
+            
+            // Simple formatting logic (in a real app, you'd use a proper formatter)
+            let formatted = input;
+            
+            if (language === 'json') {
+                try {
+                    formatted = JSON.stringify(JSON.parse(input), null, 2);
+                } catch (e) {
+                    alert('Invalid JSON');
+                    return;
+                }
+            } else if (language === 'css') {
+                formatted = input.replace(/\s*{\s*/g, ' {\n  ').replace(/;\s*/g, ';\n  ').replace(/\s*}\s*/g, '\n}\n');
+            } else if (language === 'html') {
+                formatted = input.replace(/></g, '>\n<').replace(/\s+/g, ' ');
+            }
+            
+            document.getElementById('formattedCode').textContent = formatted;
+            document.getElementById('codeOutput').classList.remove('hidden');
+        }
+
+        function copyCode() {
+            const code = document.getElementById('formattedCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Code copied to clipboard!');
+            });
+        }
+
+        function validateJSON() {
+            const input = document.getElementById('jsonInput').value;
+            const resultDiv = document.getElementById('jsonResult');
+            const errorDiv = document.getElementById('jsonError');
+            
+            try {
+                const parsed = JSON.parse(input);
+                const formatted = JSON.stringify(parsed, null, 2);
+                
+                document.getElementById('jsonOutput').textContent = formatted;
+                resultDiv.classList.remove('hidden');
+                errorDiv.classList.add('hidden');
+            } catch (error) {
+                document.getElementById('jsonErrorMessage').textContent = error.message;
+                errorDiv.classList.remove('hidden');
+                resultDiv.classList.add('hidden');
+            }
+        }
+
+        function minifyJSON() {
+            const input = document.getElementById('jsonInput').value;
+            try {
+                const parsed = JSON.parse(input);
+                const minified = JSON.stringify(parsed);
+                
+                document.getElementById('jsonOutput').textContent = minified;
+                document.getElementById('jsonResult').classList.remove('hidden');
+                document.getElementById('jsonError').classList.add('hidden');
+            } catch (error) {
+                document.getElementById('jsonErrorMessage').textContent = error.message;
+                document.getElementById('jsonError').classList.remove('hidden');
+                document.getElementById('jsonResult').classList.add('hidden');
+            }
+        }
+
+        function prettifyJSON() {
+            validateJSON();
+        }
+
+        function generatePassword() {
+            const length = parseInt(document.getElementById('passwordLength').value);
+            const count = parseInt(document.getElementById('passwordCount').value);
+            const includeUppercase = document.getElementById('includeUppercase').checked;
+            const includeLowercase = document.getElementById('includeLowercase').checked;
+            const includeNumbers = document.getElementById('includeNumbers').checked;
+            const includeSymbols = document.getElementById('includeSymbols').checked;
+            const excludeAmbiguous = document.getElementById('excludeAmbiguous').checked;
+            
+            let charset = '';
+            if (includeUppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (includeLowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
+            if (includeNumbers) charset += '0123456789';
+            if (includeSymbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+            
+            if (excludeAmbiguous) {
+                charset = charset.replace(/[0O1lI]/g, '');
+            }
+            
+            if (!charset) {
+                alert('Please select at least one character type');
+                return;
+            }
+            
+            const passwords = [];
+            for (let i = 0; i < count; i++) {
+                let password = '';
+                for (let j = 0; j < length; j++) {
+                    password += charset.charAt(Math.floor(Math.random() * charset.length));
+                }
+                passwords.push(password);
+            }
+            
+            const listDiv = document.getElementById('passwordList');
+            listDiv.innerHTML = '';
+            
+            passwords.forEach((password, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg';
+                div.innerHTML = `
+                    <span class="font-mono text-sm">${password}</span>
+                    <button onclick="copyToClipboard('${password}')" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                    </button>
+                `;
+                listDiv.appendChild(div);
+            });
+            
+            document.getElementById('passwordResult').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            });
+        }
+
+        function generateQR() {
+            const input = document.getElementById('qrInput').value;
+            const size = document.getElementById('qrSize').value;
+            
+            if (!input.trim()) {
+                alert('Please enter text or URL');
+                return;
+            }
+            
+            // Using QR Server API for QR generation
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(input)}`;
+            
+            const qrDiv = document.getElementById('qrCode');
+            qrDiv.innerHTML = `<img src="${qrUrl}" alt="QR Code" class="mx-auto">`;
+            
+            document.getElementById('qrResult').classList.remove('hidden');
+        }
+
+        function downloadQR() {
+            const img = document.querySelector('#qrCode img');
+            if (img) {
+                const link = document.createElement('a');
+                link.download = 'qrcode.png';
+                link.href = img.src;
+                link.click();
+            }
+        }
+
+        // Calculator functions
+        let calculatorValue = '';
+        let calculatorDisplay = '';
+
+        function appendToCalculator(value) {
+            calculatorValue += value;
+            calculatorDisplay += value;
+            document.getElementById('calculatorDisplay').value = calculatorDisplay;
+        }
+
+        function clearCalculator() {
+            calculatorValue = '';
+            calculatorDisplay = '';
+            document.getElementById('calculatorDisplay').value = '';
+        }
+
+        function clearEntry() {
+            calculatorValue = '';
+            calculatorDisplay = '';
+            document.getElementById('calculatorDisplay').value = '';
+        }
+
+        function deleteLast() {
+            calculatorValue = calculatorValue.slice(0, -1);
+            calculatorDisplay = calculatorDisplay.slice(0, -1);
+            document.getElementById('calculatorDisplay').value = calculatorDisplay;
+        }
+
+        function calculateResult() {
+            try {
+                const result = eval(calculatorValue.replace(/×/g, '*').replace(/÷/g, '/'));
+                calculatorValue = result.toString();
+                calculatorDisplay = result.toString();
+                document.getElementById('calculatorDisplay').value = calculatorDisplay;
+            } catch (error) {
+                document.getElementById('calculatorDisplay').value = 'Error';
+                calculatorValue = '';
+                calculatorDisplay = '';
+            }
+        }
+
+        // Hash generation functions
+        async function generateHash(algorithm) {
+            const input = document.getElementById('hashInput').value;
+            if (!input.trim()) {
+                alert('Please enter text to hash');
+                return;
+            }
+            
+            let hash = '';
+            
+            if (algorithm === 'md5') {
+                hash = await md5(input);
+            } else if (algorithm === 'sha1') {
+                hash = await sha1(input);
+            } else if (algorithm === 'sha256') {
+                hash = await sha256(input);
+            } else if (algorithm === 'sha512') {
+                hash = await sha512(input);
+            }
+            
+            const resultDiv = document.getElementById('hashResults');
+            const hashDiv = document.createElement('div');
+            hashDiv.className = 'p-3 bg-gray-50 dark:bg-gray-700 rounded-lg';
+            hashDiv.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-700 dark:text-gray-300">${algorithm.toUpperCase()}</p>
+                        <p class="text-xs font-mono text-gray-600 dark:text-gray-400 break-all">${hash}</p>
+                    </div>
+                    <button onclick="copyToClipboard('${hash}')" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `;
+            resultDiv.appendChild(hashDiv);
+            lucide.createIcons();
+        }
+
+        // Simple hash functions (for demo purposes)
+        async function md5(text) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
+            const hashBuffer = await crypto.subtle.digest('MD5', data).catch(() => 'MD5 not supported');
+            if (typeof hashBuffer === 'string') return hashBuffer;
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function sha1(text) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
+            const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function sha256(text) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function sha512(text) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
+            const hashBuffer = await crypto.subtle.digest('SHA-512', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // Color picker functions
+        function initializeColorPicker() {
+            const colorPicker = document.getElementById('colorPicker');
+            const hexInput = document.getElementById('hexInput');
+            
+            colorPicker.addEventListener('input', updateColorValues);
+            hexInput.addEventListener('input', updateColorFromHex);
+            
+            updateColorValues();
+            generateColorPalette();
+        }
+
+        function updateColorValues() {
+            const color = document.getElementById('colorPicker').value;
+            document.getElementById('hexInput').value = color;
+            
+            const rgb = hexToRgb(color);
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            const hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+            
+            document.getElementById('rgbInput').value = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+            document.getElementById('hslInput').value = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+            document.getElementById('hsvInput').value = `hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`;
+            
+            generateColorPalette();
+        }
+
+        function updateColorFromHex() {
+            const hex = document.getElementById('hexInput').value;
+            if (/^#[0-9A-F]{6}$/i.test(hex)) {
+                document.getElementById('colorPicker').value = hex;
+                updateColorValues();
+            }
+        }
+
+        function generateRandomColor() {
+            const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+            document.getElementById('colorPicker').value = randomColor;
+            updateColorValues();
+        }
+
+        function generateColorPalette() {
+            const baseColor = document.getElementById('colorPicker').value;
+            const rgb = hexToRgb(baseColor);
+            const palette = document.getElementById('colorPalette');
+            
+            palette.innerHTML = '';
+            
+            // Generate complementary and analogous colors
+            const variations = [
+                { r: rgb.r, g: rgb.g, b: rgb.b, name: 'Base' },
+                { r: Math.min(255, rgb.r + 30), g: Math.min(255, rgb.g + 30), b: Math.min(255, rgb.b + 30), name: 'Lighter' },
+                { r: Math.max(0, rgb.r - 30), g: Math.max(0, rgb.g - 30), b: Math.max(0, rgb.b - 30), name: 'Darker' },
+                { r: 255 - rgb.r, g: 255 - rgb.g, b: 255 - rgb.b, name: 'Complement' },
+                { r: rgb.g, g: rgb.b, b: rgb.r, name: 'Rotate 1' }
+            ];
+            
+            variations.forEach(color => {
+                const hex = rgbToHex(color.r, color.g, color.b);
+                const div = document.createElement('div');
+                div.className = 'h-16 rounded-lg border border-gray-300 dark:border-gray-600 cursor-pointer relative overflow-hidden';
+                div.style.backgroundColor = hex;
+                div.title = `${color.name}: ${hex}`;
+                div.onclick = () => {
+                    document.getElementById('colorPicker').value = hex;
+                    updateColorValues();
+                };
+                
+                const label = document.createElement('div');
+                label.className = 'absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 text-center';
+                label.textContent = color.name;
+                div.appendChild(label);
+                
+                palette.appendChild(div);
+            });
+        }
+
+        // Color utility functions
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        function rgbToHex(r, g, b) {
+            return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255;
+            g /= 255;
+            b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+
+        function rgbToHsv(r, g, b) {
+            r /= 255;
+            g /= 255;
+            b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, v = max;
+
+            const d = max - min;
+            s = max === 0 ? 0 : d / max;
+
+            if (max === min) {
+                h = 0;
+            } else {
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+
+            return { h: Math.round(h * 360), s: Math.round(s * 100), v: Math.round(v * 100) };
+        }
+
+        // Notes functions
+        function loadNotes() {
+            const notes = JSON.parse(localStorage.getItem('devhub-notes') || '[]');
+            const notesList = document.getElementById('notesList');
+            
+            notesList.innerHTML = '';
+            
+            if (notes.length === 0) {
+                notesList.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-8">No notes yet. Click "Add Note" to create your first note.</p>';
+                return;
+            }
+            
+            notes.forEach((note, index) => {
+                const noteDiv = document.createElement('div');
+                noteDiv.className = 'bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600';
+                noteDiv.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-medium text-gray-900 dark:text-white">${note.title}</h4>
+                        <button onclick="deleteNote(${index})" class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm mb-2">${note.content}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-500">${new Date(note.date).toLocaleDateString()}</p>
+                `;
+                notesList.appendChild(noteDiv);
+            });
+            
+            lucide.createIcons();
+        }
+
+        function addNote() {
+            const title = prompt('Note title:');
+            if (!title) return;
+            
+            const content = prompt('Note content:');
+            if (!content) return;
+            
+            const notes = JSON.parse(localStorage.getItem('devhub-notes') || '[]');
+            notes.unshift({
+                title: title,
+                content: content,
+                date: new Date().toISOString()
+            });
+            
+            localStorage.setItem('devhub-notes', JSON.stringify(notes));
+            loadNotes();
+        }
+
+        function deleteNote(index) {
+            if (confirm('Are you sure you want to delete this note?')) {
+                const notes = JSON.parse(localStorage.getItem('devhub-notes') || '[]');
+                notes.splice(index, 1);
+                localStorage.setItem('devhub-notes', JSON.stringify(notes));
+                loadNotes();
+            }
+        }
+
+        // Todo functions
+        let todoFilter = 'all';
+
+        function loadTodos() {
+            const todos = JSON.parse(localStorage.getItem('devhub-todos') || '[]');
+            const todoList = document.getElementById('todoList');
+            
+            todoList.innerHTML = '';
+            
+            const filteredTodos = todos.filter(todo => {
+                if (todoFilter === 'all') return true;
+                if (todoFilter === 'active') return !todo.completed;
+                if (todoFilter === 'completed') return todo.completed;
+                return true;
+            });
+            
+            if (filteredTodos.length === 0) {
+                todoList.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center py-4">No todos found.</p>';
+                return;
+            }
+            
+            filteredTodos.forEach((todo, index) => {
+                const todoDiv = document.createElement('div');
+                todoDiv.className = `flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-600 ${todo.completed ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-700'}`;
+                todoDiv.innerHTML = `
+                    <div class="flex items-center">
+                        <input type="checkbox" ${todo.completed ? 'checked' : ''} onchange="toggleTodo(${index})" class="mr-3">
+                        <span class="${todo.completed ? 'line-through text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-white'}">${todo.text}</span>
+                    </div>
+                    <button onclick="deleteTodo(${index})" class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                `;
+                todoList.appendChild(todoDiv);
+            });
+            
+            lucide.createIcons();
+        }
+
+        function addTodo() {
+            const input = document.getElementById('todoInput');
+            const text = input.value.trim();
+            
+            if (!text) return;
+            
+            const todos = JSON.parse(localStorage.getItem('devhub-todos') || '[]');
+            todos.push({
+                text: text,
+                completed: false,
+                date: new Date().toISOString()
+            });
+            
+            localStorage.setItem('devhub-todos', JSON.stringify(todos));
+            input.value = '';
+            loadTodos();
+        }
+
+        function toggleTodo(index) {
+            const todos = JSON.parse(localStorage.getItem('devhub-todos') || '[]');
+            todos[index].completed = !todos[index].completed;
+            localStorage.setItem('devhub-todos', JSON.stringify(todos));
+            loadTodos();
+        }
+
+        function deleteTodo(index) {
+            const todos = JSON.parse(localStorage.getItem('devhub-todos') || '[]');
+            todos.splice(index, 1);
+            localStorage.setItem('devhub-todos', JSON.stringify(todos));
+            loadTodos();
+        }
+
+        function filterTodos(filter) {
+            todoFilter = filter;
+            loadTodos();
+        }
+
+        // System info functions
+        function loadSystemInfo() {
+            document.getElementById('userAgent').textContent = navigator.userAgent;
+            document.getElementById('platform').textContent = navigator.platform;
+            document.getElementById('language').textContent = navigator.language;
+            document.getElementById('cookieEnabled').textContent = navigator.cookieEnabled ? 'Yes' : 'No';
+            document.getElementById('onlineStatus').textContent = navigator.onLine ? 'Online' : 'Offline';
+            
+            document.getElementById('screenSize').textContent = `${screen.width}x${screen.height}`;
+            document.getElementById('availableSize').textContent = `${screen.availWidth}x${screen.availHeight}`;
+            document.getElementById('colorDepth').textContent = `${screen.colorDepth} bits`;
+            document.getElementById('pixelRatio').textContent = window.devicePixelRatio || 1;
+            
+            // Screen orientation
+            const orientation = screen.orientation ? screen.orientation.type : 'Unknown';
+            document.getElementById('orientation').textContent = orientation;
+            
+            // Additional info
+            document.getElementById('timezone').textContent = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            document.getElementById('localTime').textContent = new Date().toLocaleString();
+            
+            // Approximate memory (if available)
+            const memory = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : 'Unknown';
+            document.getElementById('memory').textContent = memory;
+            
+            // Connection info
+            const connection = navigator.connection ? 
+                `${navigator.connection.effectiveType || 'Unknown'} (${navigator.connection.downlink || 'Unknown'} Mbps)` : 
+                'Unknown';
+            document.getElementById('connection').textContent = connection;
+            
+            document.getElementById('hardwareConcurrency').textContent = navigator.hardwareConcurrency || 'Unknown';
+            document.getElementById('maxTouchPoints').textContent = navigator.maxTouchPoints || 0;
+        }
+
+        // Add event listener for Enter key on todo input
+        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    if (e.target.id === 'todoInput') {
+                        addTodo();
+                    }
+                }
+            });
+        });
+
+        // Initialize the application
+        init();
+    </script>
+</body>
+</html>

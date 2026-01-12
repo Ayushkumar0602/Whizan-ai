@@ -7,8 +7,7 @@
   <title>Whizan.ai - Smart Study</title>
   <link rel="icon" type="image/png" href="smart study.png">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary-purple: #8B5CF6;
@@ -90,23 +89,10 @@
     }
 
     @keyframes float {
-
-      0%,
-      100% {
-        transform: translate(0, 0) rotate(0deg);
-      }
-
-      25% {
-        transform: translate(30px, -30px) rotate(90deg);
-      }
-
-      50% {
-        transform: translate(-20px, 20px) rotate(180deg);
-      }
-
-      75% {
-        transform: translate(20px, -10px) rotate(270deg);
-      }
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(30px, -30px) rotate(90deg); }
+      50% { transform: translate(-20px, 20px) rotate(180deg); }
+      75% { transform: translate(20px, -10px) rotate(270deg); }
     }
 
     /* Header */
@@ -301,13 +287,8 @@
     }
 
     @keyframes shimmer {
-      0% {
-        transform: translateX(-100%);
-      }
-
-      100% {
-        transform: translateX(100%);
-      }
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
     }
 
     /* Goals Container */
@@ -639,7 +620,6 @@
         opacity: 0;
         transform: translateY(40px) scale(0.95);
       }
-
       to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -871,17 +851,9 @@
       font-size: 14px;
     }
 
-    .difficulty-easy {
-      color: var(--success-green);
-    }
-
-    .difficulty-medium {
-      color: var(--warning-yellow);
-    }
-
-    .difficulty-hard {
-      color: var(--accent-red);
-    }
+    .difficulty-easy { color: var(--success-green); }
+    .difficulty-medium { color: var(--warning-yellow); }
+    .difficulty-hard { color: var(--accent-red); }
 
     .difficulty-count {
       font-size: 14px;
@@ -966,9 +938,7 @@
     }
 
     @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
+      to { transform: rotate(360deg); }
     }
 
     /* Error States */
@@ -1164,8 +1134,7 @@
 
           <div class="form-group">
             <label for="goal-description" class="form-label">Description</label>
-            <textarea id="goal-description" class="form-input"
-              placeholder="Enter goal description (optional)"></textarea>
+            <textarea id="goal-description" class="form-input" placeholder="Enter goal description (optional)"></textarea>
           </div>
 
           <div class="form-group">
@@ -1200,8 +1169,7 @@
         <div class="form-group">
           <label for="leetcode-username-input" class="form-label">LeetCode Username</label>
           <div class="leetcode-input-group">
-            <input type="text" id="leetcode-username-input" class="form-input"
-              placeholder="Enter your LeetCode username">
+            <input type="text" id="leetcode-username-input" class="form-input" placeholder="Enter your LeetCode username">
             <button type="button" class="fetch-btn" id="fetch-leetcode-btn">
               <span class="btn-text">Fetch Stats</span>
               <div class="loading" id="leetcode-loading" style="display: none;"></div>
@@ -1220,20 +1188,21 @@
   <nav class="bottom-nav">
     <div class="nav-container">
       <a href="user_persona.html" class="nav-item">
-        <i class="material-icons">person</i>
-        <span>Profile</span>
+        <i class="material-icons">work</i>
+        <span>Career</span>
       </a>
       <a href="course.html" class="nav-item">
-        <i class="material-icons">school</i>
+        <i class="material-icons">menu_book</i>
         <span>Courses</span>
       </a>
       <a href="college.html" class="nav-item">
-        <i class="material-icons">event</i>
+        <i class="material-icons">school</i>
         <span>College</span>
       </a>
-      <a href="achievements.html" class="nav-item">
-        <i class="material-icons">emoji_events</i>
-        <span>Achievements</span>
+      <a href="toolschoise.html" class="nav-item">
+        <i class="material-icons">build</i>
+
+        <span>Tools</span>
       </a>
     </div>
   </nav>
@@ -1300,37 +1269,13 @@
               // Load profile photo
               db.collection('users').doc(user.uid).get()
                 .then(doc => {
-                  const img = document.getElementById('user-profile-img');
-
                   if (doc.exists && doc.data().photoURL) {
-                    // User has a profile photo
+                    const img = document.getElementById('user-profile-img');
                     img.src = doc.data().photoURL;
-                  } else {
-                    // No profile photo available - show default image
-                    img.src = 'profile.png';
-
-                    // Show alert with options
-                    const completeProfile = confirm('Complete your profile with a photo?\n\nClick "OK" to go to profile page or "Cancel" to stay here.');
-
-                    if (completeProfile) {
-                      // User clicked "OK" - redirect to profile page
-                      window.location.href = 'profile.html';
-                    }
-                    // If user clicked "Cancel", they stay on current page (no action needed)
                   }
                 })
                 .catch(error => {
                   console.error('Error loading profile photo:', error);
-
-                  // On error, also show default image and alert
-                  const img = document.getElementById('user-profile-img');
-                  img.src = 'profile.png';
-
-                  const completeProfile = confirm('Complete your profile with a photo?\n\nClick "OK" to go to profile page or "Cancel" to stay here.');
-
-                  if (completeProfile) {
-                    window.location.href = 'profile.html';
-                  }
                 });
 
               updateCurrentDateDisplay();
@@ -1342,7 +1287,6 @@
               window.location.href = 'auth.html';
             }
           });
-
 
           // Event listeners
           addGoalBtn.addEventListener('click', openAddGoalModal);
@@ -1387,9 +1331,9 @@
           notification.style.zIndex = '10000';
           notification.style.maxWidth = '90%';
           notification.textContent = 'AI Chatbot feature coming soon! 🤖';
-
+          
           document.body.appendChild(notification);
-
+          
           setTimeout(() => {
             notification.remove();
           }, 3000);
@@ -1446,7 +1390,7 @@
 
           try {
             await saveLeetCodeUsername(username);
-
+            
             // Show loading state
             const btnText = fetchLeetcodeBtn.querySelector('.btn-text');
             btnText.style.display = 'none';
@@ -1467,7 +1411,7 @@
               try {
                 console.log(`Trying API: ${apiUrl}`);
                 const response = await fetch(apiUrl);
-
+                
                 if (!response.ok) {
                   console.log(`API ${apiUrl} returned status: ${response.status}`);
                   continue;
@@ -1588,7 +1532,7 @@
         function updateLeetCodeProgressCard(stats) {
           const totalSolved = stats.totalSolved || stats.solvedProblem || 0;
           document.getElementById('leetcode-solved').textContent = totalSolved;
-
+          
           // Calculate progress based on total problems (assuming ~3000 total problems)
           const progress = Math.min(100, Math.floor((totalSolved / 3000) * 100));
           document.getElementById('leetcode-progress').style.width = `${progress}%`;
@@ -1692,9 +1636,9 @@
           notification.style.zIndex = '10000';
           notification.style.maxWidth = '90%';
           notification.textContent = message;
-
+          
           document.body.appendChild(notification);
-
+          
           setTimeout(() => {
             notification.remove();
           }, 3000);
@@ -1710,9 +1654,9 @@
           notification.style.zIndex = '10000';
           notification.style.maxWidth = '90%';
           notification.textContent = message;
-
+          
           document.body.appendChild(notification);
-
+          
           setTimeout(() => {
             notification.remove();
           }, 3000);

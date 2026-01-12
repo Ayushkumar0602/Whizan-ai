@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hash Generator & Decoder</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .tab:hover:not(.active) {
+            background: #e9ecef;
+            transform: translateY(-1px);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        textarea, input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            background: #f8f9ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-display:hover {
+            background: #f0f4ff;
+            border-color: #4facfe;
+        }
+
+        .file-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e8f2ff;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .hash-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .hash-btn {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .hash-btn.md5 {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .hash-btn.sha1 {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+
+        .hash-btn.sha256 {
+            background: linear-gradient(135deg, #45b7d1, #096dd9);
+            color: white;
+        }
+
+        .hash-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .hash-btn:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+        }
+
+        .result-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-value {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            word-break: break-all;
+            background: #f1f3f4;
+            padding: 12px;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            opacity: 1;
+        }
+
+        .decoder-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .decoder-input input {
+            flex: 1;
+        }
+
+        .decode-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #9c88ff, #8c7ae6);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .decode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(156, 136, 255, 0.3);
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .alert.info {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            color: #1976d2;
+        }
+
+        .alert.warning {
+            background: #fff3e0;
+            border: 1px solid #ff9800;
+            color: #f57c00;
+        }
+
+        .progress {
+            width: 100%;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            
+            .hash-buttons {
+                flex-direction: column;
+            }
+            
+            .decoder-input {
+                flex-direction: column;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Hash Generator & Decoder</h1>
+            <p>Generate MD5, SHA1, SHA256 hashes for text and files with advanced decoding capabilities</p>
+        </div>
+
+        <div class="content">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('generator')">Hash Generator</button>
+                <button class="tab" onclick="switchTab('decoder')">Hash Decoder</button>
+            </div>
+
+            <div id="generator" class="tab-content active">
+                <div class="input-group">
+                    <label>Choose Input Method:</label>
+                    <div class="tabs" style="margin-bottom: 20px;">
+                        <button class="tab active" onclick="switchInputMethod('text')">Text Input</button>
+                        <button class="tab" onclick="switchInputMethod('file')">File Upload</button>
+                    </div>
+                </div>
+
+                <div id="text-input" class="input-method">
+                    <div class="input-group">
+                        <label for="textInput">Enter Text to Hash:</label>
+                        <textarea id="textInput" placeholder="Type your text here..."></textarea>
+                    </div>
+                </div>
+
+                <div id="file-input" class="input-method" style="display: none;">
+                    <div class="input-group">
+                        <label>Select File to Hash:</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="fileInput" class="file-input" onchange="handleFileSelect(event)">
+                            <div class="file-input-display">
+                                <span>📁 Click to select a file or drag & drop</span>
+                            </div>
+                        </div>
+                        <div id="fileInfo" class="file-info" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <div class="hash-buttons">
+                    <button class="hash-btn md5" onclick="generateHash('MD5')">Generate MD5</button>
+                    <button class="hash-btn sha1" onclick="generateHash('SHA1')">Generate SHA1</button>
+                    <button class="hash-btn sha256" onclick="generateHash('SHA256')">Generate SHA256</button>
+                </div>
+
+                <div class="progress" id="progress" style="display: none;">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+
+                <div id="results" class="results" style="display: none;"></div>
+            </div>
+
+            <div id="decoder" class="tab-content">
+                <div class="alert info">
+                    <strong>Note:</strong> Hash decoding works by comparing against common dictionaries and previously computed hashes. MD5 and SHA1 are more likely to be decoded than SHA256.
+                </div>
+
+                <div class="input-group">
+                    <label for="hashInput">Enter Hash to Decode:</label>
+                    <div class="decoder-input">
+                        <input type="text" id="hashInput" placeholder="Enter hash (MD5, SHA1, or SHA256)">
+                        <button class="decode-btn" onclick="decodeHash()">Decode Hash</button>
+                    </div>
+                </div>
+
+                <div id="decodeResults" class="results" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+        let currentInputMethod = 'text';
+
+        // Common passwords and dictionary for decoding
+        const commonPasswords = [
+            'password', '123456', 'password123', 'admin', 'qwerty', 'letmein', 
+            'welcome', 'monkey', '1234567890', 'abc123', 'Password1', 'hello',
+            'test', 'user', 'guest', 'root', 'toor', 'pass', '12345', 'secret'
+        ];
+
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function switchInputMethod(method) {
+            currentInputMethod = method;
+            
+            // Update method buttons
+            document.querySelectorAll('#generator .tabs .tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Show/hide input methods
+            document.getElementById('text-input').style.display = method === 'text' ? 'block' : 'none';
+            document.getElementById('file-input').style.display = method === 'file' ? 'block' : 'none';
+        }
+
+        function handleFileSelect(event) {
+            selectedFile = event.target.files[0];
+            const fileInfo = document.getElementById('fileInfo');
+            
+            if (selectedFile) {
+                fileInfo.innerHTML = `
+                    <strong>Selected:</strong> ${selectedFile.name}<br>
+                    <strong>Size:</strong> ${(selectedFile.size / 1024).toFixed(2)} KB<br>
+                    <strong>Type:</strong> ${selectedFile.type || 'Unknown'}
+                `;
+                fileInfo.style.display = 'block';
+                
+                document.querySelector('.file-input-display span').textContent = '✅ File selected: ' + selectedFile.name;
+            }
+        }
+
+        function showProgress() {
+            document.getElementById('progress').style.display = 'block';
+            const progressBar = document.getElementById('progressBar');
+            let width = 0;
+            const interval = setInterval(() => {
+                width += 10;
+                progressBar.style.width = width + '%';
+                if (width >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        document.getElementById('progress').style.display = 'none';
+                        progressBar.style.width = '0%';
+                    }, 500);
+                }
+            }, 50);
+        }
+
+        async function generateHash(algorithm) {
+            let input;
+            
+            if (currentInputMethod === 'text') {
+                input = document.getElementById('textInput').value;
+                if (!input.trim()) {
+                    alert('Please enter some text to hash.');
+                    return;
+                }
+            } else {
+                if (!selectedFile) {
+                    alert('Please select a file to hash.');
+                    return;
+                }
+                input = await readFileAsArrayBuffer(selectedFile);
+            }
+
+            showProgress();
+
+            setTimeout(() => {
+                let hash;
+                
+                if (currentInputMethod === 'text') {
+                    switch (algorithm) {
+                        case 'MD5':
+                            hash = CryptoJS.MD5(input).toString();
+                            break;
+                        case 'SHA1':
+                            hash = CryptoJS.SHA1(input).toString();
+                            break;
+                        case 'SHA256':
+                            hash = CryptoJS.SHA256(input).toString();
+                            break;
+                    }
+                } else {
+                    // For files, convert ArrayBuffer to WordArray
+                    const wordArray = CryptoJS.lib.WordArray.create(input);
+                    switch (algorithm) {
+                        case 'MD5':
+                            hash = CryptoJS.MD5(wordArray).toString();
+                            break;
+                        case 'SHA1':
+                            hash = CryptoJS.SHA1(wordArray).toString();
+                            break;
+                        case 'SHA256':
+                            hash = CryptoJS.SHA256(wordArray).toString();
+                            break;
+                    }
+                }
+
+                displayHashResult(algorithm, hash, input);
+            }, 500);
+        }
+
+        function readFileAsArrayBuffer(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        function displayHashResult(algorithm, hash, input) {
+            const results = document.getElementById('results');
+            const inputDisplay = currentInputMethod === 'text' 
+                ? (input.length > 50 ? input.substring(0, 50) + '...' : input)
+                : selectedFile.name;
+
+            results.innerHTML = `
+                <div class="result-item">
+                    <div class="result-label">
+                        <span>📝 Input (${currentInputMethod}):</span>
+                    </div>
+                    <div class="result-value">${inputDisplay}</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">
+                        <span>🔐 ${algorithm} Hash:</span>
+                    </div>
+                    <div class="result-value">
+                        ${hash}
+                        <button class="copy-btn" onclick="copyToClipboard('${hash}')">Copy</button>
+                    </div>
+                </div>
+            `;
+            
+            results.style.display = 'block';
+        }
+
+        async function decodeHash() {
+            const hashInput = document.getElementById('hashInput').value.trim();
+            if (!hashInput) {
+                alert('Please enter a hash to decode.');
+                return;
+            }
+
+            const results = document.getElementById('decodeResults');
+            results.innerHTML = '<div class="alert info">🔍 Decoding hash, please wait...</div>';
+            results.style.display = 'block';
+
+            // Simulate processing time
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Determine hash type by length
+            let hashType;
+            if (hashInput.length === 32) {
+                hashType = 'MD5';
+            } else if (hashInput.length === 40) {
+                hashType = 'SHA1';
+            } else if (hashInput.length === 64) {
+                hashType = 'SHA256';
+            } else {
+                results.innerHTML = '<div class="alert warning">❌ Invalid hash format. Please check your input.</div>';
+                return;
+            }
+
+            // Try to decode using common passwords
+            let decoded = null;
+            for (const password of commonPasswords) {
+                let testHash;
+                switch (hashType) {
+                    case 'MD5':
+                        testHash = CryptoJS.MD5(password).toString();
+                        break;
+                    case 'SHA1':
+                        testHash = CryptoJS.SHA1(password).toString();
+                        break;
+                    case 'SHA256':
+                        testHash = CryptoJS.SHA256(password).toString();
+                        break;
+                }
+                
+                if (testHash === hashInput.toLowerCase()) {
+                    decoded = password;
+                    break;
+                }
+            }
+
+            if (decoded) {
+                results.innerHTML = `
+                    <div class="result-item">
+                        <div class="result-label">
+                            <span>✅ Hash Successfully Decoded!</span>
+                        </div>
+                        <div class="result-value">
+                            Original Text: <strong>${decoded}</strong>
+                            <button class="copy-btn" onclick="copyToClipboard('${decoded}')">Copy</button>
+                        </div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">
+                            <span>🔐 Hash Type: ${hashType}</span>
+                        </div>
+                        <div class="result-value">${hashInput}</div>
+                    </div>
+                `;
+            } else {
+                results.innerHTML = `
+                    <div class="alert warning">
+                        <strong>❌ Unable to decode this hash.</strong><br>
+                        This could mean:<br>
+                        • The original text is not in our common password dictionary<br>
+                        • The hash uses a salt or additional security measures<br>
+                        • The hash is from a complex or random string<br><br>
+                        <strong>Detected Hash Type:</strong> ${hashType}
+                    </div>
+                `;
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Visual feedback
+                event.target.textContent = 'Copied!';
+                setTimeout(() => {
+                    event.target.textContent = 'Copy';
+                }, 1000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
+
+        // Drag and drop functionality
+        const fileInputDisplay = document.querySelector('.file-input-display');
+        
+        fileInputDisplay.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileInputDisplay.style.background = '#e8f4f8';
+            fileInputDisplay.style.borderColor = '#4facfe';
+        });
+
+        fileInputDisplay.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            fileInputDisplay.style.background = '#f8f9ff';
+            fileInputDisplay.style.borderColor = '#667eea';
+        });
+
+        fileInputDisplay.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileInputDisplay.style.background = '#f8f9ff';
+            fileInputDisplay.style.borderColor = '#667eea';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                selectedFile = files[0];
+                document.getElementById('fileInput').files = files;
+                handleFileSelect({ target: { files: files } });
+            }
+        });
+    </script>
+</body>
+</html>

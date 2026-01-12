@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown to HTML Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            height: calc(100vh - 40px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            padding: 20px 30px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header .icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            overflow: hidden;
+        }
+
+        .editor-panel, .preview-panel {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .panel-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 600;
+            color: #495057;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-panel .panel-header {
+            background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 100%);
+            color: white;
+        }
+
+        .preview-panel .panel-header {
+            background: linear-gradient(45deg, #a8edea 0%, #fed6e3 100%);
+            color: #495057;
+        }
+
+        .word-count {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        #markdown-input {
+            flex: 1;
+            border: none;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+            background: #fefefe;
+            color: #333;
+        }
+
+        #html-preview {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: white;
+            border-left: 1px solid #e9ecef;
+        }
+
+        #html-preview h1, #html-preview h2, #html-preview h3,
+        #html-preview h4, #html-preview h5, #html-preview h6 {
+            color: #2c3e50;
+            margin: 1em 0 0.5em 0;
+            line-height: 1.3;
+        }
+
+        #html-preview h1 { font-size: 2em; border-bottom: 2px solid #eee; padding-bottom: 0.3em; }
+        #html-preview h2 { font-size: 1.5em; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
+        #html-preview h3 { font-size: 1.3em; }
+
+        #html-preview p {
+            margin: 1em 0;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        #html-preview code {
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #c7254e;
+        }
+
+        #html-preview pre {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+
+        #html-preview pre code {
+            background: none;
+            color: #333;
+            padding: 0;
+        }
+
+        #html-preview blockquote {
+            border-left: 4px solid #4facfe;
+            margin: 1em 0;
+            padding: 0.5em 1em;
+            background: #f8f9ff;
+            color: #555;
+            font-style: italic;
+        }
+
+        #html-preview ul, #html-preview ol {
+            margin: 1em 0;
+            padding-left: 2em;
+        }
+
+        #html-preview li {
+            margin: 0.3em 0;
+            line-height: 1.6;
+        }
+
+        #html-preview table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1em 0;
+        }
+
+        #html-preview th, #html-preview td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        #html-preview th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        #html-preview a {
+            color: #4facfe;
+            text-decoration: none;
+        }
+
+        #html-preview a:hover {
+            text-decoration: underline;
+        }
+
+        #html-preview hr {
+            border: none;
+            border-top: 2px solid #eee;
+            margin: 2em 0;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.9rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 1fr;
+            }
+            
+            .header {
+                padding: 15px 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .controls {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <div class="icon">📝</div>
+                Markdown to HTML Converter
+            </h1>
+            <div class="controls">
+                <button class="btn" onclick="clearEditor()">Clear</button>
+                <button class="btn" onclick="copyHtml()">Copy HTML</button>
+                <button class="btn" onclick="downloadHtml()">Download</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="editor-panel">
+                <div class="panel-header">
+                    Markdown Editor
+                    <span class="word-count" id="word-count">0 words</span>
+                </div>
+                <textarea id="markdown-input" placeholder="# Welcome to Markdown!
+
+Type your Markdown here and see the HTML preview on the right...
+
+## Features
+- **Bold text**
+- *Italic text*
+- `Inline code`
+- [Links](https://example.com)
+- Lists and more!
+
+```javascript
+console.log('Code blocks work too!');
+```
+
+> Blockquotes are supported
+
+| Table | Support |
+|-------|---------|
+| Yes   | Indeed  |"></textarea>
+            </div>
+
+            <div class="preview-panel">
+                <div class="panel-header">
+                    HTML Preview
+                    <span class="word-count" id="html-size">0 chars</span>
+                </div>
+                <div id="html-preview"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Live Markdown to HTML Converter • Type in the editor to see real-time preview
+        </div>
+    </div>
+
+    <script>
+        // Simple Markdown to HTML converter
+        function markdownToHtml(markdown) {
+            let html = markdown;
+
+            // Headers
+            html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+            html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+            html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+
+            // Bold
+            html = html.replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>');
+            html = html.replace(/__(.*?)__/gim, '<strong>$1</strong>');
+
+            // Italic
+            html = html.replace(/\*(.*?)\*/gim, '<em>$1</em>');
+            html = html.replace(/_(.*?)_/gim, '<em>$1</em>');
+
+            // Code blocks
+            html = html.replace(/```([\s\S]*?)```/gim, '<pre><code>$1</code></pre>');
+
+            // Inline code
+            html = html.replace(/`(.*?)`/gim, '<code>$1</code>');
+
+            // Links
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2">$1</a>');
+
+            // Images
+            html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/gim, '<img alt="$1" src="$2" />');
+
+            // Blockquotes
+            html = html.replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>');
+
+            // Horizontal rules
+            html = html.replace(/^\-\-\-$/gim, '<hr>');
+
+            // Lists
+            html = html.replace(/^\* (.*$)/gim, '<li>$1</li>');
+            html = html.replace(/^\- (.*$)/gim, '<li>$1</li>');
+            html = html.replace(/^\+ (.*$)/gim, '<li>$1</li>');
+            html = html.replace(/^(\d+)\. (.*$)/gim, '<li>$1. $2</li>');
+
+            // Wrap consecutive list items in ul/ol tags
+            html = html.replace(/(<li>.*<\/li>)/gims, function(match) {
+                if (match.includes('<li>1.') || /\d+\./.test(match)) {
+                    return '<ol>' + match + '</ol>';
+                } else {
+                    return '<ul>' + match + '</ul>';
+                }
+            });
+
+            // Tables (basic support)
+            const lines = html.split('\n');
+            let inTable = false;
+            let tableHtml = '';
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                if (line.includes('|') && line !== '') {
+                    if (!inTable) {
+                        tableHtml += '<table>';
+                        inTable = true;
+                    }
+                    
+                    const cells = line.split('|').map(cell => cell.trim()).filter(cell => cell !== '');
+                    
+                    if (i < lines.length - 1 && lines[i + 1].includes('---')) {
+                        // Header row
+                        tableHtml += '<tr>';
+                        cells.forEach(cell => {
+                            tableHtml += `<th>${cell}</th>`;
+                        });
+                        tableHtml += '</tr>';
+                        i++; // Skip the separator line
+                    } else {
+                        // Data row
+                        tableHtml += '<tr>';
+                        cells.forEach(cell => {
+                            tableHtml += `<td>${cell}</td>`;
+                        });
+                        tableHtml += '</tr>';
+                    }
+                } else if (inTable) {
+                    tableHtml += '</table>';
+                    html = html.replace(new RegExp(lines.slice(i - getTableLength(lines, i), i + 1).join('\n')), tableHtml);
+                    tableHtml = '';
+                    inTable = false;
+                }
+            }
+            
+            if (inTable) {
+                tableHtml += '</table>';
+                html = html.replace(/\|.*\|/g, '') + tableHtml;
+            }
+
+            // Convert line breaks to paragraphs
+            html = html.replace(/\n\n/gim, '</p><p>');
+            html = '<p>' + html + '</p>';
+
+            // Clean up empty paragraphs and fix formatting
+            html = html.replace(/<p><\/p>/gim, '');
+            html = html.replace(/<p>(<h[1-6]>)/gim, '$1');
+            html = html.replace(/(<\/h[1-6]>)<\/p>/gim, '$1');
+            html = html.replace(/<p>(<ul>|<ol>|<blockquote>|<pre>|<table>)/gim, '$1');
+            html = html.replace(/(<\/ul>|<\/ol>|<\/blockquote>|<\/pre>|<\/table>)<\/p>/gim, '$1');
+            html = html.replace(/<p>(<hr>)<\/p>/gim, '$1');
+
+            return html;
+        }
+
+        function getTableLength(lines, currentIndex) {
+            let count = 0;
+            for (let i = currentIndex - 1; i >= 0; i--) {
+                if (lines[i].includes('|')) {
+                    count++;
+                } else {
+                    break;
+                }
+            }
+            return count;
+        }
+
+        function updatePreview() {
+            const markdown = document.getElementById('markdown-input').value;
+            const html = markdownToHtml(markdown);
+            document.getElementById('html-preview').innerHTML = html;
+
+            // Update counters
+            const wordCount = markdown.trim() === '' ? 0 : markdown.trim().split(/\s+/).length;
+            document.getElementById('word-count').textContent = wordCount + ' words';
+            document.getElementById('html-size').textContent = html.length + ' chars';
+        }
+
+        function clearEditor() {
+            document.getElementById('markdown-input').value = '';
+            updatePreview();
+        }
+
+        function copyHtml() {
+            const html = document.getElementById('html-preview').innerHTML;
+            navigator.clipboard.writeText(html).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        function downloadHtml() {
+            const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generated HTML</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        h1, h2, h3 { color: #333; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; }
+        pre { background: #f4f4f4; padding: 15px; border-radius: 4px; overflow-x: auto; }
+        blockquote { border-left: 4px solid #ddd; margin: 0; padding-left: 20px; color: #666; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+        th { background: #f4f4f4; }
+    </style>
+</head>
+<body>
+${document.getElementById('html-preview').innerHTML}
+</body>
+</html>`;
+
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'converted.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize
+        document.getElementById('markdown-input').addEventListener('input', updatePreview);
+        
+        // Load initial content
+        updatePreview();
+    </script>
+</body>
+</html>
